@@ -50,7 +50,7 @@ class ViewContainer implements ArrayAccess
         try {
             return $this->container->get($offset);
         } catch (\Exception $e) {
-            throw new \Exception(sprintf('No existe el helper <b>%s</b>', $offset));
+            throw new \Exception(sprintf('No existe el helper \"%s\"', $offset));
         }
     }
 

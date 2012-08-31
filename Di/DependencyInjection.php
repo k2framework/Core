@@ -43,7 +43,7 @@ class DependencyInjection implements DependencyInjectionInterface
     public function newInstance($id, $config)
     {
         if (!isset($config['class'])) {
-            throw new IndexNotDefinedException("No se Encontró el indice <b>class</b> en la definicón del servicio $id");
+            throw new IndexNotDefinedException("No se Encontró el indice \"class\" en la definicón del servicio \"$id\"");
         }
 
         $reflection = new ReflectionClass($config['class']);

@@ -56,7 +56,7 @@ class Container implements ContainerInterface
         //si no existe debemos crearlo
         //buscamos el servicio en el contenedor de servicios
         if (!$this->definitioManager->hasService($id)) {
-            throw new \Exception(sprintf('No existe el servicio <b>%s</b>', $id));
+            throw new \Exception(sprintf('No existe el servicio "%s"', $id));
         }
 
         $config = $this->definitioManager->getService($id)->getConfig();
