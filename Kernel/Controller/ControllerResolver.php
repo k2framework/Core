@@ -127,7 +127,7 @@ class ControllerResolver
         try {
             $reflectionClass = new ReflectionClass($controllerClass);
         } catch (\Exception $e) {
-            throw new NotFoundException(sprintf("No exite el controlador \"%s\" en el Módulo \"%s</b>", $controllerName, $module), 404);
+            throw new NotFoundException(sprintf("No exite el controlador \"%s\" en el Módulo \"%s\"", $controllerName, $module), 404);
         }
 
         //verifico si la clase hereda de Controller
@@ -145,13 +145,15 @@ class ControllerResolver
 
     public function executeAction($action, $arguments)
     {
+        $this->action = $action;
+        
         $controller = new ReflectionObject($this->controller);
 
         $this->executeBeforeFilter($controller);
 
         $this->validateAction($controller, $arguments);
-
-        $response = call_user_func_array(array($this->controller, $action), $arguments);
+        
+        $response = call_user_func_array(array($this->controller, $this->action), $arguments);
 
         $this->executeAfterFilter($controller);
 
