@@ -56,7 +56,7 @@ class ControllerResolver
                     //si no es un modulo, verificamos que sea un controlador.
                 } elseif (!$this->isController($this->camelcase($module), current($url))) {
                     //si no es ni modulo ni controller, lanzo la excepcion.
-                    throw new NotFoundException(sprintf("El primer patron de la Ruta <b>%s</b> No Coincide con ningun Módulo ni Controlador", current($url)), 404);
+                    throw new NotFoundException(sprintf("El primer patron de la Ruta \"%s\" No Coincide con ningun Módulo ni Controlador", current($url)), 404);
                 }
             }
         }
@@ -64,7 +64,7 @@ class ControllerResolver
         if (current($url)) {
             //si no es un controlador lanzo la excepcion
             if (!$this->isController($module, current($url))) {
-                throw new NotFoundException(sprintf("El controlador <b>%sController</b> para el Módulo <b>%s</b> no Existe", $controller, $module), 404);
+                throw new NotFoundException(sprintf("El controlador \"%sController\" para el Módulo \"%s\" no Existe", $controller, $module), 404);
             }
             $controller = $this->camelcase(current($url));
             next($url);
@@ -127,7 +127,7 @@ class ControllerResolver
         try {
             $reflectionClass = new ReflectionClass($controllerClass);
         } catch (\Exception $e) {
-            throw new NotFoundException(sprintf("No exite el controlador <b>%s</b> en el Módulo <b>%s</b>", $controllerName, $module), 404);
+            throw new NotFoundException(sprintf("No exite el controlador \"%s\" en el Módulo \"%s</b>", $controllerName, $module), 404);
         }
 
         //verifico si la clase hereda de Controller
@@ -157,29 +157,29 @@ class ControllerResolver
 
         //verificamos la existencia del metodo.
         if (!$reflectionClass->hasMethod($action)) {
-            throw new NotFoundException(sprintf("No exite el metodo <b>%s</b> en el controlador <b>%s</b>", $action, $controllerName), 404);
+            throw new NotFoundException(sprintf("No exite el metodo \"%s\" en el controlador \"%s\"", $action, $controllerName), 404);
         }
 
         $reflectionMethod = $reflectionClass->getMethod($action);
 
         //verificamos que no sea el constructor a quien se llama
         if ($reflectionMethod->isConstructor()) {
-            throw new NotFoundException(sprintf("Se está intentando ejecutar el constructor del controlador como una acción, en el controlador <b>%s</b>", $controllerName), 404);
+            throw new NotFoundException(sprintf("Se está intentando ejecutar el constructor del controlador como una acción, en el controlador \"%s\"", $controllerName), 404);
         }
 
         if (in_array($action, array('beforeFilter', 'afterFilter'))) {
-            throw new NotFoundException(sprintf("Se está intentando ejecutar el filtro <b>%s</b> del controlador <b>%s</b>", $action, $controllerName), 404);
+            throw new NotFoundException(sprintf("Se está intentando ejecutar el filtro \"%s\" del controlador \"%s\"", $action, $controllerName), 404);
         }
 
         //el nombre del metodo debe ser exactamente igual al camelCase
         //de la porcion de url
         if ($reflectionMethod->getName() !== $action) {
-            throw new NotFoundException(sprintf("No exite el metodo <b>%s</b> en el controlador <b>%s</b>", $action, $controllerName), 404);
+            throw new NotFoundException(sprintf("No exite el metodo <b>%s</b> en el controlador \"%s\"", $action, $controllerName), 404);
         }
 
         //se verifica que el metodo sea public
         if (!$reflectionMethod->isPublic()) {
-            throw new NotFoundException(sprintf("Éstas Tratando de acceder a un metodo no publico <b>%s</b> en el controlador <b>%s</b>", $action, $controllerName), 404);
+            throw new NotFoundException(sprintf("Éstas Tratando de acceder a un metodo no publico \"%s\" en el controlador \"%s\"", $action, $controllerName), 404);
         }
 
         //verificamos si el primer parametro del metodo requiere una
@@ -196,7 +196,7 @@ class ControllerResolver
         if ($limitParams && (count($params) < $reflectionMethod->getNumberOfRequiredParameters() ||
                 count($params) > $reflectionMethod->getNumberOfParameters())) {
 
-            throw new NotFoundException(sprintf("Número de parámetros erróneo para ejecutar la acción <b>%s</b> en el controlador <b>%s</b>", $action, $controllerName), 404);
+            throw new NotFoundException(sprintf("Número de parámetros erróneo para ejecutar la acción \"%s\" en el controlador \"%s\"", $action, $controllerName), 404);
         }
 
         return array($this->controller, $action, $params);
@@ -208,7 +208,17 @@ class ControllerResolver
         if ($reflectionObject->hasMethod('beforeFilter')) {
             $method = $reflectionObject->getMethod('beforeFilter');
             $method->setAccessible(TRUE);
-            $method->invoke($this->controller);
+            if (NULL !== $result = $method->invoke($this->controller)) {
+                if ( !is_string($result) ){
+                    throw new NotFoundException(sprintf("El método \"beforeFilter\" solo puede devolver una cadena, en el Controlador \"%sController\"", $this->contShortName));                    
+                }
+                if (!$reflectionObject->hasMethod($result)) {
+                    throw new NotFoundException(sprintf("El método \"beforeFilter\" está devolviendo el nombre de una acción inexistente \"%s\" en el Controlador \"%sController\"", $result, $this->contShortName));
+                }
+                //si el beforeFilter del controlador devuelve un valor, el mismo será
+                //usado como el nuevo nombre de la acción a ejecutar.
+                $action = $result;
+            }
         }
 
         $response = call_user_func_array(array($this->controller, $action), $arguments);
