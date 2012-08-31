@@ -1,10 +1,10 @@
 <?php
 
-namespace KumbiaPHP\KumbiaActiveRecord;
+namespace KumbiaPHP\ActiveRecord;
 
 use ActiveRecord\Model;
 use ActiveRecord\Config\Config;
-use KumbiaPHP\KumbiaActiveRecord\Config\Reader;
+use KumbiaPHP\ActiveRecord\Config\Reader;
 use KumbiaPHP\Validation\Validatable;
 use KumbiaPHP\Validation\ValidationBuilder;
 

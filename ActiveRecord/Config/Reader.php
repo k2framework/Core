@@ -1,6 +1,6 @@
 <?php
 
-namespace KumbiaPHP\KumbiaActiveRecord\Config;
+namespace KumbiaPHP\ActiveRecord\Config;
 
 use \AppKernel;
 use ActiveRecord\Config\Parameters;
