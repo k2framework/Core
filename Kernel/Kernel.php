@@ -23,51 +23,71 @@ require_once __DIR__ . '/KernelInterface.php';
 Autoload::register();
 
 /**
- * Description of Kernel
+ * Kernel del FW
  *
  * @author manuel
  */
 abstract class Kernel implements KernelInterface
 {
 
+    /**
+     * Arreglo con los namespaces definidos en la aplicación
+     * @var array 
+     */
     protected $namespaces;
+
+    /**
+     * Arreglo con los prefijos de las rutas para los modulos usados en la aplicación
+     * @var array 
+     */
     protected $routes;
 
     /**
+     * Objeto inyector de dependencias
      *
      * @var DependencyInjection
      */
     protected $di;
 
     /**
+     * Objeto contenedor de servicios
      *  
      * @var Container
      */
     protected static $container;
 
     /**
+     * Objeto Request
      *
      * @var Request 
      */
     protected $request;
 
     /**
-     *  @var EventDispatcher
+     * Objeto despachador de eventos
+     * @var EventDispatcher
      */
     protected $dispatcher;
 
     /**
-     *
+     * Indica si la aplicación está ó no en producción
      * @var boolean 
      */
     protected $production;
 
     /**
-     *
+     * ruta hacia la carpeta app del fw 
      * @var string
      */
     protected $appPath;
 
+    /**
+     * Constructor de la clase. 
+     * 
+     * La instancia del kernel se crea en proyecto/public/index.php
+     * 
+     * @param boolean $production indica si estamos en producción ó no.
+     */
     public function __construct($production = FALSE)
     {
         ob_start(); //arrancamos el buffer de salida.
@@ -89,6 +109,12 @@ abstract class Kernel implements KernelInterface
         $this->routes = $this->registerRoutes();
     }
 
+    /**
+     * Inicializa las clases basicas del fw.
+     * 
+     * AppContext, Container, Inyector de dependencias, Dispatcher, etc.
+     *  
+     */
     protected function init()
     {
         //creamos la instancia del AppContext
@@ -111,7 +137,9 @@ abstract class Kernel implements KernelInterface
         self::$container->set('app.context', $context);
     }
 
-    //put your code here
+    /**
+     * {inherit}
+     */
     public function execute(Request $request)
     {
         $this->request = $request;
@@ -163,7 +191,7 @@ abstract class Kernel implements KernelInterface
     }
 
     /**
-     *
+     * Devuelve el objeto container
      * @return \KumbiaPHP\Di\Container\ContainerInterface 
      */
     public static function getContainer()
@@ -171,10 +199,24 @@ abstract class Kernel implements KernelInterface
         return self::$container;
     }
 
+    /**
+     * clase abstracta que está implementada en el AppKernel de la carpeta app
+     * del proyecto, donde se especifican las rutas y los namespaces que trabajará 
+     * la aplicación, permite instalar librerias, etc.
+     */
     abstract protected function registerNamespaces();
 
+    /**
+     * clase abstracta que está implementada en el AppKernel de la carpeta app
+     * del proyecto, donde se especificarán en un arreglo los prefijos de rutas
+     * que tendran los modulos de la aplicación.
+     */
     abstract protected function registerRoutes();
 
+    /**
+     * devuelve la ruta a la carpeta app del proyecto.
+     * @return string 
+     */
     private function getAppPath()
     {
         if (!$this->appPath) {
@@ -186,6 +228,8 @@ abstract class Kernel implements KernelInterface
 
     /**
      * Esta función inicializa el contenedor de servicios.
+     * @param Parameters $config toda la configuracion de los archivos de config
+     * de cada lib y modulo compilados en uno solo.
      */
     protected function initContainer(Parameters $config)
     {
@@ -205,6 +249,10 @@ abstract class Kernel implements KernelInterface
         self::$container = new Container($this->di, $definitions);
     }
 
+    /**
+     * Inicializa el despachador de eventos
+     * @param Parameters $config config de todo el proyecto.
+     */
     protected function initDispatcher(Parameters $config)
     {
         $this->dispatcher = new EventDispatcher(self::$container);

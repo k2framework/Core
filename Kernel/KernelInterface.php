@@ -6,6 +6,10 @@ use KumbiaPHP\Kernel\Request;
 use KumbiaPHP\Di\Container\ContainerInterface;
 
 /**
+ * Interface base para el kernel del FW
+ * 
+ * Contiene los metodos minimos a implementar por un kernel para correr
+ * una petición.
  *
  * @author manuel
  */
@@ -13,9 +17,10 @@ interface KernelInterface
 {
 
     /**
-     * @param Request $request
-     * 
-     * @return Response 
+     * Metodó que ejecuta todo el proceso de la ejecucion de la petición.
+     * @param Request $request objeto que contiene toda la info de la petición 
+     * @return Response objeto respuesta
+     * @throws \LogicException excepcion si no se puede devolver una respuesta
      */
     public function execute(Request $request);
     
