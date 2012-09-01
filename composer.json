@@ -6,4 +6,5 @@
             "KumbiaPHP": "src/"
         }
     }
+    "target-dir": "../../"
 }
