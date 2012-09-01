@@ -48,11 +48,13 @@ class Request
      * @var SessionInterface 
      */
     protected $session;
+
     /**
      *
      * @var string 
      */
     private $baseUrl;
+    protected $content = FALSE;
 
     public function __construct()
     {
@@ -61,6 +63,15 @@ class Request
         $this->query = new Parameters($_GET);
         $this->cookies = new Parameters($_COOKIE);
         $this->files = new Parameters($_FILES);
+
+        if (0 === strpos($this->server->get('CONTENT_TYPE'), 'application/x-www-form-urlencoded')
+                && in_array($this->server->get('REQUEST_METHOD'), array('PUT', 'DELETE'))
+        ) {
+            parse_str($this->getContent(), $data);
+            $this->request = new Parameters($data);
+        } elseif (0 === strpos($this->server->get('CONTENT_TYPE'), 'application/json')) {
+            $this->request = new Parameters((array) json_decode($this->getContent(), TRUE));
+        }
     }
 
     public function get($key, $default = NULL)
@@ -116,14 +127,22 @@ class Request
         return $this->baseUrl;
     }
 
-    private function createBaseUrl()
-    {
-        return dirname($this->server->get('SCRIPT_NAME')) . '/';
-    }
-
     public function getRequestUrl()
     {
         return $this->query->get('_url', '/');
+    }
+
+    public function getContent()
+    {
+        if (FALSE === $this->content) {
+            $this->content = file_get_contents('php://input');
+        }
+        return $this->content;
+    }
+
+    private function createBaseUrl()
+    {
+        return dirname($this->server->get('SCRIPT_NAME')) . '/';
     }
 
 }

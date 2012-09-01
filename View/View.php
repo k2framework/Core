@@ -84,7 +84,7 @@ class View
             $file = rtrim($app->getAppPath(), '/') . '/view/templates/' . $template[0] . '.phtml';
         }
         if (!file_exists($file)) {
-            throw new \LogicException(sprintf("No existe El Template <b>%s</b> en <b>%s</b>", basename($file), $file));
+            throw new \LogicException(sprintf("No existe El Template \"%s\" en \"%s\"", basename($file), $file));
         }
         return $file;
     }
@@ -98,7 +98,7 @@ class View
         $file = rtrim($app->getModules($module), '/') . '/' . $module .
                 '/View/' . $controller . '/' . $view . '.phtml';
         if (!file_exists($file)) {
-            throw new \LogicException(sprintf("No existe la Vista <b>%s</b> en <b>%s</b>", basename($file), $file));
+            throw new \LogicException(sprintf("No existe la Vista \"%s\" en \"%s\"", basename($file), $file));
         }
         return $file;
     }

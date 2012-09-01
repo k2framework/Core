@@ -64,4 +64,29 @@ class Parameters implements \Serializable
         $this->params = unserialize($serialized);
     }
 
+    public function keys()
+    {
+        return array_keys($this->params);
+    }
+
+    public function getInt($key, $default = 0)
+    {
+        return (int) $this->get($key, $default, $deep);
+    }
+
+    public function getDigits($key, $default = '')
+    {
+        return preg_replace('/[^[:digit:]]/', '', $this->get($key, $default));
+    }
+
+    public function getAlnum($key, $default = '')
+    {
+        return preg_replace('/[^[:alnum:]]/', '', $this->get($key, $default));
+    }
+
+    public function getAlpha($key, $default = '')
+    {
+        return preg_replace('/[^[:alpha:]]/', '', $this->get($key, $default));
+    }
+
 }

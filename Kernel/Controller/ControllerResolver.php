@@ -56,7 +56,7 @@ class ControllerResolver
                     //si no es un modulo, verificamos que sea un controlador.
                 } elseif (!$this->isController($this->camelcase($module), current($url))) {
                     //si no es ni modulo ni controller, lanzo la excepcion.
-                    throw new NotFoundException(sprintf("El primer patron de la Ruta <b>%s</b> No Coincide con ningun Módulo ni Controlador", current($url)), 404);
+                    throw new NotFoundException(sprintf("No existe el Módulo \"%s\"", current($url)), 404);
                 }
             }
         }
@@ -64,7 +64,7 @@ class ControllerResolver
         if (current($url)) {
             //si no es un controlador lanzo la excepcion
             if (!$this->isController($module, current($url))) {
-                throw new NotFoundException(sprintf("El controlador <b>%sController</b> para el Módulo <b>%s</b> no Existe", $controller, $module), 404);
+                throw new NotFoundException(sprintf("El controlador \"%sController\" para el Módulo \"%s\" no Existe", $controller, $module), 404);
             }
             $controller = $this->camelcase(current($url));
             next($url);
@@ -127,7 +127,7 @@ class ControllerResolver
         try {
             $reflectionClass = new ReflectionClass($controllerClass);
         } catch (\Exception $e) {
-            throw new NotFoundException(sprintf("No exite el controlador <b>%s</b> en el Módulo <b>%s</b>", $controllerName, $module), 404);
+            throw new NotFoundException(sprintf("No exite el controlador \"%s\" en el Módulo \"%s\"", $controllerName, $module), 404);
         }
 
         //verifico si la clase hereda de Controller
@@ -140,84 +140,22 @@ class ControllerResolver
             $this->controller = $reflectionClass->newInstance();
         }
 
-
-        if ($reflectionClass->hasProperty('limitParams')) {
-            $limitParams = $reflectionClass->getProperty('limitParams');
-            $limitParams->setAccessible(true);
-            $limitParams = $limitParams->getValue($this->controller);
-        } else {
-            $limitParams = TRUE; //por defeto siempre limita los parametro
-        }
-
-        if ($reflectionClass->hasProperty('parameters')) {
-            $parameters = $reflectionClass->getProperty('parameters');
-            $parameters->setAccessible(true);
-            $parameters->setValue($this->controller, $params);
-        }
-
-        //verificamos la existencia del metodo.
-        if (!$reflectionClass->hasMethod($action)) {
-            throw new NotFoundException(sprintf("No exite el metodo <b>%s</b> en el controlador <b>%s</b>", $action, $controllerName), 404);
-        }
-
-        $reflectionMethod = $reflectionClass->getMethod($action);
-
-        //verificamos que no sea el constructor a quien se llama
-        if ($reflectionMethod->isConstructor()) {
-            throw new NotFoundException(sprintf("Se está intentando ejecutar el constructor del controlador como una acción, en el controlador <b>%s</b>", $controllerName), 404);
-        }
-
-        if (in_array($action, array('beforeFilter', 'afterFilter'))) {
-            throw new NotFoundException(sprintf("Se está intentando ejecutar el filtro <b>%s</b> del controlador <b>%s</b>", $action, $controllerName), 404);
-        }
-
-        //el nombre del metodo debe ser exactamente igual al camelCase
-        //de la porcion de url
-        if ($reflectionMethod->getName() !== $action) {
-            throw new NotFoundException(sprintf("No exite el metodo <b>%s</b> en el controlador <b>%s</b>", $action, $controllerName), 404);
-        }
-
-        //se verifica que el metodo sea public
-        if (!$reflectionMethod->isPublic()) {
-            throw new NotFoundException(sprintf("Éstas Tratando de acceder a un metodo no publico <b>%s</b> en el controlador <b>%s</b>", $action, $controllerName), 404);
-        }
-
-        //verificamos si el primer parametro del metodo requiere una
-        //instancia de Request
-        $parameters = $reflectionMethod->getParameters();
-        //si espera parametros y el un objeto lo que espera
-        if (count($parameters) && $parameters[0]->getClass()) {
-            //le pasamos el Request actual
-            array_unshift($params, $this->container->get('request'));
-        }
-        /**
-         * Verificamos que los parametros coincidan 
-         */
-        if ($limitParams && (count($params) < $reflectionMethod->getNumberOfRequiredParameters() ||
-                count($params) > $reflectionMethod->getNumberOfParameters())) {
-
-            throw new NotFoundException(sprintf("Número de parámetros erróneo para ejecutar la acción <b>%s</b> en el controlador <b>%s</b>", $action, $controllerName), 404);
-        }
-
         return array($this->controller, $action, $params);
     }
 
     public function executeAction($action, $arguments)
     {
-        $reflectionObject = new ReflectionObject($this->controller);
-        if ($reflectionObject->hasMethod('beforeFilter')) {
-            $method = $reflectionObject->getMethod('beforeFilter');
-            $method->setAccessible(TRUE);
-            $method->invoke($this->controller);
-        }
+        $this->action = $action;
+        
+        $controller = new ReflectionObject($this->controller);
 
-        $response = call_user_func_array(array($this->controller, $action), $arguments);
+        $this->executeBeforeFilter($controller);
 
-        if ($reflectionObject->hasMethod('afterFilter')) {
-            $method = $reflectionObject->getMethod('afterFilter');
-            $method->setAccessible(TRUE);
-            $method->invoke($this->controller);
-        }
+        $this->validateAction($controller, $arguments);
+        
+        $response = call_user_func_array(array($this->controller, $this->action), $arguments);
+
+        $this->executeAfterFilter($controller);
 
         return $response;
     }
@@ -227,7 +165,7 @@ class ControllerResolver
         return get_object_vars($this->controller);
     }
 
-    public function getView($action)
+    public function getView()
     {
         return $this->getParamValue('view');
     }
@@ -241,6 +179,104 @@ class ControllerResolver
     {
         $namespaces = $this->container->get('app.context')->getModules();
         return rtrim($namespaces[$this->module] . '/') . '/' . $this->module;
+    }
+
+    protected function validateAction(\ReflectionObject $controller, array $params)
+    {
+        if ($controller->hasProperty('limitParams')) {
+            $limitParams = $controller->getProperty('limitParams');
+            $limitParams->setAccessible(true);
+            $limitParams = $limitParams->getValue($this->controller);
+        } else {
+            $limitParams = TRUE; //por defeto siempre limita los parametro
+        }
+
+//        if ($controller->hasProperty('parameters')) {
+//            $parameters = $controller->getProperty('parameters');
+//            $parameters->setAccessible(true);
+//            $parameters->setValue($this->controller, $params);
+//        }
+        //verificamos la existencia del metodo.
+        if (!$controller->hasMethod($this->action)) {
+            throw new NotFoundException(sprintf("No exite el metodo \"%s\" en el controlador \"%sController\"", $this->action, $this->contShortName), 404);
+        }
+
+        $reflectionMethod = $controller->getMethod($this->action);
+
+        //verificamos que no sea el constructor a quien se llama
+        if ($reflectionMethod->isConstructor()) {
+            throw new NotFoundException(sprintf("Se está intentando ejecutar el constructor del controlador como una acción, en el controlador \"%sController\"", $this->contShortName), 404);
+        }
+
+        if (in_array($this->action, array('beforeFilter', 'afterFilter'))) {
+            throw new NotFoundException(sprintf("Se está intentando ejecutar el filtro \"%s\" del controlador \"%sController\"", $this->action, $this->contShortName), 404);
+        }
+
+        //el nombre del metodo debe ser exactamente igual al camelCase
+        //de la porcion de url
+        if ($reflectionMethod->getName() !== $this->action) {
+            throw new NotFoundException(sprintf("No exite el metodo <b>%s</b> en el controlador \"%sController\"", $this->action, $this->contShortName), 404);
+        }
+
+        //se verifica que el metodo sea public
+        if (!$reflectionMethod->isPublic()) {
+            throw new NotFoundException(sprintf("Éstas Tratando de acceder a un metodo no publico \"%s\" en el controlador \"%sController\"", $this->action, $this->contShortName), 404);
+        }
+
+        //verificamos si el primer parametro del metodo requiere una
+        //instancia de Request
+        $parameters = $reflectionMethod->getParameters();
+        //si espera parametros y es un objeto lo que espera
+        if (count($parameters) && $parameters[0]->getClass()) {
+            //le pasamos el Request actual
+            array_unshift($params, $this->container->get('request'));
+        }
+        /**
+         * Verificamos que los parametros coincidan 
+         */
+        if ($limitParams && (count($params) < $reflectionMethod->getNumberOfRequiredParameters() ||
+                count($params) > $reflectionMethod->getNumberOfParameters())) {
+
+            throw new NotFoundException(sprintf("Número de parámetros erróneo para ejecutar la acción \"%s\" en el controlador \"%sController\"", $action, $this->contShortName), 404);
+        }
+    }
+
+    protected function executeBeforeFilter(ReflectionObject $controller)
+    {
+        if ($controller->hasMethod('beforeFilter')) {
+            $method = $controller->getMethod('beforeFilter');
+            $method->setAccessible(TRUE);
+            //verificamos si el primer parametro del beforeFilter requiere una
+            //instancia de Request
+            $parameters = $method->getParameters();
+            //si espera parametros y es un objeto lo que espera
+            if (count($parameters) && $parameters[0]->getClass()) {
+                //le pasamos el Request actual
+                $request = $this->container->get('request');
+            } else {
+                $request = NULL;
+            }
+            if (NULL !== $result = $method->invoke($this->controller, $request)) {
+                if (!is_string($result)) {
+                    throw new NotFoundException(sprintf("El método \"beforeFilter\" solo puede devolver una cadena, en el Controlador \"%sController\"", $this->contShortName));
+                }
+                if (!$controller->hasMethod($result)) {
+                    throw new NotFoundException(sprintf("El método \"beforeFilter\" está devolviendo el nombre de una acción inexistente \"%s\" en el Controlador \"%sController\"", $result, $this->contShortName));
+                }
+                //si el beforeFilter del controlador devuelve un valor, el mismo será
+                //usado como el nuevo nombre de la acción a ejecutar.
+                $this->action = $result;
+            }
+        }
+    }
+
+    protected function executeAfterFilter(ReflectionObject $controller)
+    {
+        if ($controller->hasMethod('afterFilter')) {
+            $method = $controller->getMethod('afterFilter');
+            $method->setAccessible(TRUE);
+            $method->invoke($this->controller);
+        }
     }
 
     protected function getParamValue($propertie)
