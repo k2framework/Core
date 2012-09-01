@@ -7,6 +7,7 @@ use KumbiaPHP\Di\DependencyInjectionInterface as Di;
 use KumbiaPHP\Di\Definition\DefinitionManager;
 use KumbiaPHP\Di\Container\Services;
 use KumbiaPHP\Di\Definition\Service;
+use KumbiaPHP\Di\Exception\IndexNotDefinedException;
 
 /**
  * Description of Container
@@ -56,7 +57,7 @@ class Container implements ContainerInterface
         //si no existe debemos crearlo
         //buscamos el servicio en el contenedor de servicios
         if (!$this->definitioManager->hasService($id)) {
-            throw new \Exception(sprintf('No existe el servicio "%s"', $id));
+            throw new IndexNotDefinedException(sprintf('No existe el servicio "%s"', $id));
         }
 
         $config = $this->definitioManager->getService($id)->getConfig();
