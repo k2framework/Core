@@ -199,11 +199,11 @@ class ControllerResolver
             $limitParams = TRUE; //por defeto siempre limita los parametro
         }
 
-//        if ($controller->hasProperty('parameters')) {
-//            $parameters = $controller->getProperty('parameters');
-//            $parameters->setAccessible(true);
-//            $parameters->setValue($this->controller, $params);
-//        }
+        if ($controller->hasProperty('parameters')) {
+            $parameters = $controller->getProperty('parameters');
+            $parameters->setAccessible(true);
+            $parameters->setValue($this->controller, $params);
+        }
         //verificamos la existencia del metodo.
         if (!$controller->hasMethod($this->action)) {
             throw new NotFoundException(sprintf("No exite el metodo \"%s\" en el controlador \"%sController\"", $this->action, $this->contShortName), 404);
