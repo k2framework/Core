@@ -3,7 +3,7 @@
 namespace KumbiaPHP\Di\Exception;
 
 /**
- * Description of IndexNotDefinedException
+ * Excepcion lanzada si no existe un servicio
  *
  * @author manuel
  */

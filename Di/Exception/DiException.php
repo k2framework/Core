@@ -3,7 +3,7 @@
 namespace KumbiaPHP\Di\Exception;
 
 /**
- * Description of DiException
+ * Excepciones del inyector de dependencias
  *
  * @author manuel
  */

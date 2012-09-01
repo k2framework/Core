@@ -5,7 +5,8 @@ namespace KumbiaPHP\Di\Definition;
 use KumbiaPHP\Di\Definition\DefinitionInterface;
 
 /**
- * Description of ParameterDefinition
+ * Define un parametro, que no es mas que el valor de un indice especificado
+ * en la seccion [congif] de los archivos de configuracion del FW
  *
  * @author maguirre
  */
