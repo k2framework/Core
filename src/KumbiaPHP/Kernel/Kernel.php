@@ -17,11 +17,6 @@ use KumbiaPHP\Di\Container\Container;
 use KumbiaPHP\Di\Definition\DefinitionManager;
 use KumbiaPHP\Kernel\Exception\ExceptionHandler;
 
-require_once __DIR__ . '/../Loader/Autoload.php';
-require_once __DIR__ . '/KernelInterface.php';
-
-Autoload::register();
-
 /**
  * Kernel del FW
  *
@@ -96,6 +91,10 @@ abstract class Kernel implements KernelInterface
         Autoload::registerDirectories(
                 $this->namespaces = $this->registerNamespaces()
         );
+        
+        Autoload::register();
+        
+        ExceptionHandler::handle($this);
 
         if ($production) {
             error_reporting(0);
@@ -104,7 +103,6 @@ abstract class Kernel implements KernelInterface
             error_reporting(-1);
             ini_set('display_errors', 'On');
         }
-        ExceptionHandler::handle($this);
 
         $this->routes = $this->registerRoutes();
     }
