@@ -5,13 +5,18 @@ namespace KumbiaPHP\Kernel;
 use KumbiaPHP\Kernel\Response;
 
 /**
- * Description of RedirectResponse
+ * Respuesta para hacer redirecciones
  *
  * @author maguirre
  */
 class RedirectResponse extends Response
 {
 
+    /**
+     * Url a la que se va a redireccionar
+     * @param string $url
+     * @param int $status 
+     */
     public function __construct($url, $status = 302)
     {
         parent::__construct(sprintf('<!DOCTYPE html>
