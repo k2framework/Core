@@ -8,15 +8,15 @@ use KumbiaPHP\Di\Exception\IndexNotDefinedException;
 use \ReflectionClass;
 
 /**
- * @Service(mi_servicio,$propiedad)
- * @Service( otro, $otraPropiedad)
- *
+ * Clase inyectora de dependencias de los servicios en el FW
+ * 
  * @author manuel
  */
 class DependencyInjection implements DependencyInjectionInterface
 {
 
     /**
+     *  Contenedor de servicios
      *  @var Container
      */
     protected $container;
@@ -33,13 +33,24 @@ class DependencyInjection implements DependencyInjectionInterface
      * @var array 
      */
     private $queue = array();
+    /**
+     * Indica si se le estan inyectando servicios a un elemento que ya estaba en
+     * la cola y solicitó servicios que no habian sido creados aun.
+     * @var type 
+     */
     private $isQueue = FALSE;
 
+    /**
+     * {inherit}
+     */
     public function setContainer(Container $container)
     {
         $this->container = $container;
     }
 
+    /**
+     * {inherit}
+     */
     public function newInstance($id, $config)
     {
         if (!isset($config['class'])) {
@@ -73,6 +84,14 @@ class DependencyInjection implements DependencyInjectionInterface
         return $instance;
     }
 
+    /**
+     * Obtiene los valores para los argumentos del constructor
+     * a partir de la configuración definida para el servicio.
+     * 
+     * @param string $id nombre del servico
+     * @param array $config configuracion propia del servicio
+     * @return array devuelve los valores para los argumentos del constructor 
+     */
     protected function getArgumentsFromConstruct($id, array $config)
     {
         $args = array();
@@ -102,8 +121,13 @@ class DependencyInjection implements DependencyInjectionInterface
     }
 
     /**
-     *
-     * @param type $class 
+     * Inserta las demas dependencias en la instancia que se crea a traves
+     * de metodos public de la clase.
+     * 
+     * @param string $id nombre del servicio
+     * @param object $object instancia recien creado
+     * @param array $calls arreglo con los nombres de los metodos a llamar y
+     * los sercicios que estos metodos esperan
      */
     protected function setOtherDependencies($id, $object, array $calls)
     {
@@ -138,17 +162,35 @@ class DependencyInjection implements DependencyInjectionInterface
         return isset($this->queue[$id]);
     }
 
+    /**
+     * Cuando un servicio está solicitando una instancia de otro servicio que
+     * aun no existe, el servicio actual pasa a una cola de servicios que esperan
+     * por la creación de las instancias que necesitan.
+     *  
+     * @param string $id nombre del servicio
+     * @param array $config configuracion del servicio
+     * @throws LogicException si se está agregando a un servicio que ya está en la
+     * cola de servicios y no esta activada la variable "isQueue" que indica que
+     * estamos inyectando servicios a uno de la cola, significa que hay una dependencia
+     * que no se puede resolver. ejemplo de ello es un servicio A que en el constructor
+     * espera la instancia de un servicio B que en el constructor espera una 
+     * instancia del servicio A.
+     */
     protected function addToQueue($id, $config)
     {
         //si el servicio actual aparece en la cola de servicios
         //indica que dicho servicio tiene una dependencia a un servicio 
         //que depende de este, por lo que hay una dependencia circular.
         if (!$this->isQueue && $this->inQueue($id)) {
-            throw new \Exception("Se ha Detectado una Dependencia Circular entre Servicios");
+            throw new \LogicException("Se ha Detectado una Dependencia Circular entre Servicios");
         }
         $this->queue[$id] = $config;
     }
 
+    /**
+     * Quita un servicio de la cola de servicios en espera.
+     * @param string $id nombre del servicio
+     */
     protected function removeToQueue($id)
     {
         if ($this->inQueue($id)) {
