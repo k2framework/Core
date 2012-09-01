@@ -2,7 +2,7 @@
     "name": "kumbiaphp/kumbiaphp",
      "autoload": {
         "psr-0": { 
-            "KumbiaPHP": "../" 
+            "KumbiaPHP": "/../" 
         }
     }
 }
