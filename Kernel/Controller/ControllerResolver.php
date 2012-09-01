@@ -135,7 +135,7 @@ class ControllerResolver
         try {
             $reflectionClass = new ReflectionClass($controllerClass);
         } catch (\Exception $e) {
-            throw new NotFoundException(sprintf("No exite el controlador \"%s\" en el Módulo \"%s\"", $controllerName, $currentPath), 404);
+            throw new NotFoundException(sprintf("No exite el controlador \"%s\" en el Módulo \"%sController/\"", $controllerName, $currentPath), 404);
         }
 
         //verifico si la clase hereda de Controller
