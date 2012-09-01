@@ -83,8 +83,8 @@ abstract class Kernel implements KernelInterface
         } else {
             error_reporting(-1);
             ini_set('display_errors', 'On');
-            ExceptionHandler::handle($this);
         }
+        ExceptionHandler::handle($this);
 
         $this->routes = $this->registerRoutes();
     }
@@ -92,7 +92,7 @@ abstract class Kernel implements KernelInterface
     protected function init()
     {
         //creamos la instancia del AppContext
-        $context = new AppContext($this->request, $this->production, $this->getAppPath(), $this->routes,$this->namespaces);
+        $context = new AppContext($this->request, $this->production, $this->getAppPath(), $this->routes, $this->namespaces);
         //leemos la config de la app
         $config = new ConfigContainer($context);
         //iniciamos el container con esa config
