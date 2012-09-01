@@ -1,3 +1,9 @@
 {
-    "name": "kumbiaphp/kumbiaphp"
+    "name": "kumbiaphp/kumbiaphp",
+     "autoload": {
+        "psr-0": { 
+            "KumbiaPHP": "../" 
+        }
+    },
+    "target-dir": "Symfony/Bundle/TwigBundle",
 }
