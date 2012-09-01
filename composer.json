@@ -1,5 +1,7 @@
 {
     "name": "kumbiaphp111/kumbiaphp",
     "type": "library",
-    "target-dir": "KumbiaPHP"
+    "autoload": {
+        "psr-0":{ "KumbiaPHP": "lib/"}
+    }
 }
