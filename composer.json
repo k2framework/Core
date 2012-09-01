@@ -1,7 +1,9 @@
 {
-    "name": "kumbiaphp/kumbiaphp",
+    "name": "kumbiaphp/KumbiaPHP",
     "type": "library",
     "autoload": {
-        "psr-0":{ "KumbiaPHP": "src/"}
+        "psr-0":{ 
+            "KumbiaPHP": "src/"
+        }
     }
 }
