@@ -1,8 +1,4 @@
 {
-    "name": "kumbiaphp111/kumbiaphp",
-     "autoload": {
-        "psr-0": { 
-            "KumbiaPHP": "/../" 
-        }
-    }
+    "name": "kumbiaphp/kumbiaphp",
+    "type": "library"
 }
