@@ -36,20 +36,24 @@ class ControllerResolver
         $action = 'index'; //accion por defecto si no se especifica.
         $params = array(); //parametros de la url, de existir.
         //obtenemos la url actual de la petición.
-        $url = '/' . trim($this->container->get('app.context')->getCurrentUrl(), '/');
+        $currentUrl = '/' . trim($this->container->get('app.context')->getCurrentUrl(), '/');
 
-        if (!$module = $this->getModule($url)) {
-            throw new NotFoundException(sprintf("No existe un módulo para la ruta \"%s\"", $url), 404);
+        if (!$module = $this->getModule($currentUrl)) {
+            throw new NotFoundException(sprintf("La ruta \"%s\" no concuerda con ningún módulo ni controlador en la App", $currentUrl), 404);
         }
 
-        if ($url = explode('/', trim(substr($url, strlen($module)), '/'))) {
+        if ($url = explode('/', trim(substr($currentUrl, strlen($module)), '/'))) {
 
             //ahora obtengo el controlador
             if (current($url)) {
                 //si no es un controlador lanzo la excepcion
                 if (!$this->isController($module, current($url))) {
                     $controller = $this->camelcase(current($url));
-                    throw new NotFoundException(sprintf("El controlador \"%sController\" para el Módulo \"%s\" no Existe", $controller, $module), 404);
+                    if ('/' !== $module) {
+                        throw new NotFoundException(sprintf("El controlador \"%sController\" para el Módulo \"%s\" no Existe", $controller, $module), 404);
+                    } else {
+                        throw new NotFoundException(sprintf("La ruta \"%s\" no concuerda con ningún módulo ni controlador en la App", $currentUrl), 404);
+                    }
                 }
                 $controller = $this->camelcase(current($url));
                 next($url);
@@ -101,9 +105,11 @@ class ControllerResolver
 
         foreach ($routes as $route) {
             if (0 === strpos($url, $route)) {
-                //if ('/' === substr($url, strlen($route), 1) || strlen($url) === strlen($route)) {
-                return $route;
-                //}
+                if ('/' === $route) {
+                    return $route;
+                } elseif ('/' === substr($url, strlen($route), 1) || strlen($url) === strlen($route)) {
+                    return $route;
+                }
             }
         }
         return FALSE;
