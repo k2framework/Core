@@ -4,6 +4,5 @@
         "psr-0": { 
             "KumbiaPHP": "../" 
         }
-    },
-    "target-dir": "Symfony/Bundle/TwigBundle",
+    }
 }
