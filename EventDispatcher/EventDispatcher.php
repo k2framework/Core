@@ -6,26 +6,40 @@ use KumbiaPHP\EventDispatcher\EventDispatcherInterface;
 use KumbiaPHP\Di\Container\ContainerInterface;
 
 /**
- * Description of EventDispatcher
+ * Clase que se encarga de despachar los eventos basicos del fw.
  *
  * @author manuel
  */
 class EventDispatcher implements EventDispatcherInterface
 {
 
+    /**
+     * Arreglo que contiene los escuchas insartados en el despachador.
+     *
+     * @var array 
+     */
     protected $listeners = array();
 
     /**
+     * Clase container para obtener las instancias de los servicios
+     * que escuchan eventos, para llamarlos el despachar un evento.
      *
      * @var ContainerInterface 
      */
     protected $container;
 
+    /**
+     * Constructor de la clase.
+     * @param ContainerInterface $container 
+     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
     }
 
+    /**
+     * {inherit} 
+     */
     public function dispatch($eventName, Event $event)
     {
         if (!array_key_exists($eventName, $this->listeners)) {
@@ -42,7 +56,9 @@ class EventDispatcher implements EventDispatcherInterface
         }
     }
 
-    //put your code here
+    /**
+     * {inherit} 
+     */
     public function addListener($eventName, $listener)
     {
         if (!$this->hasListener($eventName, $listener)) {
@@ -50,6 +66,9 @@ class EventDispatcher implements EventDispatcherInterface
         }
     }
 
+    /**
+     * {inherit} 
+     */
     public function hasListener($eventName, $listener)
     {
         if (isset($this->listeners[$eventName])) {
@@ -59,6 +78,9 @@ class EventDispatcher implements EventDispatcherInterface
         }
     }
 
+    /**
+     * {inherit} 
+     */
     public function removeListener($eventName, $listener)
     {
         if ($this->hasListener($eventName, $listener)) {
