@@ -142,7 +142,10 @@ class Request
 
     private function createBaseUrl()
     {
-        return dirname($this->server->get('SCRIPT_NAME')) . '/';
+        //return dirname($this->server->get('SCRIPT_NAME')) . '/';
+        $uri = $this->server->get('REQUEST_URI');
+        $qString = $this->server->get('QUERY_STRING');
+        return substr(urldecode($uri), 0, - strlen($qString) + 6);
     }
 
 }
