@@ -3,36 +3,46 @@
 namespace KumbiaPHP\Loader;
 
 /**
+ * Clase para el manejo del autoload del fw.
+ * 
+ * Usa el estandar PSR-0
  * 
  */
 final class Autoload
 {
 
     /**
+     * Arreglo con las rutas donde se van a buscar las clases.
      * @var array
      */
     private static $directories = array();
 
     /**
-     * 
+     * registra rutas donde se buscarán clases.
      */
     public static function registerDirectories(array $directories = array())
     {
         self::$directories = array_merge(self::$directories, $directories);
     }
 
+    /**
+     * registra la clase en el autoload spl
+     */
     public static function register()
     {
         spl_autoload_register(array(__CLASS__, 'autoload'));
     }
 
+    /**
+     * Desregistra la clase del autoload spl 
+     */
     public static function unregister()
     {
         spl_autoload_unregister(array(__CLASS__, 'autoload'));
     }
 
     /**
-     * Autoloader
+     * Metodo que realiza la busqueda de la clase.
      */
     public static function autoload($className)
     {
