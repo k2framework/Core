@@ -31,6 +31,7 @@ abstract class Kernel implements KernelInterface
 {
 
     protected $namespaces;
+    protected $routes;
 
     /**
      *
@@ -69,7 +70,7 @@ abstract class Kernel implements KernelInterface
 
     public function __construct($production = FALSE)
     {
-        ob_start();//arrancamos el buffer de salida.
+        ob_start(); //arrancamos el buffer de salida.
         $this->production = $production;
 
         Autoload::registerDirectories(
@@ -84,12 +85,14 @@ abstract class Kernel implements KernelInterface
             ini_set('display_errors', 'On');
             ExceptionHandler::handle($this);
         }
+
+        $this->routes = $this->registerRoutes();
     }
 
     protected function init()
     {
         //creamos la instancia del AppContext
-        $context = new AppContext($this->request, $this->production, $this->getAppPath(), $this->namespaces);
+        $context = new AppContext($this->request, $this->production, $this->getAppPath(), $this->routes,$this->namespaces);
         //leemos la config de la app
         $config = new ConfigContainer($context);
         //iniciamos el container con esa config
@@ -120,7 +123,7 @@ abstract class Kernel implements KernelInterface
         }
 
         //ejecutamos el evento request
-        $this->dispatcher->dispatch(KumbiaEvents::REQUEST, new RequestEvent($request));
+        //$this->dispatcher->dispatch(KumbiaEvents::REQUEST, new RequestEvent($request));
 
         $resolver = new ControllerResolver(self::$container);
 
@@ -169,6 +172,8 @@ abstract class Kernel implements KernelInterface
     }
 
     abstract protected function registerNamespaces();
+
+    abstract protected function registerRoutes();
 
     private function getAppPath()
     {

@@ -14,25 +14,24 @@ class AppContext
 
     protected $baseUrl;
     protected $appPath;
-    protected $moduleDir;
-    protected $namespaces;
+    protected $modulesPath;
+    protected $routes;
     protected $currentUrl;
     protected $modules;
+    protected $namespaces;
     protected $currentModule;
     protected $currentController;
     protected $inProduction;
 
-    public function __construct(Request $request, $inProduction, $appPath, $namespaces)
+    public function __construct(Request $request, $inProduction, $appPath, $modules, $namespaces)
     {
         $this->baseUrl = $request->getBaseUrl();
         $this->inProduction = $inProduction;
         $this->appPath = $appPath;
         $this->currentUrl = $request->getRequestUrl();
-        $this->moduleDir = $appPath . 'modules/';
+        $this->modulesPath = $appPath . 'modules/';
+        $this->modules = $modules;
         $this->namespaces = $namespaces;
-        $this->modules = $namespaces;
-        //debemos excluir el namespace del dir del core del propio fw
-        unset($this->modules['KumbiaPHP']);
     }
 
     public function setRequest(Request $request)
@@ -55,9 +54,9 @@ class AppContext
         return $this->currentUrl;
     }
 
-    public function getModuleDir()
+    public function getModulesPath()
     {
-        return $this->moduleDir;
+        return $this->modulesPath;
     }
 
     public function getNamespaces()
@@ -65,10 +64,10 @@ class AppContext
         return $this->namespaces;
     }
 
-    public function getModules($module = NULL)
+    public function getModules($route = NULL)
     {
-        if ($module) {
-            return isset($this->modules[$module]) ? $this->modules[$module] : NULL;
+        if ($route) {
+            return isset($this->modules[$route]) ? $this->modules[$route] : NULL;
         } else {
             return $this->modules;
         }
@@ -98,6 +97,5 @@ class AppContext
     {
         return $this->inProduction;
     }
-
 }
 

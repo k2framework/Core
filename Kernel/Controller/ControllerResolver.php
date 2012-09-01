@@ -32,51 +32,37 @@ class ControllerResolver
 
     public function getController()
     {
-        $controllerFound = FALSE;
-        $module = 'Index'; //modulo por defecto del fw, no hace falta escribirlo en la URL.
         $controller = 'Index'; //controlador por defecto si no se especifica.
         $action = 'index'; //accion por defecto si no se especifica.
         $params = array(); //parametros de la url, de existir.
         //obtenemos la url actual de la petición.
-        $url = explode('/', trim($this->container->get('app.context')->getCurrentUrl(), '/'));
+        $url = '/' . trim($this->container->get('app.context')->getCurrentUrl(), '/');
 
-        //primero obtengo el modulo ó controlador.
-        if (current($url)) {
-            //si la url comienza con index, asumimos que estamos en el modulo
-            //por defecto index, ya que este nunca debe colocarse en la URL.
-            //y estaremos solicitando el controlador Index del modulo Index
-            if ($this->camelcase(current($url)) !== 'Index') {
-                //verifico la existencia del patron de la url en los modulos
-                if (array_key_exists($this->camelcase(current($url)), $this->container
-                                        ->get('app.context')->getModules())) {
-                    //si concuerda con un algun indice, es un modulo.
-                    $module = $this->camelcase(current($url));
-                    next($url);
+        if (!$module = $this->getModule($url)) {
+            throw new NotFoundException(sprintf("No existe un módulo para la ruta \"%s\"", $url), 404);
+        }
 
-                    //si no es un modulo, verificamos que sea un controlador.
-                } elseif (!$this->isController($this->camelcase($module), current($url))) {
-                    //si no es ni modulo ni controller, lanzo la excepcion.
-                    throw new NotFoundException(sprintf("No existe el Módulo \"%s\"", current($url)), 404);
+        if ($url = explode('/', trim(substr($url, strlen($module)), '/'))) {
+
+            //ahora obtengo el controlador
+            if (current($url)) {
+                //si no es un controlador lanzo la excepcion
+                if (!$this->isController($module, current($url))) {
+                    $controller = $this->camelcase(current($url));
+                    throw new NotFoundException(sprintf("El controlador \"%sController\" para el Módulo \"%s\" no Existe", $controller, $module), 404);
                 }
+                $controller = $this->camelcase(current($url));
+                next($url);
             }
-        }
-        //ahora obtengo el controlador
-        if (current($url)) {
-            //si no es un controlador lanzo la excepcion
-            if (!$this->isController($module, current($url))) {
-                throw new NotFoundException(sprintf("El controlador \"%sController\" para el Módulo \"%s\" no Existe", $controller, $module), 404);
+            //luego obtenemos la acción
+            if (current($url)) {
+                $action = $this->camelcase(current($url), TRUE);
+                next($url);
             }
-            $controller = $this->camelcase(current($url));
-            next($url);
-        }
-        //luego obtenemos la acción
-        if (current($url)) {
-            $action = $this->camelcase(current($url), TRUE);
-            next($url);
-        }
-        //por ultimo los parametros
-        if (current($url)) {
-            $params = array_slice($url, key($url));
+            //por ultimo los parametros
+            if (current($url)) {
+                $params = array_slice($url, key($url));
+            }
         }
 
         $this->module = $module;
@@ -87,7 +73,7 @@ class ControllerResolver
         $app->setCurrentModule($module);
         $app->setCurrentController($controller);
 
-        return $this->createController($module, $controller, $action, $params);
+        return $this->createController($params);
     }
 
     /**
@@ -109,50 +95,66 @@ class ControllerResolver
         }
     }
 
+    protected function getModule($url)
+    {
+        $routes = array_keys($this->container->get('app.context')->getModules());
+
+        foreach ($routes as $route) {
+            if (0 === strpos($url, $route)) {
+                //if ('/' === substr($url, strlen($route), 1) || strlen($url) === strlen($route)) {
+                return $route;
+                //}
+            }
+        }
+        return FALSE;
+    }
+
     protected function isController($module, $controller)
     {
         $path = $this->container->get('app.context')->getModules($module);
-        return is_file("{$path}/{$module}/Controller/{$this->camelcase($controller)}Controller.php");
+        return is_file("{$path}/Controller/{$this->camelcase($controller)}Controller.php");
     }
 
-    protected function createController($module, $controller, $action, $params)
+    protected function createController($params)
     {
         //creo el namespace para poder crear la instancia del controlador
-        $path = $module . '/';
+        $currentPath = $this->container->get('app.context')->getModules($this->module);
+        $modulesPath = $this->container->get('app.context')->getModulesPath();
+        $namespace = substr($currentPath, strlen($modulesPath));
         //creo el nombre del controlador con el sufijo Controller
-        $controllerName = $controller . 'Controller';
+        $controllerName = $this->contShortName . 'Controller';
         //uno el namespace y el nombre del controlador.
-        $controllerClass = str_replace('/', '\\', $path . 'Controller/') . $controllerName;
+        $controllerClass = str_replace('/', '\\', $namespace . 'Controller/') . $controllerName;
 
         try {
             $reflectionClass = new ReflectionClass($controllerClass);
         } catch (\Exception $e) {
-            throw new NotFoundException(sprintf("No exite el controlador \"%s\" en el Módulo \"%s\"", $controllerName, $module), 404);
+            throw new NotFoundException(sprintf("No exite el controlador \"%s\" en el Módulo \"%s\"", $controllerName, $currentPath), 404);
         }
 
         //verifico si la clase hereda de Controller
         if ($reflectionClass->isSubclassOf('\\KumbiaPHP\\Kernel\\Controller\\Controller')) {
             //si es así le paso el contenedor como argumento
             $this->controller = $reflectionClass->newInstanceArgs(array($this->container));
-            $this->setViewDefault($action);
+            $this->setViewDefault($this->action);
         } else {
             //si no es una instancia de Controller, lo creo como una simple clase PHP
             $this->controller = $reflectionClass->newInstance();
         }
 
-        return array($this->controller, $action, $params);
+        return array($this->controller, $this->action, $params);
     }
 
     public function executeAction($action, $arguments)
     {
         $this->action = $action;
-        
+
         $controller = new ReflectionObject($this->controller);
 
         $this->executeBeforeFilter($controller);
 
         $this->validateAction($controller, $arguments);
-        
+
         $response = call_user_func_array(array($this->controller, $this->action), $arguments);
 
         $this->executeAfterFilter($controller);
@@ -237,7 +239,7 @@ class ControllerResolver
         if ($limitParams && (count($params) < $reflectionMethod->getNumberOfRequiredParameters() ||
                 count($params) > $reflectionMethod->getNumberOfParameters())) {
 
-            throw new NotFoundException(sprintf("Número de parámetros erróneo para ejecutar la acción \"%s\" en el controlador \"%sController\"", $action, $this->contShortName), 404);
+            throw new NotFoundException(sprintf("Número de parámetros erróneo para ejecutar la acción \"%s\" en el controlador \"%sController\"", $this->action, $this->contShortName), 404);
         }
     }
 
