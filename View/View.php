@@ -78,8 +78,8 @@ class View
         $template = explode(':', $template);
 
         if (count($template) > 1) {
-            $module = rtrim($app->getModules($template[0]), '/') . '/' . $app->getCurrentModule();
-            $file = $module . '/View/_shared/templates/' . $template[1] . '.phtml';
+            $modulePath = rtrim($app->getModulesPath(), '/') . '/' . $template[0];
+            $file = $modulePath . '/View/_shared/templates/' . $template[1] . '.phtml';
         } else {
             $file = rtrim($app->getAppPath(), '/') . '/view/templates/' . $template[0] . '.phtml';
         }
