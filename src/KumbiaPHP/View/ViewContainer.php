@@ -14,7 +14,7 @@ use KumbiaPHP\Di\Definition\Service;
 class ViewContainer implements ArrayAccess
 {
 
-    public $content;
+    public $content = '';
 
     /**
      * 
