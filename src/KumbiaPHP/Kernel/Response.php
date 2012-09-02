@@ -100,7 +100,7 @@ class Response
      */
     public function setCharset($charset)
     {
-        $this->charset = $charset;
+        $this->charset = $charset ? : 'UTF-8';
     }
 
     /**
@@ -140,8 +140,8 @@ class Response
     protected function sendContent()
     {
         echo $this->content;
-        while (ob_get_level()){
-            ob_end_flush();//vamos limpiando y mostrando todos los niveles de buffer creados.
+        while (ob_get_level()) {
+            ob_end_flush(); //vamos limpiando y mostrando todos los niveles de buffer creados.
         }
     }
 
