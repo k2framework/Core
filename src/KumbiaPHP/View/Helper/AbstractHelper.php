@@ -9,22 +9,36 @@ use KumbiaPHP\Kernel\AppContext;
  *
  * @author manuel
  */
-class AbstractHelper
+abstract class AbstractHelper
 {
 
     /**
      *
      * @var AppContext 
      */
-    protected $app;
+    protected static $app;
 
     /**
-     * @Service(app.context,$app)
+     * 
      * @param AppContext $app 
      */
-    public function __construct(AppContext $app)
+    public static function setAppContext(AppContext $app)
     {
-        $this->app = $app;
+        self::$app = $app;
     }
 
+    /**
+     * Convierte los argumentos de un metodo de parametros por nombre a un string con los atributos
+     *
+     * @param array $params argumentos a convertir
+     * @return string
+     */
+    public static function getAttrs($params)
+    {
+        $data = '';
+        foreach ($params as $k => $v) {
+            $data .= " $k=\"$v\"";
+        }
+        return $data;
+    }
 }

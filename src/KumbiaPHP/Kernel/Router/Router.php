@@ -43,25 +43,7 @@ class Router implements RouterInterface
 
     public function toAction($action)
     {
-        $module = $this->toSmallCase($this->app->getCurrentModule());
-        $controller = $this->toSmallCase($this->app->getCurrentController());
-
-        if (count($parts = explode('/', $action)) > 1) {
-            //si se están enviando parametros adicionales al nombre de la acción
-            //convertimos el nombre de la accion a small_case
-            $parts[0] = $this->toSmallCase($parts[0]);
-            //y volvemos a construir la ruta
-            $action = join('/', $parts);
-        } else {
-            $action = $this->toSmallCase($action);
-        }
-
-        if ($module === 'index') {
-            $url = $this->app->getBaseUrl() . $controller . '/' . ltrim($action, '/');
-        } else {
-            $url = $this->app->getBaseUrl() . $module . '/' . $controller . '/' . ltrim($action, '/');
-        }
-
+        $url = $this->app->getControllerUrl() . '/' . $action;
         return new RedirectResponse($url);
     }
 
@@ -73,7 +55,7 @@ class Router implements RouterInterface
         //obtengo el request y le asigno la nueva url.
         $request = $this->kernel->getContainer()->get('request');
         $request->query->set('_url', $url);
-        
+
         //retorno la respuesta del kernel.
         return $this->kernel->execute($request);
     }

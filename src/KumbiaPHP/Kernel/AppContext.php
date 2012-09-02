@@ -200,5 +200,17 @@ class AppContext
         return $this->inProduction;
     }
 
+    public function getControllerUrl()
+    {
+        return $this->currentModule . '/' . $this->toSmallCase($this->currentController);
+    }
+
+    protected function toSmallCase($string)
+    {
+        $string[0] = strtolower($string[0]);
+
+        return strtolower(preg_replace('/([A-Z])/', "_$1", $string));
+    }
+
 }
 
