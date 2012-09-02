@@ -40,7 +40,18 @@ class NotNull extends ValidatorBase
      */
     public static function validate(Validatable $object, $column, $params = NULL, $update = FALSE)
     {
-        return isset($object->$column) && NULL !== $object->$column && '' !== $object->$column;
+        $res = isset($object->$column) && NULL !== $object->$column && '' !== $object->$column;
+        if (!$res) {
+            if ($params && isset($params['message'])) {
+                self::$lastError = $params['message'];
+            } else {
+                self::$lastError = "El campo $column no puede ser nulo";
+            }
+
+            return FALSE;
+        }
+
+        return TRUE;
     }
 
 }

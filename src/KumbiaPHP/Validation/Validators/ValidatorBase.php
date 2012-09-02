@@ -44,7 +44,7 @@ abstract class ValidatorBase
         return TRUE;
     }
 
-    public static function getError()
+    public static function getLastError()
     {
         return self::$lastError;
     }

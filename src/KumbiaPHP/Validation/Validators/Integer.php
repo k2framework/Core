@@ -2,7 +2,7 @@
 
 namespace KumbiaPHP\Validation\Validators;
 
-use KumbiaPHP\Validation\Validators\ValidatorInterface;
+use KumbiaPHP\Validation\Validators\ValidatorBase;
 use KumbiaPHP\Validation\Validatable;
 
 /**
@@ -40,7 +40,16 @@ class Integer extends ValidatorBase
      */
     public static function validate(Validatable $object, $column, $params = NULL, $update = FALSE)
     {
-        return filter_var($object->$column, FILTER_VALIDATE_INT);
+        if (!filter_var($object->$column, FILTER_VALIDATE_INT)) {
+            if ($params && isset($params['message'])) {
+                self::$lastError = $params['message'];
+            } else {
+                self::$lastError = "El campo $column debe ser un número entero";
+            }
+            return FALSE;
+        }
+
+        return TRUE;
     }
 
 }

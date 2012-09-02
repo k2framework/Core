@@ -47,7 +47,7 @@ class Validator
             if (FALSE === call_user_func_array(array($class, 'validate'), array(
                         $object, $field, $params, $update))) {
                 //agregamos el error al objeto.
-                $object->addError($field, $params['message']);
+                $object->addError($field, $class::getLastError());
                 $valid = FALSE;
             }
         }

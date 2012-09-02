@@ -2,7 +2,7 @@
 
 namespace KumbiaPHP\Validation\Validators;
 
-use KumbiaPHP\Validation\Validators\ValidatorInterface;
+use KumbiaPHP\Validation\Validators\ValidatorBase;
 use KumbiaPHP\Validation\Validatable;
 
 /**
@@ -60,7 +60,7 @@ class Unique extends ValidatorBase
                 foreach ($pk as $k) {
                     // Verifica que este definida la clave primaria
                     if (!isset($object->$k) || $object->$k === '') {
-                        throw new KumbiaException("Debe definir valor para la columna $k de la clave primaria");
+                        throw new \LogicException("Debe definir valor para la columna $k de la clave primaria");
                     }
 
                     $conditions[] = "$k = :pk_$k";
@@ -71,7 +71,7 @@ class Unique extends ValidatorBase
             } else {
                 // Verifica que este definida la clave primaria
                 if (!isset($object->$pk) || $object->$pk === '') {
-                    throw new KumbiaException("Debe definir valor para la clave primaria $pk");
+                    throw new \LogicException("Debe definir valor para la clave primaria $pk");
                 }
 
                 $q->where("NOT $pk = :pk_$pk");

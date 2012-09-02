@@ -2,7 +2,7 @@
 
 namespace KumbiaPHP\Validation\Validators;
 
-use KumbiaPHP\Validation\Validators\ValidatorInterface;
+use KumbiaPHP\Validation\Validators\ValidatorBase;
 use KumbiaPHP\Validation\Validatable;
 
 /**
@@ -40,7 +40,17 @@ class MinLength extends ValidatorBase
      */
     public static function validate(Validatable $object, $column, $params = NULL, $update = FALSE)
     {
-        return strlen($object->$column) >= $params['min'];
+        if (strlen($object->$column) < $params['min']) {
+            if (isset($params['message'])) {
+                self::$lastError = $params['message'];
+            } else {
+                self::$lastError = "El campo $column debe tener mas de {$params['min']} caracteres";
+            }
+
+            return FALSE;
+        }
+
+        return TRUE;
     }
 
 }

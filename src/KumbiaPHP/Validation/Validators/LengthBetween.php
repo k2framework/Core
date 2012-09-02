@@ -2,7 +2,7 @@
 
 namespace KumbiaPHP\Validation\Validators;
 
-use KumbiaPHP\Validation\Validators\ValidatorInterface;
+use KumbiaPHP\Validation\Validators\ValidatorBase;
 use KumbiaPHP\Validation\Validatable;
 
 /**
@@ -41,11 +41,11 @@ class LengthBetween extends ValidatorBase
      */
     public static function validate(Validatable $object, $column, $params = NULL, $update = FALSE)
     {
-        if (!Validate::between($object->$column, $params['min'], $params['max'])) {
+        if (strlen($object->$column) < $params['min'] || strlen($object->$column) > $params['max']) {
             if (isset($params['message'])) {
-                Flash::error($params['message']);
+                self::$lastError = $params['message'];
             } else {
-                Flash::error("El campo $column debe tener una cantidad de caracteres comprendida entre $min y $max");
+                self::$lastError = "El campo $column debe estár entre {$params['min']} y {$params['max']}";
             }
 
             return FALSE;
