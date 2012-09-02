@@ -13,9 +13,9 @@ use KumbiaPHP\Validation\ValidationBuilder;
 class Validator
 {
 
-    public function validate(Validatable $object)
+    public function validate(Validatable $object, ValidationBuilder $builder = NULL)
     {
-        $builder = $object->getValidations();
+        $builder || $builder = $object->getValidations();
 
         if (!$builder instanceof ValidationBuilder) {
             throw new \LogicException(sprintf("El método\"validations\" de la clase \"%s\" debe devolver un objeto ValidationBuilder", get_class($object)));
@@ -24,9 +24,9 @@ class Validator
         return $this->execute($object, $builder->getValidations());
     }
 
-    public function validateOnUpdate(Validatable $object)
+    public function validateOnUpdate(Validatable $object, ValidationBuilder $builder = NULL)
     {
-        $builder = $object->getValidations();
+        $builder || $builder = $object->getValidations();
 
         if (!$builder instanceof ValidationBuilder) {
             throw new \LogicException(sprintf("El método\"validations\" de la clase \"%s\" debe devolver un objeto ValidationBuilder", get_class($object)));
