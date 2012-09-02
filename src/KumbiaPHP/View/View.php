@@ -62,12 +62,12 @@ class View
             $content = ob_get_clean();
         }
 
-        if ($response instanceof Response) {
-            $response->setContent($content);
-            return $response;
+        if (!$response instanceof Response) {
+            $response = new Response($content);
+            $response->setCharset($this->container->getParameter('config.charset'));
         }
 
-        return new Response($content);
+        return $response;
     }
 
     protected function findTemplate($template)
