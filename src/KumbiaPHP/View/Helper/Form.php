@@ -590,7 +590,7 @@ class Form extends AbstractHelper
     {
         // aviso al programador
         if (!self::$_multipart) {
-            Flash::error('Para poder subir ficheros, debe abrir el form con Form::openMultipart()');
+            throw new \LogicException('Para poder subir ficheros, debe abrir el form con Form::openMultipart()');
         }
 
         if (is_array($attrs)) {
