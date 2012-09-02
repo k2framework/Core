@@ -46,7 +46,7 @@ class View
     protected function getContent(Response $response = NULL)
     {
         extract($this->variables, EXTR_OVERWRITE);
-        ;
+        $content = NULL;
 
         //si va a mostrar vista
         if ($this->view !== NULL) {
@@ -95,12 +95,39 @@ class View
         $app = $this->container->get('app.context');
         $module = $app->getCurrentModule();
         $controller = $app->getCurrentController();
-        $file = rtrim($app->getModules($module), '/') . '/' . $module .
-                '/View/' . $controller . '/' . $view . '.phtml';
+        $file = rtrim($app->getModules($module), '/') . '/View/' . $controller . '/' . $view . '.phtml';
         if (!file_exists($file)) {
             throw new \LogicException(sprintf("No existe la Vista \"%s\" en \"%s\"", basename($file), $file));
         }
         return $file;
     }
 
+}
+
+/**
+ * Atajo para htmlspecialchars, por defecto toma el charset de la
+ * aplicacion
+ *
+ * @param string $s
+ * @param string $charset
+ * @return string
+ */
+function h($s, $charset = APP_CHARSET)
+{
+
+    return htmlspecialchars($s, ENT_QUOTES, $charset);
+}
+
+/**
+ * Atajo para echo + htmlspecialchars, por defecto toma el charset de la
+ * aplicacion
+ *
+ * @param string $s
+ * @param string $charset
+ * @return string
+ */
+function eh($s, $charset = APP_CHARSET)
+{
+
+    echo htmlspecialchars($s, ENT_QUOTES, $charset);
 }
