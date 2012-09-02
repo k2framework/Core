@@ -20,8 +20,10 @@
 
 namespace KumbiaPHP\Upload;
 
-use KumbiaPHP\Upload\Exception\UploadException;
 use KumbiaPHP\Kernel\Request;
+use KumbiaPHP\Upload\Adapter\File;
+use KumbiaPHP\Upload\Adapter\Image;
+use KumbiaPHP\Upload\Exception\UploadException;
 
 /**
  * Sube archivos al servidor.
@@ -110,8 +112,8 @@ abstract class Upload
      * Obtiene el adaptador para Upload
      *
      * @param string $name nombre de archivo recibido por POST
-     * @param string $adapter (file, image, model)
-     * @return Upload
+     * @param string $adapter (File, Image)
+     * @return File|Image
      */
     public static function factory(Request $request, $name, $adapter = 'File')
     {
@@ -359,7 +361,7 @@ abstract class Upload
         if ($this->overwrite) {
             return TRUE;
         }
-        if (file_exists("$this->_path/$name")) {
+        if (file_exists("$this->path/$name")) {
             $this->errors[] = 'Error: ya existe este fichero. Y no se permite reescribirlo';
             return FALSE;
         }

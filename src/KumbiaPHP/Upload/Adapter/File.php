@@ -21,6 +21,7 @@
 namespace KumbiaPHP\Upload\Adapter;
 
 use KumbiaPHP\Upload\Upload;
+use KumbiaPHP\Kernel\Request;
 
 /**
  * Clase para guardar archivo subido
@@ -40,15 +41,16 @@ class File extends Upload
 
     /**
      * Constructor
+     *
+     * @param Request $request
+     * @param string $name nombre de archivo por metodo POST 
      * 
-     * @param string $name nombre de archivo por metodo POST
      */
-    public function __construct($name)
+    public function __construct(Request $request, $name)
     {
-        parent::__construct($name);
-
+        parent::__construct($request, $name);
         // Ruta donde se guardara el archivo
-        $this->path = dirname(APP_PATH) . '/public/files/upload';
+        $this->path = dirname($request->getAppContext()->getAppPath()) . '/public/files/upload';
     }
 
     /**
@@ -69,7 +71,7 @@ class File extends Upload
      */
     protected function saveFile($name)
     {
-        return move_uploaded_file($_FILES[$this->name]['tmp_name'], "$this->path/$name");
+        return move_uploaded_file($this->file['tmp_name'], "$this->path/$name");
     }
 
     /**
@@ -81,11 +83,11 @@ class File extends Upload
     {
         // Verifica que se pueda escribir en el directorio
         if (!is_writable($this->path)) {
-            Flash::error('Error: no se puede escribir en el directorio');
+            $this->errors[] = 'Error: no se puede escribir en el directorio';
             return FALSE;
         }
 
-        return parent::_validates();
+        return parent::validates();
     }
 
 }

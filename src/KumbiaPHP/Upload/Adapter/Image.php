@@ -18,13 +18,18 @@
  * @license    http://wiki.kumbiaphp.com/Licencia     New BSD License
  */
 
+namespace KumbiaPHP\Upload\Adapter;
+
+use KumbiaPHP\Upload\Exception\UploadException;
+use KumbiaPHP\Kernel\Request;
+
 /**
  * Clase para guardar imagen subida
  *
  * @category   Kumbia
  * @package    Upload
  */
-class ImageUpload extends Upload
+class Image extends Upload
 {
 
     /**
@@ -32,43 +37,48 @@ class ImageUpload extends Upload
      *
      * @var string
      */
-    protected $_path;
+    protected $path;
+
     /**
      * Ancho mínimo de la imagen
      * 
      * @var int
      */
-    protected $_minWidth = NULL;
+    protected $minWidth = NULL;
+
     /**
      * Ancho máximo de la imagen
      *
      * @var int
      */
-    protected $_maxWidth = NULL;
+    protected $maxWidth = NULL;
+
     /**
      * Alto mínimo de la imagen
      * 
      * @var int
      */
-    protected $_minHeight = NULL;
+    protected $minHeight = NULL;
+
     /**
      * Alto máximo de la imagen
      *
      * @var int
      */
-    protected $_maxHeight = NULL;
+    protected $maxHeight = NULL;
 
     /**
      * Constructor
+     *
+     * @param Request $request
+     * @param string $name nombre de archivo por metodo POST 
      * 
-     * @param string $name nombre de archivo por metodo POST
      */
-    public function __construct($name)
+    public function __construct(Request $request, $name)
     {
-        parent::__construct($name);
-
+        parent::__construct($request, $name);
         // Ruta donde se guardara el archivo
-        $this->_path = dirname(APP_PATH) . '/public/img/upload';
+        $this->path = dirname($request->getAppContext()->getAppPath()) . '/public/img/upload';
     }
 
     /**
@@ -78,7 +88,7 @@ class ImageUpload extends Upload
      */
     public function setPath($path)
     {
-        $this->_path = $path;
+        $this->path = $path;
     }
 
     /**
@@ -88,7 +98,7 @@ class ImageUpload extends Upload
      */
     public function setMinWidth($value)
     {
-        $this->_minWidth = $value;
+        $this->minWidth = $value;
     }
 
     /**
@@ -98,7 +108,7 @@ class ImageUpload extends Upload
      */
     public function setMaxWidth($value)
     {
-        $this->_maxWidth = $value;
+        $this->maxWidth = $value;
     }
 
     /**
@@ -108,7 +118,7 @@ class ImageUpload extends Upload
      */
     public function setMinHeight($value)
     {
-        $this->_minHeight = $value;
+        $this->minHeight = $value;
     }
 
     /**
@@ -118,7 +128,7 @@ class ImageUpload extends Upload
      */
     public function setMaxHeight($value)
     {
-        $this->_maxHeight = $value;
+        $this->maxHeight = $value;
     }
 
     /**
@@ -126,70 +136,70 @@ class ImageUpload extends Upload
      * 
      * @return boolean
      */
-    protected function _validates()
+    protected function validates()
     {
         // Verifica que se pueda escribir en el directorio
-        if (!is_writable($this->_path)) {
-            Flash::error('Error: no se puede escribir en el directorio');
+        if (!is_writable($this->path)) {
+            $this->errors[] = 'Error: no se puede escribir en el directorio';
             return FALSE;
         }
 
         // Verifica que sea un archivo de imagen
-        if (!preg_match('/^image\//i', $_FILES[$this->_name]['type'])) {
-            Flash::error('Error: el archivo debe ser una imagen');
+        if (!preg_match('/^image\//i', $this->file['type'])) {
+            $this->errors[] = 'Error: el archivo debe ser una imagen';
             return FALSE;
         }
 
         // Verifica ancho minimo de la imagen
-        if ($this->_minWidth !== NULL) {
+        if ($this->minWidth !== NULL) {
             // Obtiene datos de la imagen
-            $imageSize = getimagesize($_FILES[$this->_name]['tmp_name']);
+            $imageSize = getimagesize($this->file['tmp_name']);
 
-            if ($imageSize[0] < $this->_minWidth) {
-                Flash::error("Error: el ancho de la imagen debe ser superior o igual a {$this->_minWidth}px");
+            if ($imageSize[0] < $this->minWidth) {
+                $this->errors[] = "Error: el ancho de la imagen debe ser superior o igual a {$this->minWidth}px";
                 return FALSE;
             }
         }
 
         // Verifica ancho maximo de la imagen
-        if ($this->_maxWidth !== NULL) {
+        if ($this->maxWidth !== NULL) {
             if (!isset($imageSize)) {
                 // Obtiene datos de la imagen
-                $imageSize = getimagesize($_FILES[$this->_name]['tmp_name']);
+                $imageSize = getimagesize($this->file['tmp_name']);
             }
 
-            if ($imageSize[0] > $this->_maxWidth) {
-                Flash::error("Error: el ancho de la imagen debe ser inferior o igual a {$this->_maxWidth}px");
+            if ($imageSize[0] > $this->maxWidth) {
+                $this->errors[] = "Error: el ancho de la imagen debe ser inferior o igual a {$this->maxWidth}px";
                 return FALSE;
             }
         }
 
         // Verifica alto minimo de la imagen
-        if ($this->_minHeight !== NULL) {
+        if ($this->minHeight !== NULL) {
             // Obtiene datos de la imagen
-            $imageSize = getimagesize($_FILES[$this->_name]['tmp_name']);
+            $imageSize = getimagesize($this->file['tmp_name']);
 
-            if ($imageSize[1] < $this->_minHeight) {
-                Flash::error("Error: el alto de la imagen debe ser superior o igual a {$this->_minHeight}px");
+            if ($imageSize[1] < $this->minHeight) {
+                $this->errors[] = "Error: el alto de la imagen debe ser superior o igual a {$this->minHeight}px";
                 return FALSE;
             }
         }
 
         // Verifica alto maximo de la imagen
-        if ($this->_maxHeight !== NULL) {
+        if ($this->maxHeight !== NULL) {
             if (!isset($imageSize)) {
                 // Obtiene datos de la imagen
-                $imageSize = getimagesize($_FILES[$this->_name]['tmp_name']);
+                $imageSize = getimagesize($this->file['tmp_name']);
             }
 
-            if ($imageSize[1] > $this->_maxHeight) {
-                Flash::error("Error: el alto de la imagen debe ser inferior o igual a {$this->_maxHeight}px");
+            if ($imageSize[1] > $this->maxHeight) {
+                $this->errors[] = "Error: el alto de la imagen debe ser inferior o igual a {$this->maxHeight}px";
                 return FALSE;
             }
         }
 
         // Validaciones
-        return parent::_validates();
+        return parent::validates();
     }
 
     /**
@@ -197,10 +207,10 @@ class ImageUpload extends Upload
      *
      * @return boolean
      */
-    protected function _validatesTypes()
+    protected function validatesTypes()
     {
         foreach ($this->_types as $type) {
-            if ($_FILES[$this->_name]['type'] == "image/$type") {
+            if ($this->file['type'] == "image/$type") {
                 return TRUE;
             }
         }
@@ -214,9 +224,9 @@ class ImageUpload extends Upload
      * @param string $name nombre con el que se guardará el archivo
      * @return boolean
      */
-    protected function _saveFile($name)
+    protected function saveFile($name)
     {
-        return move_uploaded_file($_FILES[$this->_name]['tmp_name'], "$this->_path/$name");
+        return move_uploaded_file($this->file['tmp_name'], "$this->path/$name");
     }
 
 }
