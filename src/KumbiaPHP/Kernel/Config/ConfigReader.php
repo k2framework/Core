@@ -10,7 +10,7 @@ use KumbiaPHP\Kernel\Parameters;
  *
  * @author manuel
  */
-class ConfigContainer
+class ConfigReader
 {
 
     /**
@@ -36,7 +36,7 @@ class ConfigContainer
         $section['services'] = new Parameters();
         $section['parameters'] = new Parameters();
 
-        $dirs = array_merge($app->getNamespaces(), array_values($app->getModules()), array(dirname($app->getAppPath())));
+        $dirs = array_merge($app->getNamespaces(), array_values($app->getModules()), array($app->getAppPath()));
 
         foreach (array_unique($dirs) as $namespace => $dir) {
             if (is_numeric($namespace)) {
