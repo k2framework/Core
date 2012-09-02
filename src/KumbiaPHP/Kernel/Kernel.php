@@ -263,5 +263,4 @@ abstract class Kernel implements KernelInterface
             }
         }
     }
-
 }

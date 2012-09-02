@@ -103,6 +103,11 @@ class ControllerResolver
     {
         $routes = array_keys($this->container->get('app.context')->getModules());
 
+        usort($routes, function($a, $b) {
+                    return (strlen($a) > strlen($b)) ? -1 : 1;
+                }
+        );
+        
         foreach ($routes as $route) {
             if (0 === strpos($url, $route)) {
                 if ('/' === $route) {
