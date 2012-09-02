@@ -3,6 +3,7 @@
 namespace KumbiaPHP\Kernel;
 
 use KumbiaPHP\Kernel\Session\SessionInterface;
+use KumbiaPHP\Kernel\AppContext;
 use KumbiaPHP\Kernel\Parameters;
 
 /**
@@ -44,10 +45,15 @@ class Request
     public $files;
 
     /**
-     * Contiene la Información de la Sesi�n
+     * Contiene la Información de la Sesión
      * @var SessionInterface 
      */
     protected $session;
+    /**
+     * Contiene el contexto de ejecución de la aplicación
+     * @var AppContext
+     */
+    protected $app;
 
     /**
      *
@@ -127,6 +133,22 @@ class Request
     public function setSession(SessionInterface $session)
     {
         $this->session = $session;
+    }
+    /**
+     * Devuelve la instancia del objeto que tiene el contexto de la aplicación
+     * @return AppContext
+     */
+    public function getAppContext()
+    {
+        return $this->app;
+    }
+    /**
+     * Estabelce la instancia del objeto que tiene el contexto de la aplicación
+     * @param SessionInterface $session 
+     */
+    public function setAppContext(AppContext $app)
+    {
+        $this->app = $app;
     }
 
     /**

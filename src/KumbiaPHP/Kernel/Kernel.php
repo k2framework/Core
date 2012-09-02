@@ -128,6 +128,7 @@ abstract class Kernel implements KernelInterface
 
         //le asignamos el servicio session al request
         $this->request->setSession(self::$container->get('session'));
+        $this->request->setAppContext($context);
 
         //agregamos el request al container
         self::$container->set('request', $this->request);
