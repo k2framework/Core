@@ -11,7 +11,7 @@ use KumbiaPHP\Kernel\Event\KumbiaEvents;
 use KumbiaPHP\EventDispatcher\EventDispatcher;
 use KumbiaPHP\Kernel\Event\ControllerEvent;
 use KumbiaPHP\Kernel\Event\ResponseEvent;
-use KumbiaPHP\Kernel\Config\ConfigContainer;
+use KumbiaPHP\Kernel\Config\ConfigReader;
 use KumbiaPHP\Di\DependencyInjection;
 use KumbiaPHP\Di\Container\Container;
 use KumbiaPHP\Di\Definition\DefinitionManager;
@@ -91,9 +91,9 @@ abstract class Kernel implements KernelInterface
         Autoload::registerDirectories(
                 $this->namespaces = $this->registerNamespaces()
         );
-        
+
         Autoload::register();
-        
+
         ExceptionHandler::handle($this);
 
         if ($production) {
@@ -118,7 +118,7 @@ abstract class Kernel implements KernelInterface
         //creamos la instancia del AppContext
         $context = new AppContext($this->request, $this->production, $this->getAppPath(), $this->routes, $this->namespaces);
         //leemos la config de la app
-        $config = new ConfigContainer($context);
+        $config = new ConfigReader($context);
         //iniciamos el container con esa config
         $this->initContainer($config->getConfig());
         //asignamos el kernel al container como un servicio
@@ -178,6 +178,7 @@ abstract class Kernel implements KernelInterface
                 $properties = $resolver->getPublicProperties(); //nos devuelve las propiedades publicas del controlador
                 //llamamos al render del servicio "view" y esté nos devolverá
                 //una instancia de response con la respuesta creada
+                /* @var $response Response */
                 $response = self::$container->get('view')->render($template, $view, $properties);
             }
         }
