@@ -7,6 +7,6 @@ Esta es una base del core para una nueva versión de KumbiaPHP framework, trabaj
 Librerias Disponibles
 ---------------------
 
-    * Kernel: Es la base del framework, contiene las clases y librerias básicas para la ejecución de una petición.
-    * Loader: Clase que se encarga de realizar la autocarga de clases en el fw (Actualmente gran parte de este 
-trabajo loa realiza composer).
+   * Kernel: Es la base del framework, contiene las clases y librerias básicas para la ejecución de una petición.
+   * Loader: Clase que se encarga de realizar la autocarga de clases en el fw (Actualmente gran parte de este trabajo loa realiza composer).
+   * EventDispatcher: Clases que manejan la ejecución de los eventos del fw ( request, controller, response, exception  )
