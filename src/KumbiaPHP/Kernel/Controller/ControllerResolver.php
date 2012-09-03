@@ -166,6 +166,9 @@ class ControllerResolver
 
         $this->executeBeforeFilter($controller);
 
+        if (FALSE === $this->action) {
+            return NULL;//si el before devuelve false, es porque no queremos que se ejecute nuestra acción.
+        }
         $this->validateAction($controller, $controllerEvent->getParameters());
 
         $response = call_user_func_array(array($this->controller, $this->action), $controllerEvent->getParameters());
@@ -272,6 +275,11 @@ class ControllerResolver
                 $request = NULL;
             }
             if (NULL !== $result = $method->invoke($this->controller, $request)) {
+                if (FALSE === $result) {
+                    //si el resultado es false, es porque no queremos que se ejecute la acción
+                    $this->action = FALSE;
+                    return;
+                }
                 if (!is_string($result)) {
                     throw new NotFoundException(sprintf("El método \"beforeFilter\" solo puede devolver una cadena, en el Controlador \"%sController\"", $this->contShortName));
                 }
