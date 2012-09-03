@@ -6,6 +6,7 @@ use KumbiaPHP\Di\Container\ContainerInterface;
 use KumbiaPHP\Kernel\Exception\NotFoundException;
 use \ReflectionClass;
 use \ReflectionObject;
+use KumbiaPHP\Kernel\Event\ControllerEvent;
 
 /**
  * Description of ControllerResolver
@@ -107,7 +108,7 @@ class ControllerResolver
                     return (strlen($a) > strlen($b)) ? -1 : 1;
                 }
         );
-        
+
         foreach ($routes as $route) {
             if (0 === strpos($url, $route)) {
                 if ('/' === $route) {
@@ -156,17 +157,18 @@ class ControllerResolver
         return array($this->controller, $this->action, $params);
     }
 
-    public function executeAction($action, $arguments)
+    public function executeAction(ControllerEvent $controllerEvent)
     {
-        $this->action = $action;
+        $this->controller = $controllerEvent->getController();
+        $this->action = $controllerEvent->getAction();
 
         $controller = new ReflectionObject($this->controller);
 
         $this->executeBeforeFilter($controller);
 
-        $this->validateAction($controller, $arguments);
+        $this->validateAction($controller, $controllerEvent->getParameters());
 
-        $response = call_user_func_array(array($this->controller, $this->action), $arguments);
+        $response = call_user_func_array(array($this->controller, $this->action), $controllerEvent->getParameters());
 
         $this->executeAfterFilter($controller);
 

@@ -150,37 +150,41 @@ abstract class Kernel implements KernelInterface
         }
 
         //ejecutamos el evento request
-        //$this->dispatcher->dispatch(KumbiaEvents::REQUEST, new RequestEvent($request));
+        $response = $this->dispatcher->dispatch(KumbiaEvents::REQUEST, new RequestEvent($request));
 
-        $resolver = new ControllerResolver(self::$container);
-
-        //obtenemos la instancia del controlador, el nombre de la accion
-        //a ejecutar, y los parametros que recibirá dicha acción
-        list($controller, $action, $params) = $resolver->getController($request);
-
-        //ejecutamos el evento controller.
-        $this->dispatcher
-                ->dispatch(KumbiaEvents::CONTROLLER, new ControllerEvent($request, array($controller, $action)));
-        //ejecutamos la acción de controlador pasandole los parametros.
-        $response = $resolver->executeAction($action, $params);
-
+        //si el evento devuelve una espuesta no ejecutamos el controlador.
         if (!$response instanceof Response) {
+            //si el evento no devuelve una respuesta, ejecutamos el controlador.
+            $resolver = new ControllerResolver(self::$container);
 
-            //si no es una instancia de KumbiaPHP\Kernel\Controller\Controller
-            //lanzamos una excepción
-            if (!$controller instanceof \KumbiaPHP\Kernel\Controller\Controller) {
-                throw new \LogicException(sprintf("El controlador debe retornar una Respuesta"));
-            } else {
-                //como la acción no devolvió respuesta, debemos
-                //obtener la vista y el template establecidos en el controlador
-                //para pasarlos al servicio view, y este construya la respuesta
-                $view = $resolver->getView();
-                $template = $resolver->getTemplate();
-                $properties = $resolver->getPublicProperties(); //nos devuelve las propiedades publicas del controlador
-                //llamamos al render del servicio "view" y esté nos devolverá
-                //una instancia de response con la respuesta creada
-                /* @var $response Response */
-                $response = self::$container->get('view')->render($template, $view, $properties);
+            //obtenemos la instancia del controlador, el nombre de la accion
+            //a ejecutar, y los parametros que recibirá dicha acción
+            list($controller, $action, $params) = $resolver->getController($request);
+
+            //ejecutamos el evento controller.
+            $this->dispatcher
+                    ->dispatch(KumbiaEvents::CONTROLLER, $contEvent = new ControllerEvent($request, array($controller, $action, $params)));
+            //ejecutamos la acción de controlador pasandole los parametros.
+            $response = $resolver->executeAction($contEvent);
+
+            if (!$response instanceof Response) {
+
+                //si no es una instancia de KumbiaPHP\Kernel\Controller\Controller
+                //lanzamos una excepción
+                if (!$controller instanceof \KumbiaPHP\Kernel\Controller\Controller) {
+                    throw new \LogicException(sprintf("El controlador debe retornar una Respuesta"));
+                } else {
+                    //como la acción no devolvió respuesta, debemos
+                    //obtener la vista y el template establecidos en el controlador
+                    //para pasarlos al servicio view, y este construya la respuesta
+                    $view = $resolver->getView();
+                    $template = $resolver->getTemplate();
+                    $properties = $resolver->getPublicProperties(); //nos devuelve las propiedades publicas del controlador
+                    //llamamos al render del servicio "view" y esté nos devolverá
+                    //una instancia de response con la respuesta creada
+                    /* @var $response Response */
+                    $response = self::$container->get('view')->render($template, $view, $properties);
+                }
             }
         }
 
@@ -264,4 +268,5 @@ abstract class Kernel implements KernelInterface
             }
         }
     }
+
 }
