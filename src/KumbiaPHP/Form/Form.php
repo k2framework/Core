@@ -70,11 +70,6 @@ class Form implements ArrayAccess
     protected static $validator;
 
     /**
-     * @var ValidationBuilder 
-     */
-    protected $validationBuilder;
-
-    /**
      * Constructor de la clase.
      * 
      * Más Adelante podrá recibir un objeto Active Record, y crear las 
@@ -134,8 +129,7 @@ class Form implements ArrayAccess
     protected function _add(Field $field)
     {
         //$index = preg_replace('/\[.*\]/i', '', $formField->getFieldName());
-        $index = $field->setValidationBuilder($this->validationBuilder)
-                ->getFieldName();
+        $index = $field->getFieldName();
         $this->fields[$index] = $field;
         if ($field instanceof Field\File) {
             $this->attrs(array('enctype' => 'multipart/form-data'));

@@ -30,7 +30,7 @@ class Text extends Field
     public function maxLength($max, $min = 0, $message = 'El campo %s debe tener mínimo %s caracteres y maximo %s')
     {
         $this->validationBuilder->maxlength($this->getFieldName(), array(
-            'message' => vsprintf($message, array($message, $min, $max))
+            'message' => vsprintf($message, array($this->getLabel(), $min, $max))
         ));
         return $this->attrs(array('maxlength' => $max));
     }

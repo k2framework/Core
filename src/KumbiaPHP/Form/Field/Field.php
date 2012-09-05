@@ -68,12 +68,7 @@ abstract class Field implements ArrayAccess, Validatable
     {
         $this->setFieldName($fieldName)
                 ->attrs(array('id' => $this->_createId($fieldName)));
-    }
-
-    public function setValidationBuilder($validationBuilder)
-    {
-        $this->validationBuilder = $validationBuilder;
-        return $this;
+        $this->validationBuilder = new ValidationBuilder();
     }
 
     /**
