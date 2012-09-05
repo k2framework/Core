@@ -86,7 +86,7 @@ class Flash
     {
         $messages = $this->messages->all();
         $this->messages->clear();
-        return $this->messages->all();
+        return $messages;
     }
 
     /**
@@ -95,7 +95,7 @@ class Flash
      */
     public function success($message)
     {
-        $this->set(__METHOD__, $message);
+        $this->set('success', $message);
     }
 
     /**
@@ -104,7 +104,7 @@ class Flash
      */
     public function info($message)
     {
-        $this->set(__METHOD__, $message);
+        $this->set('info', $message);
     }
 
     /**
@@ -113,7 +113,7 @@ class Flash
      */
     public function warning($message)
     {
-        $this->set(__METHOD__, $message);
+        $this->set('warning', $message);
     }
 
     /**
@@ -122,7 +122,7 @@ class Flash
      */
     public function error($message)
     {
-        $this->set(__METHOD__, $message);
+        $this->set('error', $message);
     }
 
 }
