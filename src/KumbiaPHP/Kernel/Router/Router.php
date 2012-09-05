@@ -35,18 +35,34 @@ class Router implements RouterInterface
         $this->kernel = $kernel;
     }
 
+    /**
+     *
+     * @param string $url
+     * @return \KumbiaPHP\Kernel\RedirectResponse 
+     */
     public function redirect($url = NULL)
     {
         $url = $this->app->getBaseUrl() . ltrim($url, '/');
         return new RedirectResponse($url);
     }
 
+    /**
+     *
+     * @param type $action
+     * @return \KumbiaPHP\Kernel\RedirectResponse 
+     */
     public function toAction($action)
     {
         $url = $this->app->getControllerUrl() . '/' . $action;
         return new RedirectResponse($url);
     }
 
+    /**
+     *
+     * @param type $url
+     * @return type
+     * @throws \LogicException 
+     */
     public function forward($url)
     {
         if ($this->forwards++ > 10) {
