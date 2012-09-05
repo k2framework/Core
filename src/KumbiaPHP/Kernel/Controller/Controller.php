@@ -54,6 +54,11 @@ class Controller
         $this->container = $container;
     }
 
+    protected function renderNotFound($message)
+    {
+        throw new \KumbiaPHP\Kernel\Exception\NotFoundException($message);
+    }
+
     /**
      *
      * @return object
