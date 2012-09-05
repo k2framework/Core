@@ -172,7 +172,7 @@ abstract class Field implements ArrayAccess, Validatable
             $this->validationBuilder->notNull($this->getFieldName(), array(
                 'message' => sprintf($message, $this->getLabel())
             ));
-            return $this->attrs(array('required11' => 'required'));
+            return $this->attrs(array('required' => 'required'));
         } else {
             $this->validationBuilder->remove('NotNull', $this->getFieldName());
             unset($this->attrs['required']);
