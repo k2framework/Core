@@ -80,6 +80,14 @@ class View
     }
 
     /**
+     * @return \KumbiaPHP\Flash\Flash 
+     */
+    public static function flash()
+    {
+        return self::$container->get('flash');
+    }
+
+    /**
      *
      * @param type $service
      * @return \KumbiaPHP\Kernel\Session\SessionInterface|\KumbiaPHP\Kernel\AppContext|\KumbiaPHP\Flash\Flash
