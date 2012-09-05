@@ -49,6 +49,7 @@ class Request
      * @var SessionInterface 
      */
     protected $session;
+
     /**
      * Contiene el contexto de ejecución de la aplicación
      * @var AppContext
@@ -134,6 +135,7 @@ class Request
     {
         $this->session = $session;
     }
+
     /**
      * Devuelve la instancia del objeto que tiene el contexto de la aplicación
      * @return AppContext
@@ -142,6 +144,7 @@ class Request
     {
         return $this->app;
     }
+
     /**
      * Estabelce la instancia del objeto que tiene el contexto de la aplicación
      * @param SessionInterface $session 
@@ -185,7 +188,7 @@ class Request
      */
     public function isMethod($method)
     {
-        return $this->getMethod() === $method;
+        return strtoupper($this->getMethod()) === strtoupper($method);
     }
 
     /**
