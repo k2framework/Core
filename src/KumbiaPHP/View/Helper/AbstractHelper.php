@@ -41,4 +41,36 @@ abstract class AbstractHelper
         }
         return $data;
     }
+
+}
+
+//debemos lograr que estas funciones queden en el espacio global de los namespaces
+
+namespace h;
+
+/**
+ * Atajo para htmlspecialchars, por defecto toma el charset de la
+ * aplicacion
+ *
+ * @param string $s
+ * @param string $charset
+ * @return string
+ */
+function h($s, $charset = APP_CHARSET)
+{
+
+    return htmlspecialchars($s, ENT_QUOTES, $charset);
+}
+
+/**
+ * Atajo para echo + htmlspecialchars, por defecto toma el charset de la
+ * aplicacion
+ *
+ * @param string $s
+ * @param string $charset
+ * @return string
+ */
+function eh($s, $charset = APP_CHARSET)
+{
+    echo htmlspecialchars($s, ENT_QUOTES, $charset);
 }
