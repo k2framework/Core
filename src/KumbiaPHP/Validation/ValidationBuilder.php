@@ -23,6 +23,12 @@ class ValidationBuilder
         return $this;
     }
 
+    public function maxlength($field, array $params = array())
+    {
+        $this->valitations['Integer'][$field] = $params;
+        return $this;
+    }
+
     public function has($type, $field)
     {
         return isset($this->valitations[$type]) && isset($this->valitations[$type][$field]);

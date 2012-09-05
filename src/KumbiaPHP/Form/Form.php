@@ -478,6 +478,9 @@ class Form implements ArrayAccess
                 if ($attribute->notNull) {
                     $field->required();
                 }
+                if (NULL !== $attribute->length && is_numeric($attribute->length)) {
+                    $field->maxLength($attribute->length);
+                }
             }
         }
     }
