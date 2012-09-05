@@ -49,5 +49,14 @@ abstract class ValidatorBase
         return self::$lastError;
     }
 
+    protected static function getValue(Validatable $object, $column)
+    {
+        if ($object instanceof \KumbiaPHP\Form\Field\Field) {
+            return $object->getValue();
+        } else {
+            return isset($object->$column) ? : NULL;
+        }
+    }
+
 }
 

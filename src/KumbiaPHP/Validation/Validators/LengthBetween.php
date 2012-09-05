@@ -41,7 +41,8 @@ class LengthBetween extends ValidatorBase
      */
     public static function validate(Validatable $object, $column, $params = NULL, $update = FALSE)
     {
-        if (strlen($object->$column) < $params['min'] || strlen($object->$column) > $params['max']) {
+        $value = self::getValue($object, $column);
+        if (strlen($value) < $params['min'] || strlen($value) > $params['max']) {
             if (isset($params['message'])) {
                 self::$lastError = $params['message'];
             } else {

@@ -40,11 +40,7 @@ class NotNull extends ValidatorBase
      */
     public static function validate(Validatable $object, $column, $params = NULL, $update = FALSE)
     {
-        if ($object instanceof \KumbiaPHP\Form\Field\Field) {
-            $value = $object->getValue();
-        } else {
-            $value = isset($object->$column) ? : NULL;
-        }
+        $value = self::getValue($object, $column);
         if (NULL === $value || '' === $value) {
             if (is_array($params) && isset($params['message'])) {
                 self::$lastError = $params['message'];
