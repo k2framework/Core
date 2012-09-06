@@ -144,15 +144,8 @@ class ControllerResolver
             throw new NotFoundException(sprintf("No exite el controlador \"%s\" en el Módulo \"%sController/\"", $controllerName, $currentPath), 404);
         }
 
-        //verifico si la clase hereda de Controller
-        if ($reflectionClass->isSubclassOf('\\KumbiaPHP\\Kernel\\Controller\\Controller')) {
-            //si es así le paso el contenedor como argumento
-            $this->controller = $reflectionClass->newInstanceArgs(array($this->container));
-            $this->setViewDefault($this->action);
-        } else {
-            //si no es una instancia de Controller, lo creo como una simple clase PHP
-            $this->controller = $reflectionClass->newInstance();
-        }
+        $this->controller = $reflectionClass->newInstanceArgs(array($this->container));
+        $this->setViewDefault($this->action);
 
         return array($this->controller, $this->action, $params);
     }
@@ -167,7 +160,7 @@ class ControllerResolver
         $this->executeBeforeFilter($controller);
 
         if (FALSE === $this->action) {
-            return NULL;//si el before devuelve false, es porque no queremos que se ejecute nuestra acción.
+            return NULL; //si el before devuelve false, es porque no queremos que se ejecute nuestra acción.
         }
         $this->validateAction($controller, $controllerEvent->getParameters());
 
@@ -241,14 +234,6 @@ class ControllerResolver
             throw new NotFoundException(sprintf("Éstas Tratando de acceder a un metodo no publico \"%s\" en el controlador \"%sController\"", $this->action, $this->contShortName), 404);
         }
 
-        //verificamos si el primer parametro del metodo requiere una
-        //instancia de Request
-        $parameters = $reflectionMethod->getParameters();
-        //si espera parametros y es un objeto lo que espera
-        if (count($parameters) && $parameters[0]->getClass()) {
-            //le pasamos el Request actual
-            array_unshift($params, $this->container->get('request'));
-        }
         /**
          * Verificamos que los parametros coincidan 
          */
@@ -264,17 +249,8 @@ class ControllerResolver
         if ($controller->hasMethod('beforeFilter')) {
             $method = $controller->getMethod('beforeFilter');
             $method->setAccessible(TRUE);
-            //verificamos si el primer parametro del beforeFilter requiere una
-            //instancia de Request
-            $parameters = $method->getParameters();
-            //si espera parametros y es un objeto lo que espera
-            if (count($parameters) && $parameters[0]->getClass()) {
-                //le pasamos el Request actual
-                $request = $this->container->get('request');
-            } else {
-                $request = NULL;
-            }
-            if (NULL !== $result = $method->invoke($this->controller, $request)) {
+
+            if (NULL !== $result = $method->invoke($this->controller)) {
                 if (FALSE === $result) {
                     //si el resultado es false, es porque no queremos que se ejecute la acción
                     $this->action = FALSE;
