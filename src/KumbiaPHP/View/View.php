@@ -50,12 +50,12 @@ class View
     protected function getContent(Response $response = NULL)
     {
         extract(self::$variables, EXTR_OVERWRITE);
-
+        
         //si va a mostrar vista
         if ($this->view !== NULL) {
 
             ob_start();
-            require_once $this->findView($this->view);
+            require_once $this->findView($this->view, $scaffold);
             self::$content = ob_get_clean();
         }
         if ($this->template !== NULL) {
@@ -116,14 +116,22 @@ class View
         return $file;
     }
 
-    protected function findView($view)
+    protected function findView($view, $scaffold = FALSE)
     {
         /* @var $app \KumbiaPHP\Kernel\AppContext */
         $app = self::$container->get('app.context');
+
         $module = $app->getCurrentModule();
         $controller = $app->getCurrentController();
         $file = rtrim($app->getModules($module), '/') . '/View/' . $controller . '/' . $view . '.phtml';
         if (!file_exists($file)) {
+            if (is_string($scaffold)) {
+                $view = '/view/scaffolds/' . $scaffold . '/' . $view . '.phtml';
+                $file = rtrim($app->getAppPath(), '/') . $view;
+                if (file_exists($file)) {
+                    return $file;
+                }
+            }
             throw new \LogicException(sprintf("No existe la Vista \"%s\" en \"%s\"", basename($file), $file));
         }
 
