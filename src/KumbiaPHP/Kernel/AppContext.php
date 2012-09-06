@@ -202,7 +202,7 @@ class AppContext
 
     public function getControllerUrl()
     {
-        return $this->currentModule . '/' . $this->toSmallCase($this->currentController);
+        return $this->getBaseUrl() . trim($this->currentModule, '/') . '/' . $this->toSmallCase($this->currentController);
     }
 
     protected function toSmallCase($string)
