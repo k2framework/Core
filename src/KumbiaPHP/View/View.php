@@ -50,7 +50,9 @@ class View
     protected function getContent(Response $response = NULL)
     {
         extract(self::$variables, EXTR_OVERWRITE);
-        
+
+        isset($scaffold) || $scaffold = FALSE;
+
         //si va a mostrar vista
         if ($this->view !== NULL) {
 
