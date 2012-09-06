@@ -1,4 +1,5 @@
 <?php
+
 /**
  * KumbiaPHP web & app Framework
  *
@@ -97,7 +98,7 @@ class Html extends AbstractHelper
             $attrs = self::getAttrs($attrs);
         }
 
-        return '<a href="' . self::$app->getBaseUrl() . self::$app->getControllerUrl() . "/$action\" $attrs >$text</a>";
+        return '<a href="' . self::$app->getControllerUrl() . "/$action\" $attrs >$text</a>";
     }
 
     /**
