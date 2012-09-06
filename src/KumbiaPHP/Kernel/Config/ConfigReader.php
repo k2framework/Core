@@ -3,7 +3,7 @@
 namespace KumbiaPHP\Kernel\Config;
 
 use KumbiaPHP\Kernel\AppContext;
-use KumbiaPHP\Kernel\Parameters;
+//use KumbiaPHP\Kernel\Parameters;
 
 /**
  * Description of ConfigContainer
@@ -32,9 +32,9 @@ class ConfigReader
      */
     protected function compile(AppContext $app)
     {
-        $section['config'] = new Parameters();
-        $section['services'] = new Parameters();
-        $section['parameters'] = new Parameters();
+        $section['config'] = array();
+        $section['services'] = array();
+        $section['parameters'] = array();
 
         $dirs = array_merge($app->getNamespaces(), array_values($app->getModules()), array($app->getAppPath()));
 
@@ -52,14 +52,14 @@ class ConfigReader
 
                     if (in_array($sectionType, $this->sectionsValid)) {
                         foreach ($values as $index => $v) {
-                            $section[$sectionType]->set($index, $v);
+                            $section[$sectionType][$index] = $v;
                         }
                     }
                 }
             }
             if (is_file($servicesFile)) {
                 foreach (parse_ini_file($servicesFile, TRUE) as $serviceName => $config) {
-                    $section['services']->set($serviceName, $config);
+                    $section['services'][$serviceName] = $config;
                 }
             }
         }
@@ -68,7 +68,7 @@ class ConfigReader
 
         unset($section['config']); //esta seccion esta disponible en parameters con el prefio config.*
 
-        return new Parameters($section);
+        return $section;
     }
 
     public function getConfig()
@@ -99,18 +99,18 @@ class ConfigReader
      */
     protected function explodeIndexes(array $section)
     {
-        foreach ($section['config']->all() as $key => $value) {
+        foreach ($section['config'] as $key => $value) {
             $explode = explode('.', $key);
             //si hay un punto y el valor delante del punto
             //es el nombre de un servicio existente
-            if (count($explode) > 1 && $section['services']->has($explode[0])) {
+            if (count($explode) > 1 && isset($section['services'][$explode[0]])) {
                 //le asignamos el nuevo valor al parametro
                 //que usará ese servicio
-                if ($section['parameters']->has($explode[1])) {
-                    $section['parameters']->set($explode[1], $value);
+                if (isset($section['parameters'][$explode[1]])) {
+                    $section['parameters'][$explode[1]] = $value;
                 }
             } else {
-                $section['parameters']->set('config.' . $key, $value);
+                $section['parameters']['config.' . $key] = $value;
             }
         }
         return $section;

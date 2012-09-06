@@ -235,18 +235,14 @@ abstract class Kernel implements KernelInterface
      * @param Parameters $config toda la configuracion de los archivos de config
      * de cada lib y modulo compilados en uno solo.
      */
-    protected function initContainer(Parameters $config)
+    protected function initContainer(array $config = array())
     {
 
-        $definitions = new DefinitionManager();
-
-        foreach ($config->get('services')->all() as $id => $configs) {
-            $definitions->addService(new \KumbiaPHP\Di\Definition\Service($id, $configs));
-        }
-
-        foreach ($config->get('parameters')->all() as $id => $value) {
-            $definitions->addParam(new \KumbiaPHP\Di\Definition\Parameter($id, $value));
-        }
+        //$definitions = new DefinitionManager();
+        $definitions = array(
+            'services' => $config['services'],
+            'parameters' => $config['parameters'],
+        );
 
         $this->di = new DependencyInjection();
 
@@ -257,10 +253,10 @@ abstract class Kernel implements KernelInterface
      * Inicializa el despachador de eventos
      * @param Parameters $config config de todo el proyecto.
      */
-    protected function initDispatcher(Parameters $config)
+    protected function initDispatcher(array $config = array())
     {
         $this->dispatcher = new EventDispatcher(self::$container);
-        foreach ($config->get('services')->all() as $service => $params) {
+        foreach ($config['services'] as $service => $params) {
             if (isset($params['listen'])) {
                 foreach ($params['listen'] as $method => $event) {
                     $this->dispatcher->addListener($event, array($service, $method));

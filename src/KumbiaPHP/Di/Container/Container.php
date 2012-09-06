@@ -4,8 +4,6 @@ namespace KumbiaPHP\Di\Container;
 
 use KumbiaPHP\Di\Container\ContainerInterface;
 use KumbiaPHP\Di\DependencyInjectionInterface as Di;
-use KumbiaPHP\Di\Definition\DefinitionManager;
-use KumbiaPHP\Di\Container\Services;
 use KumbiaPHP\Di\Definition\Service;
 use KumbiaPHP\Di\Exception\IndexNotDefinedException;
 
@@ -19,7 +17,7 @@ class Container implements ContainerInterface
 
     /**
      * 
-     * @var Services
+     * @var array
      */
     protected $services;
 
@@ -31,15 +29,15 @@ class Container implements ContainerInterface
 
     /**
      *
-     * @var DefinitionManager 
+     * @var array 
      */
-    protected $definitioManager;
+    protected $definitions;
 
-    public function __construct(Di $di, DefinitionManager $dm = NULL)
+    public function __construct(Di $di, array $definitions = array())
     {
-        $this->services = new Services();
+        $this->services = array();
         $this->di = $di;
-        $this->definitioManager = $dm ? : new DefinitionManager();
+        $this->definitions = $definitions;
 
         $di->setContainer($this);
 
@@ -50,17 +48,17 @@ class Container implements ContainerInterface
     public function get($id)
     {
 
-        if ($this->services->has($id)) {
+        if ($this->has($id)) {
             //si existe el servicio lo devolvemos
-            return $this->services->get($id);
+            return $this->services[$id];
         }
         //si no existe debemos crearlo
         //buscamos el servicio en el contenedor de servicios
-        if (!$this->definitioManager->hasService($id)) {
+        if (!isset($this->definitions['services'][$id])) {
             throw new IndexNotDefinedException(sprintf('No existe el servicio "%s"', $id));
         }
 
-        $config = $this->definitioManager->getService($id)->getConfig();
+        $config = $this->definitions['services'][$id];
 
         //retorna la instancia recien creada
         return $this->di->newInstance($id, $config);
@@ -68,22 +66,25 @@ class Container implements ContainerInterface
 
     public function has($id)
     {
-        return $this->services->has($id);
+        return isset($this->services[$id]);
     }
 
     public function set($id, $object)
     {
-        $this->services->replace($id, $object);
+        $this->services[$id] = $object;
         //y lo agregamos a las definiciones. (solo será a gregado si no existe)
-        $this->definitioManager->addService(new Service($id, array(
-                    'class' => get_class($object)
-                )));
+        if (!isset($this->definitions['services'][$id])) {
+
+            $this->definitions['services'][$id] = array(
+                'class' => get_class($object)
+            );
+        }
     }
 
     public function getParameter($id)
     {
         if ($this->hasParameter($id)) {
-            return $this->definitioManager->getParam($id)->getValue();
+            return $this->definitions['parameters'][$id];
         } else {
             return NULL;
         }
@@ -91,12 +92,12 @@ class Container implements ContainerInterface
 
     public function hasParameter($id)
     {
-        return $this->definitioManager->hasParam($id);
+        return array_key_exists($id, $this->definitions['parameters']);
     }
 
-    public function getDefinitionManager()
+    public function getDefinitions()
     {
-        return $this->definitioManager;
+        return $this->definitions;
     }
 
 }
