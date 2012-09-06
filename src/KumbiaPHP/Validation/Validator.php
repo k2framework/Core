@@ -41,10 +41,9 @@ class Validator
             return TRUE;
         }
         $valid = TRUE;
-        foreach ($validations as $typeValidation => $fields) {
+        foreach ($validations as $classValidation => $fields) {
             foreach ($fields as $field => $params) {
-                $class = "KumbiaPHP\\Validation\\Validators\\$typeValidation";
-                if (FALSE === call_user_func_array(array($class, 'validate'), array(
+                if (FALSE === call_user_func_array(array($classValidation, 'validate'), array(
                             $object, $field, $params, $update))) {
                     //agregamos el error al objeto.
                     $object->addError($field, Validators\ValidatorBase::getLastError());

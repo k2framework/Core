@@ -13,6 +13,8 @@ use KumbiaPHP\Validation\ValidationBuilder;
 abstract class Field implements ArrayAccess, Validatable
 {
 
+    protected $formName;
+
     /**
      * Etiqueta para el campo del formulario
      * 
@@ -66,9 +68,14 @@ abstract class Field implements ArrayAccess, Validatable
      */
     public function __construct($fieldName)
     {
-        $this->setFieldName($fieldName)
-                ->attrs(array('id' => $this->_createId($fieldName)));
+        $this->setFieldName($fieldName);
         $this->validationBuilder = new ValidationBuilder();
+    }
+
+    public function setFormName($formName)
+    {
+        $this->formName = $formName;
+        return $this->attrs(array('id' => $this->createId()));
     }
 
     /**
@@ -187,7 +194,7 @@ abstract class Field implements ArrayAccess, Validatable
      */
     public function isRequired()
     {
-        //return array_key_exists('required', $this->getValidations());
+        return $this->validationBuilder->has(ValidationBuilder::NOT_NULL, $this->getFieldName());
     }
 
     /**
@@ -236,7 +243,7 @@ abstract class Field implements ArrayAccess, Validatable
     protected function prepareAttrs()
     {
         $this->attrs(array(
-            'name' => $this->getFieldName(),
+            'name' => $this->formName . '[' . $this->getFieldName() . ']',
             'type' => $this->getType(),
         ));
         if (!is_array($this->getValue())) {
@@ -355,9 +362,9 @@ abstract class Field implements ArrayAccess, Validatable
         }
     }
 
-    protected function _createId($fieldName)
+    protected function createId()
     {
-        return 'input_' . preg_replace('/(\[(.*)\])/i', '_$2', $fieldName);
+        return $this->formName . '_' . preg_replace('/(\[(.*)\])/i', '_$2', $this->getFieldName());
     }
 
 }

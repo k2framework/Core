@@ -38,15 +38,6 @@ class Select extends Choice
         return $html;
     }
 
-    protected function prepareValidations()
-    {
-        $validations = parent::prepareValidations();
-        if (array_key_exists('inList', $validations)) {
-            $validations['inList']['list'] = array_keys($this->getOptions());
-        }
-        return $validations;
-    }
-
     protected function prepareAttrs()
     {
         $attrs = parent::prepareAttrs();

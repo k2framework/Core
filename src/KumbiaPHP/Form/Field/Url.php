@@ -27,13 +27,4 @@ class Url extends Text
                 ));
     }
 
-    protected function prepareValidations()
-    {
-        $prepared = parent::prepareValidations();
-        if (array_key_exists('url', $prepared) && ($this->getValue() == NULL)) {
-            unset($prepared['url']); //si viene vacio no validamos que sea una URL.
-        }
-        return $prepared;
-    }
-
 }

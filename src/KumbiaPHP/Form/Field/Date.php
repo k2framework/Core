@@ -4,7 +4,6 @@ namespace KumbiaPHP\Form\Field;
 
 use KumbiaPHP\Form\Field\Text;
 
-
 /**
  * Description of FormFieldText
  *
@@ -27,13 +26,11 @@ class Date extends Text
      */
     protected function dateValidation($format = 'd-m-Y', $message = 'El campo %s debe ser una fecha Valida')
     {
-        return $this->setValidations(array(
-                    'date' => array(
-                        'value' => $this->getValue(),
-                        'format' => $format,
-                        'message' => $message,
-                    )
-                ));
+        $this->validationBuilder->date($this->getFieldName(), array(
+            'message' => sprintf($message, $this->getLabel()),
+            'format' => $format,
+        ));
+        return $this;
     }
 
 }

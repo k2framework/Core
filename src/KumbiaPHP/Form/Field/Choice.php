@@ -4,7 +4,6 @@ namespace KumbiaPHP\Form\Field;
 
 use KumbiaPHP\Form\Field\Field;
 
-
 /**
  * Description of FormFieldText
  *
@@ -80,8 +79,7 @@ abstract class Choice extends Field
         $html = array();
         $index = 0;
         foreach ($this->getOptions() as $value => $label) {
-            //$this['id'] = preg_replace('/(\[.*\])/i', "_$index", $this->getFieldName());
-            $this['id'] = $this->getFieldName() . "_$index";
+            $this['id'] = $this->createId() . "_$index";
             $html[$index] = '<input ' . $this->attrsToString();
             if (in_array($value, (array) $this->getValue())) {
                 $html[$index] .= ' checked="checked" ';
@@ -98,11 +96,11 @@ abstract class Choice extends Field
      */
     public function inListValidation($message = 'El valor del campo %s no está en la lista de opciones')
     {
-        return $this->setValidations(array('inList' => array(
-                        'value' => $this->getValue(),
-                        'list' => array(),
-                        'message' => $message,
-                        )));
+        $this->validationBuilder->inList($this->getFieldName(), array(
+            'message' => sprintf($message, $this->getLabel()),
+            'list' => $this->getOptions()
+        ));
+        return $this;
     }
 
     /**
@@ -117,22 +115,10 @@ abstract class Choice extends Field
 
     protected function prepareAttrs()
     {
-        $attrs = parent::_prepareAttrs();
+        $attrs = parent::prepareAttrs();
         unset($attrs['value']);
-        $attrs['name'] = $this->getFieldName() . '[]';
+        $attrs['name'] = $this->formName . '[' . $this->getFieldName() . '][]';
         return $attrs;
-    }
-
-    protected function prepareValidations()
-    {
-        $validations = parent::_prepareValidations();
-        if (array_key_exists('required', $validations)) {
-            $validations['required']['value'] = $this->getValue();
-        }
-        if (array_key_exists('inList', $validations)) {
-            $validations['inList']['list'] = array_keys($this->getOptions());
-        }
-        return $validations;
     }
 
 }

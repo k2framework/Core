@@ -28,14 +28,12 @@ class Number extends Text
      */
     public function range($min, $max = NULL, $message = 'El campo %s debe ser un numero entre %s y %s')
     {
-        return $this->setValidations(array(
-                    'range' => array(
-                        'value' => $this->getValue(),
-                        'min' => $min,
-                        'max' => $max,
-                        'message' => sprintf($message, $this->getFieldName(), $min, $max),
-                    )
-                ))->attrs(array(
+        $this->validationBuilder->range($this->getFieldName(), array(
+            'message' => sprintf($message, $this->getFieldName(), $min, $max),
+            'min' => $min,
+            'max' => $max,
+        ));
+        return $this->attrs(array(
                     'min' => $min,
                     'max' => $max,
                 ));

@@ -18,6 +18,8 @@ use KumbiaPHP\Di\Container\ContainerInterface;
 class Form implements ArrayAccess
 {
 
+    protected $name;
+
     /**
      * Campos (Elementos) del formulario.
      * 
@@ -79,12 +81,16 @@ class Form implements ArrayAccess
      * @pa
      * 
      */
-    final public function __construct(ActiveRecord $model = NULL, $createFields = FALSE)
+    final public function __construct($model = NULL, $createFields = FALSE)
     {
         $this->validationBuilder = new ValidationBuilder();
-        if (NULL !== $model && TRUE === $createFields) {
+        if ($model instanceof ActiveRecord && TRUE === $createFields) {
             $this->model = $model;
             $this->initFromModel($model);
+        } elseif ($model instanceof ActiveRecord) {
+            $this->name = strtolower(basename(get_class($model)));
+        } else {
+            $this->name = $model;
         }
         $this->init();
     }
@@ -95,12 +101,17 @@ class Form implements ArrayAccess
         self::$validator = $container->get('validator');
     }
 
+    public function getName()
+    {
+        return $this->name;
+    }
+
     /**
      * 
      * @param string|\KumbiaPHP\Form\Field\Field $fieldName
      * @param string $type
      * @param array $options
-     * @return \KumbiaPHP\Form\Field\Field
+     * @return \KumbiaPHP\Form\Field\Field|\KumbiaPHP\Form\Field\Choice
      * @throws Exception 
      */
     public function add($fieldName, $type = 'text', array $options = array())
@@ -129,7 +140,7 @@ class Form implements ArrayAccess
     protected function _add(Field $field)
     {
         //$index = preg_replace('/\[.*\]/i', '', $formField->getFieldName());
-        $index = $field->getFieldName();
+        $index = $field->setFormName($this->getName())->getFieldName();
         $this->fields[$index] = $field;
         if ($field instanceof Field\File) {
             $this->attrs(array('enctype' => 'multipart/form-data'));
@@ -341,9 +352,10 @@ class Form implements ArrayAccess
     public function bindRequest(Request $request)
     {
         /* @var $field \KumbiaPHP\Form\Field\Field */
-
-        foreach ($this->fields as $fieldName => $field) {
-            $field->setValue($request->get($fieldName));
+        if ($data = $request->get($this->name, FALSE)) {
+            foreach ($this->fields as $fieldName => $field) {
+                $field->setValue(isset($data[$fieldName]) ? $data[$fieldName] : NULL);
+            }
         }
         return $this;
     }
@@ -355,11 +367,18 @@ class Form implements ArrayAccess
      */
     public function getData()
     {
-        $values = array();
-        foreach ($this->fields as $fieldName => $field) {
-            $values[$fieldName] = $field->getValue();
+        if ($this->model instanceof ActiveRecord) {
+            foreach ($this->fields as $fieldName => $field) {
+                $this->model->{$fieldName} = $field->getValue();
+            }
+            return $this->model;
+        } else {
+            $values = array();
+            foreach ($this->fields as $fieldName => $field) {
+                $values[$fieldName] = $field->getValue();
+            }
+            return $values;
         }
-        return $values;
     }
 
     /**
@@ -473,10 +492,11 @@ class Form implements ArrayAccess
                     $field->required();
                 }
                 if (NULL !== $attribute->length && is_numeric($attribute->length)) {
-                    $field->maxLength($attribute->length);
+                    $field->maxLength($attribute->length, 10);
                 }
             }
         }
+        $this->name = strtolower(basename(get_class($model)));
     }
 
 }

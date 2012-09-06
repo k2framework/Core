@@ -1,6 +1,6 @@
 <?php
 
-namespace KumbiaPHP\Validation\Validators;
+namespace KumbiaPHP\ActiveRecord\Validation\Validators;
 
 use KumbiaPHP\Validation\Validators\ValidatorBase;
 use KumbiaPHP\Validation\Validatable;

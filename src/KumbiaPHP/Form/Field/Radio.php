@@ -17,7 +17,7 @@ class Radio extends Choice
     public function __construct($fieldName)
     {
         parent::__construct($fieldName);
-        $this->setType('checkbox');
+        $this->setType('radio');
     }
 
 }
