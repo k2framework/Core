@@ -117,7 +117,7 @@ abstract class Choice extends Field
     {
         $attrs = parent::prepareAttrs();
         unset($attrs['value']);
-        $attrs['name'] = $this->formName . '[' . $this->getFieldName() . '][]';
+        //$attrs['name'] = $this->formName . '[' . $this->getFieldName() . '][]';
         return $attrs;
     }
 
