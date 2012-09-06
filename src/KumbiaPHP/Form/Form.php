@@ -84,11 +84,12 @@ class Form implements ArrayAccess
     final public function __construct($model = NULL, $createFields = FALSE)
     {
         $this->validationBuilder = new ValidationBuilder();
-        if ($model instanceof ActiveRecord && TRUE === $createFields) {
-            $this->model = $model;
-            $this->initFromModel($model);
-        } elseif ($model instanceof ActiveRecord) {
+        if ($model instanceof ActiveRecord) {
             $this->name = strtolower(basename(get_class($model)));
+            $this->model = $model;
+            if ($createFields) {
+                $this->initFromModel($model);
+            }
         } else {
             $this->name = $model;
         }
@@ -345,6 +346,22 @@ class Form implements ArrayAccess
     /**
      * Establece los valores para los elementos del formulario.
      * 
+     * @param array $data arreglo con los datos a pasar
+     * 
+     * @return Form delvuelve el mismo objeto.
+     */
+    public function setData(array $data)
+    {
+        /* @var $field \KumbiaPHP\Form\Field\Field */
+        foreach ($this->fields as $fieldName => $field) {
+            $field->setValue(isset($data[$fieldName]) ? $data[$fieldName] : NULL);
+        }
+    }
+
+    /**
+     * Establece los valores para los elementos del formulario por medio del
+     * objeto Request.
+     * 
      * @param Request $request instancia de la petición actual.
      * 
      * @return Form delvuelve el mismo objeto.
@@ -363,7 +380,7 @@ class Form implements ArrayAccess
     /**
      * Devuelve un arreglo con los valores de los campos del formulario.
      *
-     * @return array 
+     * @return array|ActiveRecord 
      */
     public function getData()
     {
@@ -482,8 +499,11 @@ class Form implements ArrayAccess
         foreach ($model->metadata()->getAttributes() as $fieldName => $attribute) {
             if ($attribute->PK) {
                 $field = $this->add($fieldName, 'hidden');
+                if (isset($model->{$fieldName})) {
+                    $field->setValue($model->{$fieldName});
+                }
             } else {
-                $field = $this->add($fieldName, 'text')
+                $field = $this->add($fieldName)
                         ->setLabel($attribute->alias);
                 if (isset($model->{$fieldName})) {
                     $field->setValue($model->{$fieldName});
@@ -492,11 +512,10 @@ class Form implements ArrayAccess
                     $field->required();
                 }
                 if (NULL !== $attribute->length && is_numeric($attribute->length)) {
-                    $field->maxLength($attribute->length, 10);
+                    $field->maxLength($attribute->length);
                 }
             }
         }
-        $this->name = strtolower(basename(get_class($model)));
     }
 
 }
