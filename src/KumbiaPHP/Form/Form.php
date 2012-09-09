@@ -184,7 +184,7 @@ class Form implements ArrayAccess
      */
     public function setAction($action)
     {
-        $this->action = $this->action;
+        $this->action = $action;
         return $this;
     }
 
