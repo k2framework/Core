@@ -15,14 +15,12 @@ class User implements UserInterface
     protected $username;
     protected $password;
     protected $roles;
-    protected $attributes;
 
     function __construct(array $data = array())
     {
         isset($data['username']) && $this->username = $data['username'];
         isset($data['password']) && $this->password = $data['password'];
         isset($data['roles']) && $this->roles = $data['roles'];
-        isset($data['attributes']) && $this->attributes = $data['attributes'];
     }
 
     public function auth(UserInterface $user)
@@ -43,10 +41,5 @@ class User implements UserInterface
     public function getUsername()
     {
         return $this->username;
-    }
-
-    public function getAttributes()
-    {
-        return $this->attributes;
     }
 }
