@@ -45,4 +45,8 @@ class User implements UserInterface
         return $this->username;
     }
 
+    public function getAttributes()
+    {
+        return $this->attributes;
+    }
 }
