@@ -19,6 +19,7 @@ abstract class AbstractToken implements TokenInterface
      */
     protected $user;
     protected $valid;
+    protected $attributes;
 
     public function __construct(UserInterface $user)
     {
@@ -38,11 +39,6 @@ abstract class AbstractToken implements TokenInterface
     public function isValid()
     {
         return $this->valid;
-    }
-
-    public function logout()
-    {
-        
     }
 
     public function serialize()
@@ -68,6 +64,11 @@ abstract class AbstractToken implements TokenInterface
     public function getRoles()
     {
         return $this->user->getRoles();
+    }
+
+    public function getAttributes()
+    {
+        return $this->attributes;
     }
 
 }

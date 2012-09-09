@@ -22,6 +22,8 @@ interface TokenInterface extends Serializable
     public function getUsername();
 
     public function getRoles();
+    
+    public function getAttributes();
 
     /**
      * 
@@ -29,8 +31,6 @@ interface TokenInterface extends Serializable
     public function setUser(UserInterface $user);
 
     public function setAutenticated($autenticate);
-
-    public function logout();
 
     public function isValid();
 }
