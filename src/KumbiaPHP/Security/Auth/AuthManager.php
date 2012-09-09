@@ -3,7 +3,6 @@
 namespace KumbiaPHP\Security\Auth;
 
 use KumbiaPHP\Security\Auth\Token\TokenInterface;
-use KumbiaPHP\Security\Auth\AuthManagerInterface;
 use KumbiaPHP\Security\Auth\Provider\UserProviderInterface;
 
 /**
@@ -11,7 +10,7 @@ use KumbiaPHP\Security\Auth\Provider\UserProviderInterface;
  *
  * @author manuel
  */
-class AuthManager implements AuthManagerInterface
+class AuthManager
 {
 
     /**
