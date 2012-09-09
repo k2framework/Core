@@ -12,11 +12,11 @@ use KumbiaPHP\Kernel\Session\SessionInterface;
 class Session implements SessionInterface
 {
 
-    protected $namespace;
+    protected $namespaceApp;
 
     public function __construct($namespace = 'default')
     {
-        $this->namespace = $namespace;
+        $this->namespaceApp = $namespace;
         $this->start();
     }
 
@@ -31,25 +31,27 @@ class Session implements SessionInterface
         session_destroy();
     }
 
-    public function get($key)
+    public function get($key, $namespace = 'default')
     {
-        return $this->has($key) ? $_SESSION[$this->namespace][$key] : NULL;
+        return $this->has($key, $namespace) ? $_SESSION[$this->namespaceApp][$namespace][$key] : NULL;
     }
 
-    public function has($key)
+    public function has($key, $namespace = 'default')
     {
-        return isset($_SESSION[$this->namespace]) && array_key_exists($key, $_SESSION[$this->namespace]);
+        return isset($_SESSION[$this->namespaceApp]) &&
+                isset($_SESSION[$this->namespaceApp][$namespace]) &&
+                array_key_exists($key, $_SESSION[$this->namespaceApp][$namespace]);
     }
 
-    public function set($key, $value)
+    public function set($key, $value, $namespace = 'default')
     {
-        $_SESSION[$this->namespace][$key] = $value;
+        $_SESSION[$this->namespaceApp][$namespace][$key] = $value;
     }
 
-    public function delete($key)
+    public function delete($key, $namespace = 'default')
     {
-        if ($this->has($key)) {
-            unset($_SESSION[$this->namespace][$key]);
+        if ($this->has($key, $namespace)) {
+            unset($_SESSION[$this->namespaceApp][$namespace][$key]);
         }
     }
 
