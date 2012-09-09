@@ -32,7 +32,6 @@ class Firewall
 
         $url = $event->getRequest()->getRequestUrl();
         if (!$logged = $this->container->get('session')->has('token', 'security')) {
-
             if ($url === Reader::get('security.login_url')) {//
                 return;
             } elseif ($url === '/_autenticate' ||
@@ -42,7 +41,8 @@ class Firewall
                 $event->stopPropagation();
                 return $this->loginCheck($event->getRequest());
             }
-        } elseif ($url === Reader::get('security.login_url')) {
+        } elseif ($url == Reader::get('security.login_url')) {
+            $event->stopPropagation();
             return $this->container->get('router')
                             ->redirect(Reader::get('security.target_login'));
         }
