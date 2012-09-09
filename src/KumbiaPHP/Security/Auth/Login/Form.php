@@ -15,7 +15,13 @@ class Form extends AbstractLogin
 
     public function showLogin()
     {
-        return $this->container->get('router')->redirect(Reader::get('security.login_url'));
+        $currentUrl = $this->container->get('request')->getRequestUrl();
+        $login_url = Reader::get('security.login_url');
+        if ($currentUrl !== $login_url) {
+            $this->container->get('session')
+                    ->set('target_login', $currentUrl, 'security');
+        }
+        return $this->container->get('router')->forward($login_url);
     }
 
 }
