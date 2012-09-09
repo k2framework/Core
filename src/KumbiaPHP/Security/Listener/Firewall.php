@@ -42,6 +42,9 @@ class Firewall
                 $event->stopPropagation();
                 return $this->loginCheck($event->getRequest());
             }
+        } elseif ($url === Reader::get('security.login_url')) {
+            return $this->container->get('router')
+                            ->redirect(Reader::get('security.target_login'));
         }
 
         if ($url === Reader::get('security.logout_url')) {//
@@ -78,10 +81,10 @@ class Firewall
     protected function getProviderAndToken($provider)
     {
         $providerClassName = $this->container
-                ->getParameter('security.provider.' . Reader::get('security.provider'));
+                ->getParameter('security.provider.' . $provider);
 
         $tokenClassName = $this->container
-                ->getParameter('security.token.' . Reader::get('security.provider'));
+                ->getParameter('security.token.' . $provider);
 
         if (!class_exists($providerClassName)) {
             die("No existe el proveedor $providerClassName");
@@ -100,7 +103,11 @@ class Firewall
 
         if ($auth->autenticate($token)) {
             $this->container->get('session')->set('token', $token, 'security');
-            return $this->container->get('router')->redirect(Reader::get('security.target_login'));
+            if ($url = $this->container->get('session')->get('target_login', 'security')) {
+                return $this->container->get('router')->redirect($url);
+            } else {
+                return $this->container->get('router')->redirect(Reader::get('security.target_login'));
+            }
         } else {
             return $this->showLogin();
         }

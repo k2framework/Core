@@ -24,7 +24,6 @@ class ActiveRecord implements UserProviderInterface
     function __construct()
     {
         $ar = Reader::get('security.active_record');
-        var_dump($ar);
         if ($ar && class_exists($ar['class'])) {
             $this->userModel = new $ar['class']();
         }else{

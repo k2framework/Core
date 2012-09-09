@@ -36,7 +36,6 @@ class Security
                     $this->getToken()->isValid();
         } else {
             if ($this->session->has('token', 'security')) {
-                var_dump($this->getToken()->getRoles(),$rol);
                 return $this->getToken()->isValid() && in_array($rol, (array) $this->getToken()->getRoles());
             }
         }
