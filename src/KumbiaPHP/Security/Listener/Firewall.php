@@ -104,6 +104,7 @@ class Firewall
         if ($auth->autenticate($token)) {
             $this->container->get('session')->set('token', $token, 'security');
             if ($url = $this->container->get('session')->get('target_login', 'security')) {
+                $this->container->get('session')->delete('target_login', 'security');
                 return $this->container->get('router')->redirect($url);
             } else {
                 return $this->container->get('router')->redirect(Reader::get('security.target_login'));
