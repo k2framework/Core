@@ -6,6 +6,8 @@ use KumbiaPHP\Security\Config\Reader;
 use KumbiaPHP\Kernel\Event\RequestEvent;
 use KumbiaPHP\Security\Auth\AuthManager;
 use KumbiaPHP\Di\Container\ContainerInterface;
+use KumbiaPHP\Security\Exception\AuthException;
+use KumbiaPHP\Security\Exception\UserNotFoundException;
 
 /**
  * Description of Firewall
@@ -26,9 +28,15 @@ class Firewall
         $this->container = $container;
     }
 
+    /**
+     * metodo que será llamado por el dispatcher en el evento kumbia.request
+     * @param RequestEvent $event
+     * @return NULL|\KumbiaPHP\Kernel\Response 
+     */
     public function onKernelRequest(RequestEvent $event)
     {
         Reader::readSecurityConfig($this->container->get('app.context'));
+
 
         $url = $event->getRequest()->getRequestUrl();
         if (!$logged = $this->container->get('session')->has('token', 'security')) {
@@ -39,9 +47,9 @@ class Firewall
                     $event->getRequest()->server->get('PHP_AUTH_USER') &&
                     $event->getRequest()->server->get('PHP_AUTH_PW'))) {
                 $event->stopPropagation();
-                return $this->loginCheck($event->getRequest());
+                return $this->loginCheck();
             }
-        } elseif ($url == Reader::get('security.login_url')) {
+        } elseif ($url == Reader::get('security.login_url') || $url === '/_autenticate') {
             $event->stopPropagation();
             return $this->container->get('router')
                             ->redirect(Reader::get('security.target_login'));
@@ -63,6 +71,11 @@ class Firewall
         }
     }
 
+    /**
+     * Verifica si la URL actual está protegida.
+     * @param string $url
+     * @return boolean 
+     */
     protected function isSecure($url)
     {
         $routes = (array) Reader::get('routes');
@@ -78,30 +91,43 @@ class Firewall
         return FALSE;
     }
 
+    /**
+     * Devuelve un arreglo con las instancias del proveedor de usuarios
+     * y el token.
+     * @param string $provider
+     * @return array
+     * @throws AuthException 
+     */
     protected function getProviderAndToken($provider)
     {
-        $providerClassName = $this->container
-                ->getParameter('security.provider.' . $provider);
+        if (0 === strpos($provider, '@')) {
+            $provider = $this->container->get(str_replace('@', '', $provider));
+        } else {
+            $providerClassName = $this->container
+                    ->getParameter('security.provider.' . $provider);
 
-        $tokenClassName = $this->container
-                ->getParameter('security.token.' . $provider);
-
-        if (!class_exists($providerClassName)) {
-            die("No existe el proveedor $providerClassName");
+            if (!class_exists($providerClassName)) {
+                $providerClassName || $providerClassName = $provider;
+                throw new AuthException("No existe el proveedor $providerClassName");
+            }
+            $provider = new $providerClassName($this->container);
         }
-        if (!class_exists($tokenClassName)) {
-            die("No existe el Token $tokenClassName");
+
+        if (!($provider instanceof \KumbiaPHP\Security\Auth\Provider\UserProviderInterface )) {
+            throw new AuthException("la clase proveedora de usuarios debe implementar la interface UserProviderInterface");
         }
 
-        return array(new $providerClassName(), new $tokenClassName($this->getUserObject()));
+        return array($provider, $provider->getToken((array) Reader::get('security.user')));
     }
 
-    protected function loginCheck(\KumbiaPHP\Kernel\Request $request)
+    protected function loginCheck()
     {
-        list ($provider, $token) = $this->getProviderAndToken(Reader::get('security.provider'));
-        $auth = new AuthManager($provider);
+        try {
+            list ($provider, $token) = $this->getProviderAndToken(Reader::get('security.provider'));
+            $auth = new AuthManager($provider);
 
-        if ($auth->autenticate($token)) {
+            $auth->autenticate($token);
+
             $this->container->get('session')->set('token', $token, 'security');
             if ($url = $this->container->get('session')->get('target_login', 'security')) {
                 $this->container->get('session')->delete('target_login', 'security');
@@ -109,22 +135,32 @@ class Firewall
             } else {
                 return $this->container->get('router')->redirect(Reader::get('security.target_login'));
             }
-        } else {
-            return $this->showLogin();
+        } catch (UserNotFoundException $e) {
+            $this->container->get('flash')->set("LOGIN_ERROR", "Usuario ó Contraseña Invalidos");
         }
+        return $this->showLogin();
     }
 
+    /**
+     * Muestra el formulario de login.
+     * @return \KumbiaPHP\Kernel\Response
+     * @throws AuthException 
+     */
     protected function showLogin()
     {
         $typeLoginClassName = 'KumbiaPHP\\Security\\Auth\\Login\\' . ucfirst(Reader::get('security.type'));
         if (!class_exists($typeLoginClassName)) {
-            die("No existe el Tipo del Logueo $typeLoginClassName");
+            throw new AuthException("No existe el Tipo del Logueo $typeLoginClassName");
         }
 
         $login = new $typeLoginClassName($this->container);
         return $login->showLogin();
     }
 
+    /**
+     * Desloguea al usuario del sistema.
+     * @return \KumbiaPHP\Kernel\Response 
+     */
     protected function logout()
     {
         $typeLoginClassName = 'KumbiaPHP\\Security\\Auth\\Login\\' . ucfirst(Reader::get('security.type'));
@@ -135,34 +171,6 @@ class Firewall
 
         $login = new $typeLoginClassName($this->container);
         return $login->logout(Reader::get('security.target_logout'));
-    }
-
-    protected function getUserObject()
-    {
-        $request = $this->container->get('request');
-
-        if ('active_record' === Reader::get('security.provider')) {
-            $modelClassName = Reader::get('security.active_record.class');
-            $usernameField = Reader::get('security.active_record.username') ? : 'username';
-
-            if (!class_exists($modelClassName)) {
-                die("No existe el proveedor $modelClassName");
-            }
-
-            $form = $request->get('form_login', array(
-                $usernameField => $request->server->get('PHP_AUTH_USER'),
-                'password' => $request->server->get('PHP_AUTH_PW'),
-                    ));
-
-            return new $modelClassName($form);
-            ;
-        } else {
-            $form = $request->get('form_login', array(
-                'username' => $request->server->get('PHP_AUTH_USER'),
-                'password' => $request->server->get('PHP_AUTH_PW'),
-                    ));
-            return new \KumbiaPHP\Security\Auth\User\User($form);
-        }
     }
 
 }

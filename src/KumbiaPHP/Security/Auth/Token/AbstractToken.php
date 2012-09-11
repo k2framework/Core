@@ -21,7 +21,7 @@ abstract class AbstractToken implements TokenInterface
     protected $valid;
     protected $attributes;
 
-    public function __construct(UserInterface $user)
+    public function __construct($user)
     {
         $this->user = $user;
     }
@@ -46,7 +46,7 @@ abstract class AbstractToken implements TokenInterface
         return serialize(array($this->user, $this->valid));
     }
 
-    public function setUser(UserInterface $user)
+    public function setUser($user)
     {
         $this->user = $user;
     }

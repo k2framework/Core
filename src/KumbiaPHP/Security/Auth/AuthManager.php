@@ -3,6 +3,7 @@
 namespace KumbiaPHP\Security\Auth;
 
 use KumbiaPHP\Security\Auth\Token\TokenInterface;
+use KumbiaPHP\Security\Exception\UserNotFoundException;
 use KumbiaPHP\Security\Auth\Provider\UserProviderInterface;
 
 /**
@@ -24,13 +25,13 @@ class AuthManager
         $this->userProvider = $userProvider;
     }
 
-    //put your code here
+//put your code here
     public function autenticate(TokenInterface $token)
     {
         $user = $this->userProvider->loadUser($token);
 
         if (TRUE !== $user->auth($token->getUser())) {
-            throw new \Exception("no existe");
+            throw new UserNotFoundException("no existe el usuario {$token->getUsername()}");
         }
 
         $token->setUser($user);

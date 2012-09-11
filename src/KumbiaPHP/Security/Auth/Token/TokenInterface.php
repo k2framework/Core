@@ -11,12 +11,6 @@ use KumbiaPHP\Security\Auth\User\UserInterface;
  */
 interface TokenInterface extends Serializable
 {
-
-    public function __construct(UserInterface $user);
-
-    /**
-     * @return UserInterface 
-     */
     public function getUser();
 
     public function getUsername();
@@ -25,10 +19,7 @@ interface TokenInterface extends Serializable
     
     public function getAttributes();
 
-    /**
-     * 
-     */
-    public function setUser(UserInterface $user);
+    public function setUser($user);
 
     public function setAutenticated($autenticate);
 
