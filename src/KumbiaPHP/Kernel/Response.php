@@ -2,7 +2,7 @@
 
 namespace KumbiaPHP\Kernel;
 
-use KumbiaPHP\Kernel\Parameters;
+use KumbiaPHP\Kernel\Collection;
 
 /**
  * Clase que representa la respuesta de la petición.
@@ -14,7 +14,7 @@ class Response
 
     /**
      * Cabeceras para la respuesta
-     * @var Parameters 
+     * @var Collection 
      */
     public $headers;
 
@@ -46,7 +46,7 @@ class Response
     {
         $this->content = $content;
         $this->statusCode = $statusCode;
-        $this->headers = new Parameters($headers);
+        $this->headers = new Collection($headers);
     }
 
     /**

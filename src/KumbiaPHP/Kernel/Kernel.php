@@ -232,10 +232,10 @@ abstract class Kernel implements KernelInterface
 
     /**
      * Esta función inicializa el contenedor de servicios.
-     * @param Parameters $config toda la configuracion de los archivos de config
+     * @param Collection $config toda la configuracion de los archivos de config
      * de cada lib y modulo compilados en uno solo.
      */
-    protected function initContainer(Parameters $config)
+    protected function initContainer(Collection $config)
     {
 
         $definitions = new DefinitionManager();
@@ -255,9 +255,9 @@ abstract class Kernel implements KernelInterface
 
     /**
      * Inicializa el despachador de eventos
-     * @param Parameters $config config de todo el proyecto.
+     * @param Collection $config config de todo el proyecto.
      */
-    protected function initDispatcher(Parameters $config)
+    protected function initDispatcher(Collection $config)
     {
         $this->dispatcher = new EventDispatcher(self::$container);
         foreach ($config->get('services')->all() as $service => $params) {

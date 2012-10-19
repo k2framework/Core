@@ -4,7 +4,7 @@ namespace KumbiaPHP\Kernel;
 
 use KumbiaPHP\Kernel\Session\SessionInterface;
 use KumbiaPHP\Kernel\AppContext;
-use KumbiaPHP\Kernel\Parameters;
+use KumbiaPHP\Kernel\Collection;
 
 /**
  * Esta clase representa una petición HTTP.
@@ -16,31 +16,31 @@ class Request
 
     /**
      * Contiene la Informaci�n de la variable $_SERVER
-     * @var Parameters
+     * @var Collection
      */
     public $server;
 
     /**
      * Contiene la Informaci�n de la variable $_REQUEST
-     * @var Parameters
+     * @var Collection
      */
     public $request;
 
     /**
      * Contiene la Informaci�n de la variable $_GET
-     * @var Parameters 
+     * @var Collection 
      */
     public $query;
 
     /**
      * Contiene la informaci�n de la variable $_COOKIE
-     * @var Parameters 
+     * @var Collection 
      */
     public $cookies;
 
     /**
      * Contiene la informaci�n de la variable $_FILES
-     * @var Parameters 
+     * @var Collection 
      */
     public $files;
 
@@ -78,11 +78,11 @@ class Request
      */
     public function __construct()
     {
-        $this->server = new Parameters($_SERVER);
-        $this->request = new Parameters($_POST);
-        $this->query = new Parameters($_GET);
-        $this->cookies = new Parameters($_COOKIE);
-        $this->files = new Parameters($_FILES);
+        $this->server = new Collection($_SERVER);
+        $this->request = new Collection($_POST);
+        $this->query = new Collection($_GET);
+        $this->cookies = new Collection($_COOKIE);
+        $this->files = new Collection($_FILES);
 
         //este fix es para permitir tener en el request los valores para peticiones
         //PUT y DELETE, ya que php no ofrece una forma facil de obtenerlos
@@ -91,11 +91,11 @@ class Request
                 && in_array($this->getMethod(), array('PUT', 'DELETE'))
         ) {
             parse_str($this->getContent(), $data);
-            $this->request = new Parameters($data);
+            $this->request = new Collection($data);
         } elseif (0 === strpos($this->server->get('CONTENT_TYPE'), 'application/json')) {
             //si los datos de la petición se envian en formato JSON
             //los convertimos en una arreglo.
-            $this->request = new Parameters((array) json_decode($this->getContent(), TRUE));
+            $this->request = new Collection((array) json_decode($this->getContent(), TRUE));
         }
     }
 

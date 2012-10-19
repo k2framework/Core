@@ -3,7 +3,7 @@
 namespace KumbiaPHP\Kernel\Config;
 
 use KumbiaPHP\Kernel\AppContext;
-use KumbiaPHP\Kernel\Parameters;
+use KumbiaPHP\Kernel\Collection;
 
 /**
  * Description of ConfigContainer
@@ -15,7 +15,7 @@ class ConfigReader
 
     /**
      *
-     * @var Parameters
+     * @var Collection
      */
     protected $config;
     private $sectionsValid = array('config', 'parameters');
@@ -32,9 +32,9 @@ class ConfigReader
      */
     protected function compile(AppContext $app)
     {
-        $section['config'] = new Parameters();
-        $section['services'] = new Parameters();
-        $section['parameters'] = new Parameters();
+        $section['config'] = new Collection();
+        $section['services'] = new Collection();
+        $section['parameters'] = new Collection();
 
         $dirs = array_merge($app->getNamespaces(), array_values($app->getModules()), array($app->getAppPath()));
 
@@ -68,7 +68,7 @@ class ConfigReader
 
         unset($section['config']); //esta seccion esta disponible en parameters con el prefio config.*
 
-        return new Parameters($section);
+        return new Collection($section);
     }
 
     public function getConfig()
@@ -94,8 +94,8 @@ class ConfigReader
      * 
      * mi_servico.nombre_app = 'Nuevo nombre asignado'
      * 
-     * @param Parameters $services
-     * @param Parameters $params 
+     * @param Collection $services
+     * @param Collection $params 
      */
     protected function explodeIndexes(array $section)
     {

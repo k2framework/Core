@@ -3,7 +3,7 @@
 namespace KumbiaPHP\Flash;
 
 use KumbiaPHP\Kernel\Session\SessionInterface;
-use KumbiaPHP\Kernel\Parameters;
+use KumbiaPHP\Kernel\Collection;
 
 /**
  * Clase que permite el envio de mensajes flash desde un controlador,
@@ -20,7 +20,7 @@ class Flash
     /**
      * Contiene los mensajes que se van enviando.
      *
-     * @var Parameters 
+     * @var Collection 
      */
     private $messages;
 
@@ -33,7 +33,7 @@ class Flash
     {
         //si no existe el indice en la sesión, lo creamos.
         if (!$session->has('messages.flash')) {
-            $session->set('messages.flash', new Parameters());
+            $session->set('messages.flash', new Collection());
         }
         //le pasamos el objeto parameters
         $this->messages = $session->get('messages.flash');
