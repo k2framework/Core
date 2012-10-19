@@ -40,10 +40,10 @@ class Router implements RouterInterface
      * @param string $url
      * @return \KumbiaPHP\Kernel\RedirectResponse 
      */
-    public function redirect($url = NULL)
+    public function redirect($url = NULL, $status = 302)
     {
         $url = $this->app->getBaseUrl() . ltrim($url, '/');
-        return new RedirectResponse($url);
+        return new RedirectResponse($url, $status);
     }
 
     /**
@@ -51,10 +51,10 @@ class Router implements RouterInterface
      * @param type $action
      * @return \KumbiaPHP\Kernel\RedirectResponse 
      */
-    public function toAction($action)
+    public function toAction($action, $status = 302)
     {
         $url = $this->app->getControllerUrl() . '/' . $action;
-        return new RedirectResponse($url);
+        return new RedirectResponse($url, $status);
     }
 
     /**

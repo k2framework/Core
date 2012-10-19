@@ -130,7 +130,11 @@ class Response
         header(sprintf('HTTP/1.1 %s', $this->statusCode));
 
         foreach ($this->headers->all() as $index => $value) {
-            header("{$index}: {$value}", false);
+            if (is_string($index)) {
+                header("{$index}: {$value}", false);
+            } else {
+                header("{$value}", false);
+            }
         }
     }
 

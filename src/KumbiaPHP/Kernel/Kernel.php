@@ -126,6 +126,8 @@ abstract class Kernel implements KernelInterface
         //iniciamos el dispatcher con esa config
         $this->initDispatcher($config->getConfig());
 
+        //seteamos el contexto de la aplicación como servicio
+        self::$container->set('app.context', $context);
         //le asignamos el servicio session al request
         $this->request->setSession(self::$container->get('session'));
         $this->request->setAppContext($context);
@@ -133,7 +135,6 @@ abstract class Kernel implements KernelInterface
         //agregamos el request al container
         self::$container->set('request', $this->request);
 
-        self::$container->set('app.context', $context);
     }
 
     /**

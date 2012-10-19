@@ -57,7 +57,7 @@ class Flash
      */
     public function has($type)
     {
-        return $this->messages->has(trim($type), $message);
+        return $this->messages->has(trim($type));
     }
 
     /**
