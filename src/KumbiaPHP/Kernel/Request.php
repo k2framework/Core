@@ -45,12 +45,6 @@ class Request
     public $files;
 
     /**
-     * Contiene la Información de la Sesión
-     * @var SessionInterface 
-     */
-    protected $session;
-
-    /**
      * Contiene el contexto de ejecución de la aplicación
      * @var AppContext
      */
@@ -116,24 +110,6 @@ class Request
         //busca en request, si no existe busca en query sino existe busca en 
         //cookies, si no devuelve $default.
         return $this->request->get($key, $this->query->get($key, $this->cookies->get($key, $default)));
-    }
-
-    /**
-     * Devuelve la instancia del manejador de sesiones.
-     * @return SessionInterface 
-     */
-    public function getSession()
-    {
-        return $this->session;
-    }
-
-    /**
-     * Estabelce la instancia del manejador de sesión
-     * @param SessionInterface $session 
-     */
-    public function setSession(SessionInterface $session)
-    {
-        $this->session = $session;
     }
 
     /**
