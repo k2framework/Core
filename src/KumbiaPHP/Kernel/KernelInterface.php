@@ -3,6 +3,7 @@
 namespace KumbiaPHP\Kernel;
 
 use KumbiaPHP\Kernel\Request;
+use KumbiaPHP\Kernel\Response;
 use KumbiaPHP\Di\Container\ContainerInterface;
 
 /**

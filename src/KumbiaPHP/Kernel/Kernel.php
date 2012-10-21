@@ -120,16 +120,15 @@ abstract class Kernel implements KernelInterface
         //leemos la config de la app
         $config = new ConfigReader($context);
         //iniciamos el container con esa config
-        $this->initContainer($config->getConfig());
+        $this->initContainer($config);
         //asignamos el kernel al container como un servicio
         self::$container->set('app.kernel', $this);
         //iniciamos el dispatcher con esa config
-        $this->initDispatcher($config->getConfig());
+        $this->initDispatcher($config);
 
         //seteamos el contexto de la aplicación como servicio
         self::$container->set('app.context', $context);
-        //le asignamos el servicio session al request
-        $this->request->setSession(self::$container->get('session'));
+        //le asignamos el servicio AppContext al request
         $this->request->setAppContext($context);
 
         //agregamos el request al container
@@ -137,9 +136,6 @@ abstract class Kernel implements KernelInterface
 
     }
 
-    /**
-     * {inherit}
-     */
     public function execute(Request $request)
     {
         $this->request = $request;
@@ -233,19 +229,19 @@ abstract class Kernel implements KernelInterface
 
     /**
      * Esta función inicializa el contenedor de servicios.
-     * @param Collection $config toda la configuracion de los archivos de config
+     * @param Collection $reader toda la configuracion de los archivos de config
      * de cada lib y modulo compilados en uno solo.
      */
-    protected function initContainer(Collection $config)
+    protected function initContainer(ConfigReader $reader)
     {
 
         $definitions = new DefinitionManager();
 
-        foreach ($config->get('services')->all() as $id => $configs) {
+        foreach ($reader->getConfig()->get('services')->all() as $id => $configs) {
             $definitions->addService(new \KumbiaPHP\Di\Definition\Service($id, $configs));
         }
 
-        foreach ($config->get('parameters')->all() as $id => $value) {
+        foreach ($reader->getConfig()->get('parameters')->all() as $id => $value) {
             $definitions->addParam(new \KumbiaPHP\Di\Definition\Parameter($id, $value));
         }
 
@@ -256,12 +252,12 @@ abstract class Kernel implements KernelInterface
 
     /**
      * Inicializa el despachador de eventos
-     * @param Collection $config config de todo el proyecto.
+     * @param Collection $reader config de todo el proyecto.
      */
-    protected function initDispatcher(Collection $config)
+    protected function initDispatcher(ConfigReader $reader)
     {
         $this->dispatcher = new EventDispatcher(self::$container);
-        foreach ($config->get('services')->all() as $service => $params) {
+        foreach ($reader->getConfig()->get('services')->all() as $service => $params) {
             if (isset($params['listen'])) {
                 foreach ($params['listen'] as $method => $event) {
                     $this->dispatcher->addListener($event, array($service, $method));
