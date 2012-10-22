@@ -20,7 +20,7 @@
 
 namespace KumbiaPHP\Cache;
 
-use KumbiaPHP\Kernel\AppContext;
+use KumbiaPHP\Kernel\Kernel;
 use KumbiaPHP\Cache\CacheException;
 
 /**
@@ -69,13 +69,13 @@ abstract class Cache
 
     /**
      *
-     * @var AppContext 
+     * @var Kernel 
      */
-    protected $context;
+    protected $kernel;
 
-    function __construct(AppContext $app)
+    function __construct(Kernel $kernel)
     {
-        $this->context = $app;
+        $this->kernel = $kernel;
     }
 
     /**
@@ -167,7 +167,7 @@ abstract class Cache
      *
      * @param string $driver (file, sqlite, memsqlite, APC)
      * */
-    public static function driver(AppContext $app, $driver = NULL)
+    public static function driver(Kernel $kernel, $driver = NULL)
     {
         if (!$driver) {
             $driver = self::$_default_driver;
@@ -180,7 +180,7 @@ abstract class Cache
                 throw new CacheException("No existe el Adaptador de Cache \"$class\"");
             }
 
-            self::$_drivers[$driver] = new $class($app);
+            self::$_drivers[$driver] = new $class($kernel);
         }
 
         return self::$_drivers[$driver];

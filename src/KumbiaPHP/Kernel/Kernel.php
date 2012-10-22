@@ -218,7 +218,7 @@ abstract class Kernel implements KernelInterface
      * devuelve la ruta a la carpeta app del proyecto.
      * @return string 
      */
-    private function getAppPath()
+    public function getAppPath()
     {
         if (!$this->appPath) {
             $r = new \ReflectionObject($this);

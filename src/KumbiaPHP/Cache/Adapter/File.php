@@ -57,7 +57,7 @@ class File extends Cache
         $this->_id = $id;
         $this->_group = $group;
 
-        $filename = $this->context->getAppPath() . 'temp/cache/' . $this->_getFilename($id, $group);
+        $filename = $this->kernel->getAppPath() . 'temp/cache/' . $this->_getFilename($id, $group);
         if (file_exists($filename)) {
             $fh = fopen($filename, 'r');
 
@@ -96,7 +96,7 @@ class File extends Cache
             $lifetime = 'undefined';
         }
 
-        return file_put_contents($this->context->getAppPath() . 'temp/cache/' . $this->_getFilename($id, $group), "$lifetime\n$value");
+        return file_put_contents($this->kernel->getAppPath() . 'temp/cache/' . $this->_getFilename($id, $group), "$lifetime\n$value");
     }
 
     /**
@@ -107,7 +107,7 @@ class File extends Cache
      */
     public function clean($group=false)
     {
-        $pattern = $group ? $this->context->getAppPath() . 'temp/cache/' . '*.' . md5($group) : $this->context->getAppPath() . 'temp/cache/*';
+        $pattern = $group ? $this->kernel->getAppPath() . 'temp/cache/' . '*.' . md5($group) : $this->kernel->getAppPath() . 'temp/cache/*';
         foreach (glob($pattern) as $filename) {
             if (!unlink($filename)) {
                 return false;
@@ -125,7 +125,7 @@ class File extends Cache
      */
     public function remove($id, $group='default')
     {
-        return unlink($this->context->getAppPath() . 'temp/cache/' . $this->_getFilename($id, $group));
+        return unlink($this->kernel->getAppPath() . 'temp/cache/' . $this->_getFilename($id, $group));
     }
 
 }
