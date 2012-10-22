@@ -68,7 +68,7 @@ class Tag extends AbstractHelper
      */
     public static function js($src, $priority = 100, $cache = TRUE)
     {
-        $src = "javascript/$src.js";
+        $src = "js/$src";
         if (!$cache) {
             $src .= '?nocache=' . uniqid();
         }
