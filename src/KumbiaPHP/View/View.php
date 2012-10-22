@@ -99,6 +99,28 @@ class View
         return self::$container->get($service);
     }
 
+    public static function partial($partial, $time = FALSE, $params = array())
+    {
+        /* @var $app \KumbiaPHP\Kernel\AppContext */
+        $app = self::$container->get('app.context');
+
+        $partial = explode(':', $partial);
+
+        if (count($partial) > 1) {
+            $modulePath = rtrim($app->getModulesPath(), '/') . '/' . $partial[0];
+            $file = $modulePath . '/View/_shared/partials/' . $partial[1] . '.phtml';
+        } else {
+            $file = rtrim($app->getAppPath(), '/') . '/view/partials/' . $partial[0] . '.phtml';
+        }
+        
+        extract($params, EXTR_OVERWRITE);
+        
+        if (!file_exists($file)) {
+            throw new \LogicException(sprintf("No existe El Partial \"%s\" en \"%s\"", basename($file), $file));
+        }
+        include $file;
+    }
+
     protected function findTemplate($template)
     {
         /* @var $app \KumbiaPHP\Kernel\AppContext */
