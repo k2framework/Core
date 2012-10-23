@@ -36,10 +36,9 @@ class CacheKernel implements KernelInterface
     public function execute(Request $request)
     {
 
-//        if (!$this->kernel->isProduction()) {
-//            return $this->kernel->execute($request);
-//        }
-        //die('Tiempo: ' . round(microtime(1) - START_TIME, 4) . ' seg.');
+        if (!$this->kernel->isProduction()) {
+            return $this->kernel->execute($request);
+        }
 
         $this->kernel->init($request);
 
@@ -55,7 +54,7 @@ class CacheKernel implements KernelInterface
         } else {
             $response = $this->kernel->execute($request);
 
-            if ($this->isCacheable($request, $response)) {                
+            if ($this->isCacheable($request, $response)) {
                 $this->cache->save($id, $response);
             } else {
                 $this->cache->remove($id);

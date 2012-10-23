@@ -173,13 +173,14 @@ abstract class Kernel implements KernelInterface
                     //como la acción no devolvió respuesta, debemos
                     //obtener la vista y el template establecidos en el controlador
                     //para pasarlos al servicio view, y este construya la respuesta
-                    $view = $resolver->getView();
-                    $template = $resolver->getTemplate();
+                    $view = $resolver->getParamValue('view');
+                    $template = $resolver->getParamValue('template');
+                    $cache = $resolver->getParamValue('cache');
                     $properties = $resolver->getPublicProperties(); //nos devuelve las propiedades publicas del controlador
                     //llamamos al render del servicio "view" y esté nos devolverá
                     //una instancia de response con la respuesta creada
-                    /* @var $response Response */
-                    $response = self::$container->get('view')->render($template, $view, $properties);
+                    /* @var $response Response */ 
+                    $response = self::$container->get('view')->render($template, $view, $properties, $cache);
                 }
             }
         }

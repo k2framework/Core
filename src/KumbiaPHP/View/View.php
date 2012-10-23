@@ -36,18 +36,22 @@ class View
         define('APP_CHARSET', self::$container->getParameter('config.charset') ? : 'UTF-8');
     }
 
-    public function render($template, $view, array $params = array(), Response $response = NULL)
+    public function render($template, $view, array $params = array(), $cacheTime = NULL)
     {
         $this->template = $template;
         $this->view = $view;
         self::$variables = array_merge($params, self::$variables);
 
         AbstractHelper::setAppContext(self::$container->get('app.context'));
+        
+        $response = new Response($this->getContent());
+        $response->setCharset(APP_CHARSET);
+        $response->cache($cacheTime);
 
-        return $this->getContent($response);
+        return $response;
     }
 
-    protected function getContent(Response $response = NULL)
+    protected function getContent()
     {
         extract(self::$variables, EXTR_OVERWRITE);
 
@@ -67,14 +71,7 @@ class View
             self::$content = ob_get_clean();
         }
 
-        if (!$response instanceof Response) {
-            $response = new Response(self::$content);
-            $response->setCharset(APP_CHARSET);
-        }else{
-            $response->setContent($response->getContent() . self::$content);
-        }
-
-        return $response;
+        return self::$content;
     }
 
     public static function content()

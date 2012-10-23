@@ -176,16 +176,6 @@ class ControllerResolver
         return get_object_vars($this->controller);
     }
 
-    public function getView()
-    {
-        return $this->getParamValue('view');
-    }
-
-    public function getTemplate()
-    {
-        return $this->getParamValue('template');
-    }
-
     public function getModulePath()
     {
         $namespaces = $this->container->get('app.context')->getModules();
@@ -278,18 +268,23 @@ class ControllerResolver
         }
     }
 
-    protected function getParamValue($propertie)
+    public function getParamValue($propertie)
     {
         $reflection = new \ReflectionClass($this->controller);
 
-        //obtengo el parametro del controlador.
-        $propertie = $reflection->getProperty($propertie);
+        if ($reflection->hasProperty($propertie)) {
 
-        //lo hago accesible para poderlo leer
-        $propertie->setAccessible(true);
+            //obtengo el parametro del controlador.
+            $propertie = $reflection->getProperty($propertie);
 
-        //y retorno su valor
-        return $propertie->getValue($this->controller);
+            //lo hago accesible para poderlo leer
+            $propertie->setAccessible(true);
+
+            //y retorno su valor
+            return $propertie->getValue($this->controller);
+        } else {
+            return NULL;
+        }
     }
 
     protected function setViewDefault($action)
