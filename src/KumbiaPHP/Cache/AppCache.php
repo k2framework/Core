@@ -13,7 +13,7 @@ use KumbiaPHP\Kernel\KernelInterface;
  *
  * @author maguirre
  */
-class CacheKernel implements KernelInterface
+class AppCache implements KernelInterface
 {
 
     /**
