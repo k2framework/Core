@@ -46,7 +46,8 @@ class AppCache implements KernelInterface
 
         $id = md5($request->getRequestUrl() . $request->server->get('QUERY_STRING'));
 
-        if (($response = $this->cache->get($id)) instanceof Response) {
+        if ($this->isMethodCacheable($request) &&
+                (($response = $this->cache->get($id)) instanceof Response)) {
             $response->setNotModified();
             if ('text/html' === $response->headers->get('Content-Type', 'text/html')) {
                 echo '<!-- Tiempo: ' . round(microtime(1) - START_TIME, 4) . ' seg. -->';
@@ -66,8 +67,14 @@ class AppCache implements KernelInterface
 
     protected function isCacheable(Request $request, Response $response)
     {
-        return in_array($request->getMethod(), array('GET', 'HEAD')) &&
-                in_array($response->getStatusCode(), array(200, 203, 300, 301, 302, 404, 410));
+        return $this->isMethodCacheable($request) &&
+                in_array($response->getStatusCode(), array(
+                    200, 203, 300, 301, 302, 404, 410));
+    }
+
+    protected function isMethodCacheable(Request $request)
+    {
+        return in_array($request->getMethod(), array('GET', 'HEAD'));
     }
 
     public static function getContainer()
