@@ -59,8 +59,7 @@ final class Autoload
 
         foreach (self::$directories as $folder) {
             if (file_exists($file = $folder . DIRECTORY_SEPARATOR . $fileName)) {
-                require $file;
-                return;
+                return require_once $file;
             }
             //var_dump($file,$fileName);
         }

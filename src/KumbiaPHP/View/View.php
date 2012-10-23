@@ -3,6 +3,7 @@
 namespace KumbiaPHP\View;
 
 use KumbiaPHP\Kernel\Response;
+use KumbiaPHP\Loader\Autoload;
 use KumbiaPHP\View\ViewContainer;
 use KumbiaPHP\View\Helper\AbstractHelper;
 use KumbiaPHP\Di\Container\ContainerInterface;
@@ -42,6 +43,8 @@ class View
         $this->view = $view;
         self::$variables = array_merge($params, self::$variables);
 
+        Autoload::registerDirectories(array(__DIR__ . '/Helper/'));
+        
         AbstractHelper::setAppContext(self::$container->get('app.context'));
         
         $response = new Response($this->getContent());

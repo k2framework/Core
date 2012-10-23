@@ -17,7 +17,7 @@
  * @copyright  Copyright (c) 2005-2012 KumbiaPHP Team (http://www.kumbiaphp.com)
  * @license    http://wiki.kumbiaphp.com/Licencia     New BSD License
  */
-namespace KumbiaPHP\View\Helper;
+//namespace KumbiaPHP\View\Helper;
 
 use KumbiaPHP\View\Helper\AbstractHelper;
 /**
