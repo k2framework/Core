@@ -21,6 +21,7 @@
 namespace KumbiaPHP\Cache;
 
 use KumbiaPHP\Kernel\Kernel;
+use KumbiaPHP\Kernel\Response;
 use KumbiaPHP\Cache\CacheException;
 
 /**
@@ -37,45 +38,24 @@ abstract class Cache
      *
      * @var array
      * */
-    protected static $_drivers = array();
-
-    /**
-     * Driver por defecto
-     *
-     * @var string
-     * */
-    protected static $_default_driver = 'file';
-
-    /**
-     * Id de ultimo elemento solicitado
-     *
-     * @var string
-     */
-    protected $_id = null;
-
-    /**
-     * Grupo de ultimo elemento solicitado
-     *
-     * @var string
-     */
-    protected $_group = 'default';
+    protected static $drivers = array();
 
     /**
      * Tiempo de vida
      *
      * @var string
      */
-    protected $_lifetime = null;
+    protected $lifetime = null;
 
     /**
      *
-     * @var Kernel 
+     * @var string 
      */
-    protected $kernel;
+    protected $appPath;
 
-    function __construct(Kernel $kernel)
+    function __construct($appPath)
     {
-        $this->kernel = $kernel;
+        $this->appPath = $appPath;
     }
 
     /**
@@ -83,7 +63,7 @@ abstract class Cache
      *
      * @param string $id
      * @param string $group
-     * @return string
+     * @return Response
      */
     public abstract function get($id, $group = 'default');
 
@@ -96,7 +76,7 @@ abstract class Cache
      * @param string $group
      * @return boolean
      */
-    public abstract function save($value, $lifetime = NULL, $id = FALSE, $group = 'default');
+    public abstract function save($id, Response $response);
 
     /**
      * Limpia la cache
@@ -116,84 +96,29 @@ abstract class Cache
     public abstract function remove($id, $group = 'default');
 
     /**
-     * Inicia el cacheo del buffer de salida hasta que se llame a end
+     * Obtiene el Adaptador de cache indicado
      *
-     * @param string $lifetime tiempo de vida con formato strtotime, utilizado para cache
-     * @param string $id
-     * @param string $group
-     * @return boolean
-     */
-    public function start($lifetime, $id, $group = 'default')
-    {
-        if ($data = $this->get($id, $group)) {
-            echo $data;
-
-            // No es necesario cachear
-            return FALSE;
-        }
-        $this->_lifetime = $lifetime;
-
-        // inicia la captura del buffer
-        ob_start();
-
-        // Inicia cacheo
-        return TRUE;
-    }
-
-    /**
-     * Termina el buffer de salida
-     *
-     * @param boolean $save indica si al terminar guarda la cache
-     * @return boolean
-     */
-    public function end($save = TRUE)
-    {
-        if (!$save) {
-            ob_end_flush();
-            return FALSE;
-        }
-
-        // obtiene el contenido del buffer
-        $value = ob_get_contents();
-
-        // libera el buffer
-        ob_end_flush();
-
-        return $this->save($value, $this->_lifetime, $this->_id, $this->_group);
-    }
-
-    /**
-     * Obtiene el driver de cache indicado
-     *
-     * @param string $driver (file, sqlite, memsqlite, APC)
+     * @param Kernel $kernel 
      * */
-    public static function driver(Kernel $kernel, $driver = NULL)
+    public static function factory(Kernel $kernel)
     {
-        if (!$driver) {
-            $driver = self::$_default_driver;
+        if (Kernel::getContainer()->hasParameter('cache')) {
+            $driver = Kernel::getContainer()->getParameter('cache');
+        } else {
+            $driver = 'file';
         }
 
-        if (!isset(self::$_drivers[$driver])) {
+        if (!isset(self::$drivers[$driver])) {
             $class = 'KumbiaPHP\Cache\Adapter\\' . ucfirst($driver);
 
             if (!class_exists($class)) {
                 throw new CacheException("No existe el Adaptador de Cache \"$class\"");
             }
 
-            self::$_drivers[$driver] = new $class($kernel);
+            self::$drivers[$driver] = new $class($kernel->getAppPath());
         }
 
-        return self::$_drivers[$driver];
-    }
-
-    /**
-     * Cambia el driver por defecto
-     *
-     * @param string $driver nombre del driver por defecto
-     */
-    public static function setDefault($driver = 'file')
-    {
-        self::$_default_driver = $driver;
+        return self::$drivers[$driver];
     }
 
 }

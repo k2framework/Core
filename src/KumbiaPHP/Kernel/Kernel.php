@@ -113,8 +113,9 @@ abstract class Kernel implements KernelInterface
      * AppContext, Container, Inyector de dependencias, Dispatcher, etc.
      *  
      */
-    protected function init()
+    public function init(Request $request)
     {
+        $this->request = $request;
         //creamos la instancia del AppContext
         $context = new AppContext($this->request, $this->production, $this->getAppPath(), $this->routes, $this->namespaces);
         //leemos la config de la app
@@ -133,16 +134,14 @@ abstract class Kernel implements KernelInterface
 
         //agregamos el request al container
         self::$container->set('request', $this->request);
-
     }
 
     public function execute(Request $request)
     {
-        $this->request = $request;
-
         if (!self::$container) { //si no se ha creado el container lo creamos.
-            $this->init();
+            $this->init($request);
         } else {//si ya se creó el container solo actualizamos el app.context con el nuevo request
+            $this->request = $request;
             self::$container->get('app.context')->setRequest($this->request);
         }
 
@@ -192,9 +191,14 @@ abstract class Kernel implements KernelInterface
     }
 
     /**
-     * Devuelve el objeto container
-     * @return \KumbiaPHP\Di\Container\ContainerInterface 
+     *
+     * @return boolean 
      */
+    public function isProduction()
+    {
+        return $this->production;
+    }
+
     public static function getContainer()
     {
         return self::$container;

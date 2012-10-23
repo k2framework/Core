@@ -22,6 +22,9 @@
 namespace KumbiaPHP\Cache\Adapter;
 
 use KumbiaPHP\Cache\Cache;
+use KumbiaPHP\Kernel\Kernel;
+use KumbiaPHP\Kernel\Request;
+use KumbiaPHP\Kernel\Response;
 
 /**
  * Cacheo de Archivos
@@ -40,9 +43,9 @@ class File extends Cache
      * @param string $group
      * @return string
      */
-    protected function _getFilename($id, $group)
+    protected function getFilename($id, $group)
     {
-        return 'cache_' . md5($id) . '.' . md5($group);
+        return $this->appPath . 'temp/cache/cache_' . md5($id) . '.' . md5($group);
     }
 
     /**
@@ -50,26 +53,24 @@ class File extends Cache
      *
      * @param string $id
      * @param string $group
-     * @return string
+     * @return Response
      */
-    public function get($id, $group='default')
+    public function get($id, $group = 'default')
     {
-        $this->_id = $id;
-        $this->_group = $group;
-
-        $filename = $this->kernel->getAppPath() . 'temp/cache/' . $this->_getFilename($id, $group);
+        $filename = $this->getFilename($id, $group);
         if (file_exists($filename)) {
             $fh = fopen($filename, 'r');
 
             $lifetime = trim(fgets($fh));
             if ($lifetime == 'undefined' || $lifetime >= time()) {
                 $data = stream_get_contents($fh);
+                $response = unserialize($data);
             } else {
-                $data = null;
+                $response = null;
             }
 
             fclose($fh);
-            return $data;
+            return $response;
         }
         return null;
     }
@@ -83,20 +84,19 @@ class File extends Cache
      * @param int $lifetime tiempo de vida en forma timestamp de unix
      * @return boolean
      */
-    public function save($value, $lifetime=null, $id=false, $group='default')
+    public function save($id, Response $response)
     {
-        if (!$id) {
-            $id = $this->_id;
-            $group = $this->_group;
-        }
-
+        $group = 'default';
+        $lifetime = '+5 seconds';
         if ($lifetime) {
             $lifetime = strtotime($lifetime);
         } else {
             $lifetime = 'undefined';
         }
 
-        return file_put_contents($this->kernel->getAppPath() . 'temp/cache/' . $this->_getFilename($id, $group), "$lifetime\n$value");
+        $content = $lifetime . PHP_EOL . serialize($response);
+
+        return file_put_contents($this->getFilename($id, $group), $content);
     }
 
     /**
@@ -105,9 +105,9 @@ class File extends Cache
      * @param string $group
      * @return boolean
      */
-    public function clean($group=false)
+    public function clean($group = false)
     {
-        $pattern = $group ? $this->kernel->getAppPath() . 'temp/cache/' . '*.' . md5($group) : $this->kernel->getAppPath() . 'temp/cache/*';
+        $pattern = $group ? $this->appPath . 'temp/cache/' . '*.' . md5($group) : $this->appPath . 'temp/cache/*';
         foreach (glob($pattern) as $filename) {
             if (!unlink($filename)) {
                 return false;
@@ -123,9 +123,9 @@ class File extends Cache
      * @param string $group
      * @return string
      */
-    public function remove($id, $group='default')
+    public function remove($id, $group = 'default')
     {
-        return unlink($this->kernel->getAppPath() . 'temp/cache/' . $this->_getFilename($id, $group));
+        return unlink($this->getFilename($id, $group));
     }
 
 }

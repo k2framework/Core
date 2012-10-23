@@ -9,7 +9,7 @@ use KumbiaPHP\Kernel\Collection;
  *
  * @author manuel
  */
-class Response
+class Response implements \Serializable
 {
 
     /**
@@ -136,6 +136,25 @@ class Response
                 header("{$value}", false);
             }
         }
+    }
+
+    public function serialize()
+    {
+        return array(
+            'headers' => $this->headers->all(),
+            'content' => $this->getContent(),
+            'statusCode' => $this->getStatusCode(),
+            'charset' => $this->getCharset(),
+        );
+    }
+
+    public function unserialize($serialized)
+    {
+        $data = unserialize($serialized);
+        $this->headers = new Collection($data['headers']);
+        $this->setContent($data['content']);
+        $this->setStatusCode($data['statusCode']);
+        $this->setCharset($data['charset']);
     }
 
     /**

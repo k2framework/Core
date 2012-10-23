@@ -3,6 +3,7 @@
 namespace KumbiaPHP\Cache;
 
 use KumbiaPHP\Cache\Cache;
+use KumbiaPHP\Kernel\Kernel;
 use KumbiaPHP\Kernel\Request;
 use KumbiaPHP\Kernel\Response;
 use KumbiaPHP\Kernel\KernelInterface;
@@ -17,7 +18,7 @@ class CacheKernel implements KernelInterface
 
     /**
      *
-     * @var KernelInterface 
+     * @var Kernel
      */
     protected $kernel;
 
@@ -27,25 +28,44 @@ class CacheKernel implements KernelInterface
      */
     protected $cache;
 
-    function __construct(KernelInterface $kernel)
+    function __construct(Kernel $kernel)
     {
         $this->kernel = $kernel;
-        $this->cache = Cache::driver($kernel);
     }
 
     public function execute(Request $request)
     {
 
-        $id = md5($request->getRequestUrl());
-        if (NULL !== $content = $this->cache->get($id)) {
-            $content .= '<!-- Tiempo: ' . round(microtime(1) - START_TIME, 4) . ' seg. -->';
-            $response = new Response($content);
+//        if (!$this->kernel->isProduction()) {
+//            return $this->kernel->execute($request);
+//        }
+
+        $this->kernel->init($request);
+
+        $this->cache = Cache::factory($this->kernel);
+
+        $id = md5($request->getRequestUrl() . $request->server->get('QUERY_STRING'));
+
+        if (($response = $this->cache->get($id)) instanceof Response) {
+            if ('text/html' === $response->headers->get('Content-Type', 'text/html')) {
+                echo '<!-- Tiempo: ' . round(microtime(1) - START_TIME, 4) . ' seg. -->';
+            }
         } else {
             $response = $this->kernel->execute($request);
-            //$this->cache->save($response->getContent(), '+2 min', $id);
+
+            if ($this->isCacheable($request)) {
+                $this->cache->save($id, $response);
+            } else {
+                $this->cache->remove($id);
+            }
         }
 
         return $response;
+    }
+
+    protected function isCacheable(Request $request)
+    {
+        return in_array($request->getMethod(), array('GET', 'HEAD'));
     }
 
     public static function getContainer()
