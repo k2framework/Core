@@ -86,15 +86,16 @@ class File extends Cache
      */
     public function save($id, Response $response)
     {
-        $group = 'default';
-        $lifetime = '+5 seconds';
-        if ($lifetime) {
-            $lifetime = strtotime($lifetime);
-        } else {
-            $lifetime = 'undefined';
-        }
+        $cacheInfo = $response->getCacheInfo();
+        
+        $time = isset($cacheInfo['time']) ? strtotime($cacheInfo['time']) : 0;
+        $group = isset($cacheInfo['group']) ? $cacheInfo['group'] : 'default';
+        
+        if (0 === $time) {
+            return;
+        }        
 
-        $content = $lifetime . PHP_EOL . serialize($response);
+        $content = $time . PHP_EOL . serialize($response);
 
         return file_put_contents($this->getFilename($id, $group), $content);
     }

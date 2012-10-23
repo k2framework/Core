@@ -39,6 +39,7 @@ class CacheKernel implements KernelInterface
 //        if (!$this->kernel->isProduction()) {
 //            return $this->kernel->execute($request);
 //        }
+        //die('Tiempo: ' . round(microtime(1) - START_TIME, 4) . ' seg.');
 
         $this->kernel->init($request);
 
@@ -47,13 +48,14 @@ class CacheKernel implements KernelInterface
         $id = md5($request->getRequestUrl() . $request->server->get('QUERY_STRING'));
 
         if (($response = $this->cache->get($id)) instanceof Response) {
+            $response->setNotModified();
             if ('text/html' === $response->headers->get('Content-Type', 'text/html')) {
                 echo '<!-- Tiempo: ' . round(microtime(1) - START_TIME, 4) . ' seg. -->';
             }
         } else {
             $response = $this->kernel->execute($request);
 
-            if ($this->isCacheable($request)) {
+            if ($this->isCacheable($request, $response)) {                
                 $this->cache->save($id, $response);
             } else {
                 $this->cache->remove($id);
@@ -63,9 +65,10 @@ class CacheKernel implements KernelInterface
         return $response;
     }
 
-    protected function isCacheable(Request $request)
+    protected function isCacheable(Request $request, Response $response)
     {
-        return in_array($request->getMethod(), array('GET', 'HEAD'));
+        return in_array($request->getMethod(), array('GET', 'HEAD')) &&
+                in_array($response->getStatusCode(), array(200, 203, 300, 301, 302, 404, 410));
     }
 
     public static function getContainer()

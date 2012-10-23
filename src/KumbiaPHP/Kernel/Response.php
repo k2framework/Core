@@ -37,6 +37,12 @@ class Response implements \Serializable
     protected $charset;
 
     /**
+     * Información para la cache.
+     * @var array 
+     */
+    protected $cache;
+
+    /**
      * Constructor de la clase
      * @param string $content contenido para la respuesta
      * @param int $statusCode numero del estado de la respuesta
@@ -47,6 +53,7 @@ class Response implements \Serializable
         $this->content = $content;
         $this->statusCode = $statusCode;
         $this->headers = new Collection($headers);
+        $this->cache = array();
     }
 
     /**
@@ -127,7 +134,7 @@ class Response implements \Serializable
         }
 
         //mandamos el status
-        header(sprintf('HTTP/1.1 %s', $this->statusCode));
+        header(sprintf('HTTP/1.0 %s', $this->statusCode));
 
         foreach ($this->headers->all() as $index => $value) {
             if (is_string($index)) {
@@ -141,11 +148,11 @@ class Response implements \Serializable
     public function serialize()
     {
         return serialize(array(
-            'headers' => $this->headers->all(),
-            'content' => $this->getContent(),
-            'statusCode' => $this->getStatusCode(),
-            'charset' => $this->getCharset(),
-        ));
+                    'headers' => $this->headers->all(),
+                    'content' => $this->getContent(),
+                    'statusCode' => $this->getStatusCode(),
+                    'charset' => $this->getCharset(),
+                ));
     }
 
     public function unserialize($serialized)
@@ -155,6 +162,36 @@ class Response implements \Serializable
         $this->setContent($data['content']);
         $this->setStatusCode($data['statusCode']);
         $this->setCharset($data['charset']);
+    }
+
+    public function cache($lifetime = NULL, $group = 'default')
+    {
+        if (NULL !== $lifetime) {
+            $this->headers->set('cache-control', 'public');
+            $lastModified = new \DateTime();
+            $lastModified->setTimezone(new \DateTimeZone('UTC'));
+            $this->headers->set('last-modified', $lastModified->format('D, d M Y H:i:s') . ' GMT');
+            $expires = $lastModified->modify($lifetime);
+            $this->headers->set('expires', $expires->format('D, d M Y H:i:s') . ' GMT');
+            $this->cache = array(
+                'time' => $lifetime,
+                'group' => $group,
+            );
+        } else {
+            $this->headers->delete('expires');
+            $this->cache = array();
+        }
+    }
+
+    public function getCacheInfo()
+    {
+        return $this->cache;
+    }
+
+    public function setNotModified()
+    {
+//        $this->setStatusCode(304);
+//        $this->setContent(NULL);
     }
 
     /**

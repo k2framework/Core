@@ -70,6 +70,8 @@ class View
         if (!$response instanceof Response) {
             $response = new Response(self::$content);
             $response->setCharset(APP_CHARSET);
+        }else{
+            $response->setContent($response->getContent() . self::$content);
         }
 
         return $response;
