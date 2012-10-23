@@ -140,12 +140,12 @@ class Response implements \Serializable
 
     public function serialize()
     {
-        return array(
+        return serialize(array(
             'headers' => $this->headers->all(),
             'content' => $this->getContent(),
             'statusCode' => $this->getStatusCode(),
             'charset' => $this->getCharset(),
-        );
+        ));
     }
 
     public function unserialize($serialized)
