@@ -10,6 +10,7 @@ class Compiler implements CompilerInterface
 
     protected $filename;
     protected $code;
+    protected $config;
 
     /**
      * Arreglo con las rutas donde se van a buscar las clases.
@@ -27,6 +28,10 @@ class Compiler implements CompilerInterface
         if (TRUE === $autoload) {
             spl_autoload_register(array($this, 'autoload'), TRUE, TRUE);
         }
+
+        $this->config = parse_ini_file('compiler.ini', TRUE);
+        var_dump($this->config);
+        var_dump('Clases Compiladas:');
     }
 
     /**
@@ -52,7 +57,7 @@ class Compiler implements CompilerInterface
 
     public function autoload($className)
     {
-        if (in_array($className, $this->excludedClasses())) {
+        if (!$this->isValid($className)) {
             return;
         }
         $className = ltrim($className, '\\');
@@ -82,11 +87,30 @@ class Compiler implements CompilerInterface
         file_put_contents($this->filename, "<?php$compiled");
     }
 
-    protected function excludedClasses()
+    protected function excludedNamespaces()
     {
-        return array(
-            'KumbiaPHP\\Kernel\\Exception\\ExceptionHandler',
-        );
+        return $this->config['exclude']['namespace'];
+    }
+
+    protected function includedNamespaces()
+    {
+        return $this->config['include']['namespace'];
+    }
+
+    protected function isValid($className)
+    {
+        foreach ($this->excludedNamespaces() as $namespace) {
+            if (false !== strpos($className, $namespace)) {
+                return FALSE;
+            }
+        }
+        foreach ($this->includedNamespaces() as $namespace) {
+            if (false !== strpos($className, $namespace)) {
+                var_dump($className);
+                return TRUE;
+            }
+        }
+        return false;
     }
 
 }
