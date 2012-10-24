@@ -48,13 +48,12 @@ class EventDispatcher implements EventDispatcherInterface
         if (is_array($this->listeners[$eventName]) && count($this->listeners[$eventName])) {
             foreach ($this->listeners[$eventName] as $listener) {
                 $service = $this->container->get($listener[0]);
-                $result = call_user_func(array($service, $listener[1]), $event);
+                call_user_func(array($service, $listener[1]), $event);
                 if ($event->isPropagationStopped()) {
-                    return $result;
+                    return;
                 }
             }
         }
-        return $result;
     }
 
     /**
