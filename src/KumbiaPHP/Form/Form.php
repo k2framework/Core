@@ -122,7 +122,7 @@ class Form implements ArrayAccess
         } elseif (is_string($fieldName)) {
             $type = 'KumbiaPHP\\Form\\Field\\' . ucwords($type);
             if (!class_exists($type)) {
-                throw new Exception("No existe el tipo de Campo <b>$type</b> en la Lib Form");
+                throw new FormException("No existe el tipo de Campo <b>$type</b> en la Lib Form");
             }
 
             return $this->_add(new $type($fieldName));
