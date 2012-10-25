@@ -68,24 +68,22 @@ class DependencyInjection implements DependencyInjectionInterface
             } else {
                 $instance = $this->callFactory($reflection, $method);
             }
-            $this->container->set($id, $instance);
-            return $instance;
-        }
-
-        if (isset($config['construct'])) {
-            $arguments = $this->getArgumentsFromConstruct($id, $config);
         } else {
-            $arguments = array();
+
+            if (isset($config['construct'])) {
+                $arguments = $this->getArgumentsFromConstruct($id, $config);
+            } else {
+                $arguments = array();
+            }
+
+            //verificamos si ya se creó una instancia en una retrollamada del
+            //metodo injectObjectIntoServicesQueue
+            if ($this->container->has($id)) {
+                return $this->container->get($id);
+            }
+
+            $instance = $reflection->newInstanceArgs($arguments);
         }
-
-        //verificamos si ya se creó una instancia en una retrollamada del
-        //metodo injectObjectIntoServicesQueue
-        if ($this->container->has($id)) {
-            return $this->container->get($id);
-        }
-
-        $instance = $reflection->newInstanceArgs($arguments);
-
         //agregamos la instancia del objeto al contenedor.
         $this->container->set($id, $instance);
 
@@ -94,6 +92,7 @@ class DependencyInjection implements DependencyInjectionInterface
         if (isset($config['call'])) {
             $this->setOtherDependencies($id, $instance, $config['call']);
         }
+        
         return $instance;
     }
 
@@ -211,6 +210,16 @@ class DependencyInjection implements DependencyInjectionInterface
         }
     }
 
+    /**
+     * Obtiene la instancia del servicio a travez del llamado al metodo estático
+     * de la clase.
+     * 
+     * @param \ReflectionClass $class clase a la que se le va hacer el factory
+     * @param string $method nombre del método que hace el factory
+     * @param string $argument nombre del servicio ó parametro a pasar al método
+     * @return object
+     * @throws DiException 
+     */
     protected function callFactory(\ReflectionClass $class, $method, $argument = NULL)
     {
         if (!$class->hasMethod($method)) {
