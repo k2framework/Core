@@ -1,4 +1,5 @@
 <?php
+
 /**
  * KumbiaPHP web & app Framework
  *
@@ -68,15 +69,35 @@ abstract class Cache
     public abstract function get($id, $group = 'default');
 
     /**
-     * Guarda un elemento en la cache con nombre $id y valor $value
+     * Carga un elemento cacheado
      *
-     * @param string $value
-     * @param string $lifetime tiempo de vida con formato strtotime, utilizado para cache
      * @param string $id
      * @param string $group
-     * @return boolean
+     * @return Response
      */
-    public abstract function save($id, Response $response);
+    public abstract function getContent($id, $group = 'default');
+
+    /**
+     * Guarda un elemento en la cache con nombre $id y valor $response
+     * 
+     * @param string $id indentificador del elemento a guardar en cache.
+     * @param Response $response un objeto Response
+     * 
+     * @return int 
+     */
+    public abstract function save($id, $response);
+
+    /**
+     * Guarda un elemento en la cache con nombre $id y valor $response
+     * 
+     * @param string $id indentificador del elemento a guardar en cache.
+     * @param string $value una cadena
+     * @param string $time
+     * @param string $group
+     * 
+     * @return int 
+     */
+    public abstract function saveContent($id, $value, $time = NULL, $group = 'default');
 
     /**
      * Limpia la cache
@@ -100,14 +121,8 @@ abstract class Cache
      *
      * @param Kernel $kernel 
      * */
-    public static function factory(Kernel $kernel)
+    public static function factory($appPath, $driver = 'file')
     {
-        if (Kernel::getContainer()->hasParameter('cache')) {
-            $driver = Kernel::getContainer()->getParameter('cache');
-        } else {
-            $driver = 'file';
-        }
-
         if (!isset(self::$drivers[$driver])) {
             $class = 'KumbiaPHP\Cache\Adapter\\' . ucfirst($driver);
 
@@ -115,7 +130,7 @@ abstract class Cache
                 throw new CacheException("No existe el Adaptador de Cache \"$class\"");
             }
 
-            self::$drivers[$driver] = new $class($kernel->getAppPath());
+            self::$drivers[$driver] = new $class($appPath);
         }
 
         return self::$drivers[$driver];

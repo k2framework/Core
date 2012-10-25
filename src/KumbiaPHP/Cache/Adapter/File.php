@@ -1,4 +1,5 @@
 <?php
+
 /**
  * KumbiaPHP web & app Framework
  *
@@ -48,13 +49,6 @@ class File extends Cache
         return $this->appPath . 'temp/cache/cache_' . md5($id) . '.' . md5($group);
     }
 
-    /**
-     * Carga un elemento cacheado
-     *
-     * @param string $id
-     * @param string $group
-     * @return Response
-     */
     public function get($id, $group = 'default')
     {
         $filename = $this->getFilename($id, $group);
@@ -75,37 +69,55 @@ class File extends Cache
         return null;
     }
 
-    /**
-     * Guarda un elemento en la cache con nombre $id y valor $value
-     *
-     * @param string $id
-     * @param string $group
-     * @param string $value
-     * @param int $lifetime tiempo de vida en forma timestamp de unix
-     * @return boolean
-     */
-    public function save($id, Response $response)
+    public function getContent($id, $group = 'default')
     {
+        $filename = $this->getFilename($id, $group);
+        if (file_exists($filename)) {
+            $fh = fopen($filename, 'r');
+
+            $lifetime = trim(fgets($fh));
+            if ($lifetime == 'undefined' || $lifetime >= time()) {
+                $response = stream_get_contents($fh);
+            } else {
+                $response = null;
+            }
+
+            fclose($fh);
+            return $response;
+        }
+        return null;
+    }
+
+    public function save($id, $response)
+    {
+
         $cacheInfo = $response->getCacheInfo();
-        
+
         $time = isset($cacheInfo['time']) ? strtotime($cacheInfo['time']) : 0;
         $group = isset($cacheInfo['group']) ? $cacheInfo['group'] : 'default';
-        
-        if (0 === $time) {
+
+        if (!$time) {
             return;
-        }        
+        }
 
         $content = $time . PHP_EOL . serialize($response);
+
 
         return file_put_contents($this->getFilename($id, $group), $content);
     }
 
-    /**
-     * Limpia la cache
-     *
-     * @param string $group
-     * @return boolean
-     */
+    public function saveContent($id, $value, $time = NULL, $group = 'default')
+    {
+        if (!$time) {
+            return;
+        }
+
+        $content = strtotime($time) . PHP_EOL . $value;
+
+
+        return file_put_contents($this->getFilename($id, $group), $content);
+    }
+
     public function clean($group = false)
     {
         $pattern = $group ? $this->appPath . 'temp/cache/' . '*.' . md5($group) : $this->appPath . 'temp/cache/*';
@@ -117,13 +129,6 @@ class File extends Cache
         return true;
     }
 
-    /**
-     * Elimina un elemento de la cache
-     *
-     * @param string $id
-     * @param string $group
-     * @return string
-     */
     public function remove($id, $group = 'default')
     {
         return unlink($this->getFilename($id, $group));
