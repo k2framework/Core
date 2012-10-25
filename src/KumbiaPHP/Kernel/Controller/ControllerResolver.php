@@ -26,7 +26,7 @@ class ControllerResolver
     protected $contShortName;
     protected $action;
 
-    function __construct(ContainerInterface $con)
+    public function __construct(ContainerInterface $con)
     {
         $this->container = $con;
     }
@@ -244,6 +244,7 @@ class ControllerResolver
                 if (FALSE === $result) {
                     //si el resultado es false, es porque no queremos que se ejecute la acción
                     $this->action = FALSE;
+                    $this->container->get('app.context')->setCurrentAction(FALSE);
                     return;
                 }
                 if (!is_string($result)) {
@@ -255,6 +256,7 @@ class ControllerResolver
                 //si el beforeFilter del controlador devuelve un valor, el mismo será
                 //usado como el nuevo nombre de la acción a ejecutar.
                 $this->action = $result;
+                $this->container->get('app.context')->setCurrentAction($result);
             }
         }
     }

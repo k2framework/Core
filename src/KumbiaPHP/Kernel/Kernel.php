@@ -4,9 +4,11 @@ namespace KumbiaPHP\Kernel;
 
 use KumbiaPHP\Loader\Autoload;
 use KumbiaPHP\Kernel\AppContext;
+use KumbiaPHP\Di\Definition\Service;
 use KumbiaPHP\Di\DependencyInjection;
 use KumbiaPHP\Di\Container\Container;
 use KumbiaPHP\Kernel\KernelInterface;
+use KumbiaPHP\Di\Definition\Parameter;
 use KumbiaPHP\Kernel\Event\KumbiaEvents;
 use KumbiaPHP\Kernel\Event\RequestEvent;
 use KumbiaPHP\Kernel\Event\ResponseEvent;
@@ -168,9 +170,12 @@ abstract class Kernel implements KernelInterface
             list($controller, $action, $params) = $resolver->getController($request);
 
             $event = new ControllerEvent($request, array($controller, $action, $params));
-
+            
             //ejecutamos el evento controller.
             $this->dispatcher->dispatch(KumbiaEvents::CONTROLLER, $event);
+
+            //asignamos la acción al AppContext
+            self::$container->get('app.context')->setCurrentAction($action);
 
             //ejecutamos la acción de controlador pasandole los parametros.
             $response = $resolver->executeAction($event);
@@ -203,7 +208,7 @@ abstract class Kernel implements KernelInterface
         if ($event->hasResponse()) {
             return $this->response($event->getResponse());
         }
-        
+
         if ($this->production) {
             return ExceptionHandler::createException($e);
         }
@@ -272,12 +277,14 @@ abstract class Kernel implements KernelInterface
         $definitions = new DefinitionManager();
 
         foreach ($reader->getConfig()->get('services')->all() as $id => $configs) {
-            $definitions->addService(new \KumbiaPHP\Di\Definition\Service($id, $configs));
+            $definitions->addService(new Service($id, $configs));
         }
 
         foreach ($reader->getConfig()->get('parameters')->all() as $id => $value) {
-            $definitions->addParam(new \KumbiaPHP\Di\Definition\Parameter($id, $value));
+            $definitions->addParam(new Parameter($id, $value));
         }
+
+        $definitions->addParam(new Parameter('app_dir', $this->getAppPath()));
 
         $this->di = new DependencyInjection();
 
