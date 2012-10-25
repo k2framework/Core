@@ -128,7 +128,7 @@ class Flash
     public function __toString()
     {
         $code = '<ul class="messages-flash">' . PHP_EOL;
-        foreach ($this->getAll() as $type => $message) {
+        foreach ((array) $this->getAll() as $type => $message) {
             $code.= "<div class=\"flash $type\">$message</div>" . PHP_EOL;
         }
         $code .= '<u/l>' . PHP_EOL;
