@@ -171,7 +171,7 @@ class Ajax extends AbstractHelper
         if ($action) {
             $action = self::$app->getBaseUrl() . $action;
         } else {
-            $action = self::$app->getBaseUrl() . ltrim(self::$app->getControllerUrl(), '/');
+            $action = self::$app->getBaseUrl() . ltrim(self::$app->getCurrentUrl(), '/');
         }
         return "<form action=\"$action\" method=\"$method\" class=\"js-remote $class\" data-div=\"$update\" $attrs>";
     }
