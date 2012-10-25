@@ -119,7 +119,7 @@ abstract class Cache
     /**
      * Obtiene el Adaptador de cache indicado
      *
-     * @param Kernel $kernel 
+     * @return Cache
      * */
     public static function factory($appPath, $driver = 'file')
     {

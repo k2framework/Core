@@ -36,13 +36,21 @@ class AppCache implements KernelInterface
     public function execute(Request $request)
     {
 
-        if (!$this->kernel->isProduction()) {
-            return $this->kernel->execute($request);
-        }
+//        if (!$this->kernel->isProduction()) {
+//            return $this->kernel->execute($request);
+//        }
 
         $this->kernel->init($request);
 
-        $this->cache = Cache::factory($this->kernel);
+        $appDir = Kernel::getContainer()->getParameter('app_dir');
+
+        if (Kernel::getContainer()->hasParameter('cache')) {
+            $driver = Kernel::getContainer()->getParameter('cache');
+        } else {
+            $driver = 'file';
+        }
+
+        $this->cache = Cache::factory($appDir, $driver);
 
         $id = md5($request->getRequestUrl() . $request->server->get('QUERY_STRING'));
 

@@ -108,6 +108,14 @@ class View
         /* @var $app \KumbiaPHP\Kernel\AppContext */
         $app = self::$container->get('app.context');
 
+        if ($time && $app->InProduction()) {
+            $cache = \KumbiaPHP\Cache\Cache::factory($app->getAppPath());
+            if ($content = $cache->getContent(md5($partial), 'partials')) {
+                echo $content;
+                return;
+            }
+        }
+
         $partial = explode(':', $partial);
 
         if (count($partial) > 1) {
@@ -122,7 +130,17 @@ class View
         if (!file_exists($file)) {
             throw new \LogicException(sprintf("No existe El Partial \"%s\" en \"%s\"", basename($file), $file));
         }
+
+        ob_start();
+
         include $file;
+
+        echo $content = ob_get_clean();
+
+        if ($time && $app->InProduction()) {
+            $cache = \KumbiaPHP\Cache\Cache::factory($app->getAppPath());
+            $cache->saveContent(md5(join(':', $partial)), $content, $time, 'partials');
+        }
     }
 
     protected function findTemplate($template)
