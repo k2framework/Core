@@ -108,8 +108,8 @@ class View
         /* @var $app \KumbiaPHP\Kernel\AppContext */
         $app = self::$container->get('app.context');
 
-        if ($time && $app->InProduction()) {
-            $cache = \KumbiaPHP\Cache\Cache::factory($app->getAppPath());
+        if ($time || $app->InProduction()) {
+            $cache = self::$container->get('cache');
             if ($content = $cache->getContent(md5($partial), 'partials')) {
                 echo $content;
                 return;
@@ -137,8 +137,8 @@ class View
 
         echo $content = ob_get_clean();
 
-        if ($time && $app->InProduction()) {
-            $cache = \KumbiaPHP\Cache\Cache::factory($app->getAppPath());
+        if ($time || $app->InProduction()) {
+            $cache = self::$container->get('cache');
             $cache->saveContent(md5(join(':', $partial)), $content, $time, 'partials');
         }
     }
