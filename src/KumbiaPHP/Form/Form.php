@@ -89,11 +89,14 @@ class Form implements ArrayAccess
             $this->model = $model;
             if ($createFields) {
                 $this->initFromModel($model);
+            } else {
+                $this->init();
+                $this->setData(get_object_vars($model));
             }
         } else {
             $this->name = $model;
+            $this->init();
         }
-        $this->init();
     }
 
     public static function injectServices(ContainerInterface $container)
