@@ -56,6 +56,11 @@ class View
         return $response;
     }
 
+    public static function getVar($name)
+    {
+        return array_key_exists($name, self::$variables) ? self::$variables[$name] : NULL;
+    }
+
     protected function getContent()
     {
         extract(self::$variables, EXTR_OVERWRITE);
@@ -79,10 +84,13 @@ class View
         return self::$content;
     }
 
-    public static function content()
+    public static function content($showFlash = FALSE)
     {
         echo self::$content;
         self::$content = '';
+        if ($showFlash) {
+            echo self::flash();
+        }
     }
 
     /**
