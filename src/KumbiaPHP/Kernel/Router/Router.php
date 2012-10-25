@@ -51,7 +51,7 @@ class Router implements RouterInterface
      * @param type $action
      * @return \KumbiaPHP\Kernel\RedirectResponse 
      */
-    public function toAction($action, $status = 302)
+    public function toAction($action = NULL, $status = 302)
     {
         $url = $this->app->getControllerUrl() . '/' . $action;
         return new RedirectResponse($url, $status);
