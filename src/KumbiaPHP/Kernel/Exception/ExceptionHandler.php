@@ -27,6 +27,16 @@ class ExceptionHandler
 
     public static function onException(\Exception $e)
     {
+        self::createException($e)->send();
+    }
+
+    /**
+     *
+     * @param \Exception $e
+     * @return \KumbiaPHP\Kernel\Response 
+     */
+    public static function createException(\Exception $e)
+    {
         /* @var $app \KumbiaPHP\Kernel\AppContext */
         $app = self::$kernel->getContainer()->get('app.context');
 
@@ -41,16 +51,20 @@ class ExceptionHandler
             if (404 === $e->getCode()) {
                 header('HTTP/1.1 404 Not Found');
                 $code = 404;
+                include $app->getAppPath() . 'view/errors/404.phtml';
             } else {
                 header('HTTP/1.1 500 Internal Server Error');
                 $code = 500;
+                if (file_exists($app->getAppPath() . 'view/errors/500.phtml')) {
+                    include $app->getAppPath() . 'view/errors/500.phtml';
+                } else {
+                    include $app->getAppPath() . 'view/errors/404.phtml';
+                }
             }
-            include $app->getAppPath() . 'view/errors/404.phtml';
         } else {
             include __DIR__ . '/files/exception.php';
         }
-        $response = new Response(ob_get_clean(), $code);
-        $response->send();
+        return new Response(ob_get_clean(), $code);
     }
 
 }

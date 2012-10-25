@@ -95,7 +95,7 @@ abstract class Kernel implements KernelInterface
 
         Autoload::register();
 
-        //ExceptionHandler::handle($this);
+        ExceptionHandler::handle($this);
 
         if ($production) {
             error_reporting(0);
@@ -199,13 +199,18 @@ abstract class Kernel implements KernelInterface
     {
         $event = new ExceptionEvent($e, $this->request);
         $this->dispatcher->dispatch(KumbiaEvents::EXCEPTION, $event);
-        
-        if ( $event->hasResponse() ){
+
+        if ($event->hasResponse()) {
             return $this->response($event->getResponse());
         }
+        
+        if ($this->production) {
+            return ExceptionHandler::createException($e);
+        }
+
         throw $e;
     }
-    
+
     private function response(Response $response)
     {
         $event = new ResponseEvent($this->request, $response);
