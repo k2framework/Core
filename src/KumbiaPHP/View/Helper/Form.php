@@ -20,6 +20,7 @@
 
 //namespace KumbiaPHP\View\Helper;
 
+use KumbiaPHP\View\View;
 use KumbiaPHP\View\Helper\AbstractHelper;
 
 /**
