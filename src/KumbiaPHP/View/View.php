@@ -8,6 +8,8 @@ use KumbiaPHP\View\ViewContainer;
 use KumbiaPHP\View\Helper\AbstractHelper;
 use KumbiaPHP\Di\Container\ContainerInterface;
 
+require_once 'functions.php';
+
 /**
  * Description of Template
  *
@@ -44,9 +46,9 @@ class View
         self::$variables = array_merge($params, self::$variables);
 
         Autoload::registerDirectories(array(__DIR__ . '/Helper/'));
-        
+
         AbstractHelper::setAppContext(self::$container->get('app.context'));
-        
+
         $response = new Response($this->getContent());
         $response->setCharset(APP_CHARSET);
         $response->cache($cacheTime);
@@ -114,9 +116,9 @@ class View
         } else {
             $file = rtrim($app->getAppPath(), '/') . '/view/partials/' . $partial[0] . '.phtml';
         }
-        
+
         extract($params, EXTR_OVERWRITE);
-        
+
         if (!file_exists($file)) {
             throw new \LogicException(sprintf("No existe El Partial \"%s\" en \"%s\"", basename($file), $file));
         }
