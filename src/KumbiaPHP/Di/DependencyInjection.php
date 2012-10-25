@@ -211,6 +211,16 @@ class DependencyInjection implements DependencyInjectionInterface
         }
     }
 
+    /**
+     * Obtiene la instancia del servicio a travez del llamado al metodo estático
+     * de la clase.
+     * 
+     * @param \ReflectionClass $class clase a la que se le va hacer el factory
+     * @param string $method nombre del método que hace el factory
+     * @param string $argument nombre del servicio ó parametro a pasar al método
+     * @return object
+     * @throws DiException 
+     */
     protected function callFactory(\ReflectionClass $class, $method, $argument = NULL)
     {
         if (!$class->hasMethod($method)) {
