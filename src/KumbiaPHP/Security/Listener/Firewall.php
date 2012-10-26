@@ -135,7 +135,7 @@ class Firewall
 
             $auth = new AuthManager($provider);
 
-            $auth->autenticate($token);
+            $auth->autenticate($token);//si falla el logueo, tira una excepcion.
 
             $this->container->get('session')->set('token', $token, 'security');
             if ($url = $this->container->get('session')->get('target_login', 'security')) {
