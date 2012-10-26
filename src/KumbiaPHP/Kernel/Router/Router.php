@@ -69,7 +69,7 @@ class Router implements RouterInterface
             throw new \LogicException("Se ha detectado un ciclo de redirección Infinito...!!!");
         }
         //obtengo el request y le asigno la nueva url.
-        $request = $this->kernel->get('request');
+        $request = \KumbiaPHP\Kernel\Kernel::get('request');
         $request->query->set('_url', $url);
 
         //retorno la respuesta del kernel.
