@@ -22,9 +22,9 @@ class Reader
         foreach (parse_ini_file($ini, TRUE) as $configName => $params) {
             Config::add(new Parameters($configName, $params));
         }
-        if (Kernel::getContainer()->hasParameter('config.database')) {
+        if (Kernel::getParam('config.database')) {
             //lo seteamos solo si se ha definido.
-            $database = Kernel::getContainer()->getParameter('config.database');
+            $database = Kernel::getParam('config.database');
             if ( !Config::has($database) ){
                 throw new \LogicException("El valor database=$database del config.ini no concuerda con ninguna sección del databases.ini");
             }
