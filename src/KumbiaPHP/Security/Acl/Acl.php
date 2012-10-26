@@ -12,7 +12,17 @@ use KumbiaPHP\Security\Acl\AclInterface;
  * @category   Kumbia
  * @package    Acl
  */
-abstract class Acl
+abstract class Acl implements AclInterface
 {
+
+    /**
+     *
+     * @param string $adapter
+     * @return AclInterface 
+     */
+    public static function factory($adapter = 'simple')
+    {
+        return new Adapter\Simple();
+    }
 
 }

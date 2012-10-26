@@ -1,24 +1,12 @@
 <?php
-/**
- * KumbiaPHP web & app Framework
- *
- * LICENSE
- *
- * This source file is subject to the new BSD license that is bundled
- * with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * http://wiki.kumbiaphp.com/Licencia
- * If you did not receive a copy of the license and are unable to
- * obtain it through the world-wide-web, please send an email
- * to license@kumbiaphp.com so we can send you a copy immediately.
- *
- * Implementacion de ACL con definicion de reglas en PHP
- * 
- * @category   Kumbia
- * @package    Acl
- * @copyright  Copyright (c) 2005-2012 Kumbia Team (http://www.kumbiaphp.com)
- * @license    http://wiki.kumbiaphp.com/Licencia     New BSD License
- */
+
+namespace KumbiaPHP\Security\Acl\Adapter;
+
+use KumbiaPHP\Security\Acl\Acl;
+use KumbiaPHP\Security\Acl\Role\RoleInterface;
+use KumbiaPHP\Security\Exception\AclException;
+use KumbiaPHP\Security\Auth\User\UserInterface;
+use KumbiaPHP\Security\Acl\Resource\ResourceInterface;
 
 /**
  * Implementacion de ACL con definicion de reglas en PHP
@@ -26,115 +14,76 @@
  * @category   Kumbia
  * @package    Acl
  */
-class SimpleAcl extends Acl2
+class Simple extends Acl
 {
 
-    /**
-     * Definicion de Roles con sus respectivos padres y recursos a los que pueden acceder
-     *
-     * @var array
-     *
-     * @example SimpleAcl-roles
-     *   protected $_roles = array(
-     *       'rol1' => array(
-     *           'resources' => array('recurso1', 'recurso2')
-     *       ),
-     *       'rol2' => array(
-     *           'resources' => array('recurso2'),
-     *           'parents' => array('rol1')
-     *       )
-     *   );
-     */
-    protected $_roles = array();
-    /**
-     * Usuarios del sistema con sus respectivos roles
-     * 
-     * @var array
-     * 
-     * @example SimpleAcl-users
-     * protected $_users = array(
-     *     'usuario1' => array('rol1', 'rol2'),
-     *     'usuario2' => array('rol3')
-     * );
-     */
-    protected $_users = array();
+    protected $roles;
+    protected $users;
+    protected $resources;
 
-    /**
-     * Establece los recursos a los que el rol puede acceder
-     *
-     * @param string $role nombre de rol
-     * @param array $resources recursos a los que puede acceder el rol
-     */
-    public function allow($role, $resources)
+    public function allow(RoleInterface $role, $resourceName)
     {
-        $this->_roles[$role]['resources'] = $resources;
-    }
-
-    /**
-     * Establece los padres del rol
-     *
-     * @param string $role nombre de rol
-     * @param array $parents padres del rol
-     */
-    public function parents($role, $parents)
-    {
-        $this->_roles[$role]['parents'] = $parents;
-    }
-
-    /**
-     * Adiciona un usuario a la lista con sus respectivos roles
-     *
-     * @param string $user
-     * @param array $roles
-     */
-    public function user($user, $roles)
-    {
-        $this->_users[$user] = $roles;
-    }
-
-    /**
-     * Obtiene los roles del usuario al que se le valida si puede acceder al recurso
-     *
-     * @param string $user usuario al que se le valida acceso
-     * @return array roles de usuario
-     */
-    protected function _getUserRoles($user)
-    {
-        if (isset($this->_users[$user])) {
-            return $this->_users[$user];
+        if (!$this->resourceExist($resourceName)) {
+            throw new AclException("No se puede dar acceso al rol {$role->getName()} hacia el recurso inexistente $resourceName");
         }
 
-        return array();
+        if (!isset($this->roles[$role->getName()]['resources'])) {
+            $this->roles[$role->getName()]['resources'][] = $resourceName;
+        } elseif (!in_array($resourceName, $this->roles[$role->getName()]['resources'])) {
+            $this->roles[$role->getName()]['resources'][] = $resourceName;
+        }
+        return $this;
     }
 
-    /**
-     * Obtiene los recursos al cual el rol puede acceder
-     *
-     * @param string $role nombre de rol
-     * @return array recursos al cual el rol puede acceder
-     */
-    protected function _getRoleResources($role)
+    public function check(UserInterface $user, ResourceInterface $resource)
     {
-        if (isset($this->_roles[$role]['resources'])) {
-            return $this->_roles[$role]['resources'];
+        foreach ((array)$user->getRoles() as $role) {
+            if ($this->isAllowed($role, $resource)) {
+                return TRUE;
+            }
         }
-
-        return array();
+        return FALSE;
     }
 
-    /**
-     * Obtiene los padres del rol
-     *
-     * @param string $role nombre de rol
-     * @return array padres del rol
-     */
-    protected function _getRoleParents($role)
+    public function parents(RoleInterface $role, $parents)
     {
-        if (isset($this->_roles[$role]['parents'])) {
-            return $this->_roles[$role]['parents'];
-        }
+        $this->roles[$role->getName()]['parents'] = $parents;
+    }
 
-        return array();
+    public function user(UserInterface $user)
+    {
+        $this->users[$user->getUsername()] = $user->getRoles();
+    }
+
+    public function addResource(ResourceInterface $resource)
+    {
+        $this->resources[$resource->getName()] = $resource;
+    }
+
+    public function setResources(array $resources)
+    {
+        $this->resources = array();
+        foreach ($resources as $resource) {
+            $this->resources[$resource->getName()] = $resource;
+        }
+    }
+
+    protected function resourceExist($name)
+    {
+        return isset($this->resources[$name]);
+    }
+
+    protected function isAllowed(RoleInterface $role, ResourceInterface $resource)
+    {
+        if (in_array($resource->getName(), $this->roles[$role->getName()]['resources'])) {
+            return TRUE;
+        }
+        foreach ((array) $this->roles[$role->getName()]['parents'] as $parent) {
+            if ($this->isAllowed($parent, $resource)) {
+                return TRUE;
+            }
+        }
+        return FALSE;
     }
 
 }
