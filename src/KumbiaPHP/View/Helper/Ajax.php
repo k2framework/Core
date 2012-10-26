@@ -17,7 +17,7 @@
  * @copyright  Copyright (c) 2005-2012 KumbiaPHP Team (http://www.kumbiaphp.com)
  * @license    http://wiki.kumbiaphp.com/Licencia     New BSD License
  */
-namespace KumbiaPHP\View\Helper;
+//namespace KumbiaPHP\View\Helper;
 
 use KumbiaPHP\View\Helper\AbstractHelper;
 /**
@@ -171,7 +171,7 @@ class Ajax extends AbstractHelper
         if ($action) {
             $action = self::$app->getBaseUrl() . $action;
         } else {
-            $action = self::$app->getBaseUrl() . ltrim(self::$app->getControllerUrl(), '/');
+            $action = self::$app->getBaseUrl() . ltrim(self::$app->getCurrentUrl(), '/');
         }
         return "<form action=\"$action\" method=\"$method\" class=\"js-remote $class\" data-div=\"$update\" $attrs>";
     }

@@ -2,10 +2,11 @@
 
 namespace KumbiaPHP\Di;
 
-use KumbiaPHP\Di\DependencyInjectionInterface;
-use KumbiaPHP\Di\Container\Container;
-use KumbiaPHP\Di\Exception\IndexNotDefinedException;
 use \ReflectionClass;
+use KumbiaPHP\Di\Container\Container;
+use KumbiaPHP\Di\Exception\DiException;
+use KumbiaPHP\Di\DependencyInjectionInterface;
+use KumbiaPHP\Di\Exception\IndexNotDefinedException;
 
 /**
  * Clase inyectora de dependencias de los servicios en el FW
@@ -33,6 +34,7 @@ class DependencyInjection implements DependencyInjectionInterface
      * @var array 
      */
     private $queue = array();
+
     /**
      * Indica si se le estan inyectando servicios a un elemento que ya estaba en
      * la cola y solicitó servicios que no habian sido creados aun.
@@ -59,20 +61,29 @@ class DependencyInjection implements DependencyInjectionInterface
 
         $reflection = new ReflectionClass($config['class']);
 
-        if (isset($config['construct'])) {
-            $arguments = $this->getArgumentsFromConstruct($id, $config);
+        if (isset($config['factory'])) {
+            $method = $config['factory']['method'];
+            if (isset($config['factory']['argument'])) {
+                $instance = $this->callFactory($reflection, $method, $config['factory']['argument']);
+            } else {
+                $instance = $this->callFactory($reflection, $method);
+            }
         } else {
-            $arguments = array();
+
+            if (isset($config['construct'])) {
+                $arguments = $this->getArgumentsFromConstruct($id, $config);
+            } else {
+                $arguments = array();
+            }
+
+            //verificamos si ya se creó una instancia en una retrollamada del
+            //metodo injectObjectIntoServicesQueue
+            if ($this->container->has($id)) {
+                return $this->container->get($id);
+            }
+
+            $instance = $reflection->newInstanceArgs($arguments);
         }
-
-        //verificamos si ya se creó una instancia en una retrollamada del
-        //metodo injectObjectIntoServicesQueue
-        if ($this->container->has($id)) {
-            return $this->container->get($id);
-        }
-
-        $instance = $reflection->newInstanceArgs($arguments);
-
         //agregamos la instancia del objeto al contenedor.
         $this->container->set($id, $instance);
 
@@ -81,6 +92,7 @@ class DependencyInjection implements DependencyInjectionInterface
         if (isset($config['call'])) {
             $this->setOtherDependencies($id, $instance, $config['call']);
         }
+        
         return $instance;
     }
 
@@ -196,6 +208,43 @@ class DependencyInjection implements DependencyInjectionInterface
         if ($this->inQueue($id)) {
             unset($this->queue[$id]);
         }
+    }
+
+    /**
+     * Obtiene la instancia del servicio a travez del llamado al metodo estático
+     * de la clase.
+     * 
+     * @param \ReflectionClass $class clase a la que se le va hacer el factory
+     * @param string $method nombre del método que hace el factory
+     * @param string $argument nombre del servicio ó parametro a pasar al método
+     * @return object
+     * @throws DiException 
+     */
+    protected function callFactory(\ReflectionClass $class, $method, $argument = NULL)
+    {
+        if (!$class->hasMethod($method)) {
+            throw new DiException("No existe el Método \"$method\" en la clase \"{$class->name}\"");
+        }
+
+        $method = $class->getMethod($method);
+
+        if (!$method->isStatic()) {
+            throw new DiException("El Método \"$method\" de la clase \"{$class->name}\" debe ser Estático");
+        }
+
+        if ('@' === $argument[0]) {//si comienza con @ es un servicio lo que solicita
+            $argument = $this->container->get(substr($argument, 1));
+        } elseif ($argument) { //si no comienza por arroba es un parametro lo que solicita
+            $argument = $this->container->getParameter($argument);
+        }
+
+        $class = $method->invoke(NULL, $argument);
+
+        if (!is_object($class)) {
+            throw new DiException("El Método \"$method\" de la clase \"{$class->name}\" debe retornar un Objeto");
+        }
+
+        return $class;
     }
 
 }

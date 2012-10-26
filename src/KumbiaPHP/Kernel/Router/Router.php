@@ -35,25 +35,41 @@ class Router implements RouterInterface
         $this->kernel = $kernel;
     }
 
-    public function redirect($url = NULL)
+    /**
+     *
+     * @param string $url
+     * @return \KumbiaPHP\Kernel\RedirectResponse 
+     */
+    public function redirect($url = NULL, $status = 302)
     {
         $url = $this->app->getBaseUrl() . ltrim($url, '/');
-        return new RedirectResponse($url);
+        return new RedirectResponse($url, $status);
     }
 
-    public function toAction($action)
+    /**
+     *
+     * @param type $action
+     * @return \KumbiaPHP\Kernel\RedirectResponse 
+     */
+    public function toAction($action = NULL, $status = 302)
     {
         $url = $this->app->getControllerUrl() . '/' . $action;
-        return new RedirectResponse($url);
+        return new RedirectResponse($url, $status);
     }
 
+    /**
+     *
+     * @param type $url
+     * @return type
+     * @throws \LogicException 
+     */
     public function forward($url)
     {
         if ($this->forwards++ > 10) {
             throw new \LogicException("Se ha detectado un ciclo de redirección Infinito...!!!");
         }
         //obtengo el request y le asigno la nueva url.
-        $request = $this->kernel->getContainer()->get('request');
+        $request = \KumbiaPHP\Kernel\Kernel::get('request');
         $request->query->set('_url', $url);
 
         //retorno la respuesta del kernel.

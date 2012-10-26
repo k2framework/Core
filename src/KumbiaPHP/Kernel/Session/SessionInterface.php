@@ -26,7 +26,7 @@ interface SessionInterface
      * @param string $key
      * @param mixed $value
      */
-    public function set($key, $value);
+    public function set($key, $value, $namespace = 'default');
 
     /**
      * Obtener el valor para un indice de la sesión
@@ -34,7 +34,7 @@ interface SessionInterface
      * @param string $key
      * @return mixed
      */
-    public function get($key);
+    public function get($key, $namespace = 'default');
 
     /**
      * Verifica si el indice esta cargado en sesión
@@ -43,12 +43,12 @@ interface SessionInterface
      * 
      * @return boolean
      */
-    public function has($key);
+    public function has($key, $namespace = 'default');
 
     /**
      * Elimina un indice de la sesión
      *
      * @param string $key
      */
-    public function delete($key);
+    public function delete($key, $namespace = 'default');
 }

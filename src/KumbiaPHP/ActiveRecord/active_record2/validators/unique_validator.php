@@ -34,7 +34,7 @@ class UniqueValidator implements ValidatorInterface
 	public static function validate($object, $column, $params = NULL, $update = FALSE)
 	{
 		// Condiciones
-		$q = $object->get();
+		$q = $object->createQuery();
 		
 		$values = array();
 		

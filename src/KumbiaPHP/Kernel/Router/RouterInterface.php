@@ -10,9 +10,21 @@ namespace KumbiaPHP\Kernel\Router;
 interface RouterInterface
 {
 
-    public function redirect($url = NULL);
+    /**
+     * @param string $url
+     * @return \KumbiaPHP\Kernel\RedirectResponse 
+     */
+    public function redirect($url = NULL, $status = 302);
 
-    public function toAction($action);
+    /**
+     * @param string $action
+     * @return \KumbiaPHP\Kernel\RedirectResponse 
+     */
+    public function toAction($action, $status = 302);
     
+    /**
+     * @param string $action
+     * @return \KumbiaPHP\Kernel\Response 
+     */
     public function forward($url);
 }

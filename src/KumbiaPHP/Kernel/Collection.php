@@ -8,7 +8,7 @@ namespace KumbiaPHP\Kernel;
  *
  * @author manuel
  */
-class Parameters implements \Serializable
+class Collection implements \Serializable
 {
 
     /**

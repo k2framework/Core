@@ -3,7 +3,7 @@
 namespace KumbiaPHP\Flash;
 
 use KumbiaPHP\Kernel\Session\SessionInterface;
-use KumbiaPHP\Kernel\Parameters;
+use KumbiaPHP\Kernel\Collection;
 
 /**
  * Clase que permite el envio de mensajes flash desde un controlador,
@@ -20,7 +20,7 @@ class Flash
     /**
      * Contiene los mensajes que se van enviando.
      *
-     * @var Parameters 
+     * @var Collection 
      */
     private $messages;
 
@@ -33,7 +33,7 @@ class Flash
     {
         //si no existe el indice en la sesión, lo creamos.
         if (!$session->has('messages.flash')) {
-            $session->set('messages.flash', new Parameters());
+            $session->set('messages.flash', new Collection());
         }
         //le pasamos el objeto parameters
         $this->messages = $session->get('messages.flash');
@@ -57,7 +57,7 @@ class Flash
      */
     public function has($type)
     {
-        return $this->messages->has(trim($type), $message);
+        return $this->messages->has(trim($type));
     }
 
     /**
@@ -86,7 +86,7 @@ class Flash
     {
         $messages = $this->messages->all();
         $this->messages->clear();
-        return $this->messages->all();
+        return $messages;
     }
 
     /**
@@ -95,7 +95,7 @@ class Flash
      */
     public function success($message)
     {
-        $this->set(__METHOD__, $message);
+        $this->set('success', $message);
     }
 
     /**
@@ -104,7 +104,7 @@ class Flash
      */
     public function info($message)
     {
-        $this->set(__METHOD__, $message);
+        $this->set('info', $message);
     }
 
     /**
@@ -113,7 +113,7 @@ class Flash
      */
     public function warning($message)
     {
-        $this->set(__METHOD__, $message);
+        $this->set('warning', $message);
     }
 
     /**
@@ -122,7 +122,17 @@ class Flash
      */
     public function error($message)
     {
-        $this->set(__METHOD__, $message);
+        $this->set('error', $message);
+    }
+
+    public function __toString()
+    {
+        $code = '<ul class="messages-flash">' . PHP_EOL;
+        foreach ((array) $this->getAll() as $type => $message) {
+            $code.= "<div class=\"flash $type\">$message</div>" . PHP_EOL;
+        }
+        $code .= '<u/l>' . PHP_EOL;
+        return $code;
     }
 
 }

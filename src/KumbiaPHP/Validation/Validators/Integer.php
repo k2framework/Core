@@ -40,7 +40,7 @@ class Integer extends ValidatorBase
      */
     public static function validate(Validatable $object, $column, $params = NULL, $update = FALSE)
     {
-        if (!filter_var($object->$column, FILTER_VALIDATE_INT)) {
+        if (!filter_var(self::getValue($object, $column), FILTER_VALIDATE_INT)) {
             if ($params && isset($params['message'])) {
                 self::$lastError = $params['message'];
             } else {

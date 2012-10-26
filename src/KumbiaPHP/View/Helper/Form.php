@@ -18,8 +18,9 @@
  * @license    http://wiki.kumbiaphp.com/Licencia     New BSD License
  */
 
-namespace KumbiaPHP\View\Helper;
+//namespace KumbiaPHP\View\Helper;
 
+use KumbiaPHP\View\View;
 use KumbiaPHP\View\Helper\AbstractHelper;
 
 /**

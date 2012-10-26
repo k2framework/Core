@@ -18,7 +18,7 @@
  * @license    http://wiki.kumbiaphp.com/Licencia     New BSD License
  */
 
-namespace KumbiaPHP\View\Helper;
+//namespace KumbiaPHP\View\Helper;
 
 use KumbiaPHP\View\Helper\AbstractHelper;
 
@@ -68,7 +68,7 @@ class Tag extends AbstractHelper
      */
     public static function js($src, $priority = 100, $cache = TRUE)
     {
-        $src = "javascript/$src.js";
+        $src = "js/$src";
         if (!$cache) {
             $src .= '?nocache=' . uniqid();
         }

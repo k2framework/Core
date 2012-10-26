@@ -1,4 +1,5 @@
 <?php
+
 /**
  * KumbiaPHP web & app Framework
  *
@@ -17,9 +18,9 @@
  * @copyright  Copyright (c) 2005-2012 KumbiaPHP Team (http://www.kumbiaphp.com)
  * @license    http://wiki.kumbiaphp.com/Licencia     New BSD License
  */
+//namespace KumbiaPHP\View\Helper;
 
-namespace KumbiaPHP\View\Helper;
-
+use \Tag;
 use KumbiaPHP\View\Helper\AbstractHelper;
 
 /**
@@ -97,7 +98,7 @@ class Html extends AbstractHelper
             $attrs = self::getAttrs($attrs);
         }
 
-        return '<a href="' . self::$app->getBaseUrl() . self::$app->getControllerUrl() . "/$action\" $attrs >$text</a>";
+        return '<a href="' . self::$app->getControllerUrl() . "/$action\" $attrs >$text</a>";
     }
 
     /**
@@ -159,7 +160,7 @@ class Html extends AbstractHelper
     {
         $js = Tag::getJs();
         self::sortByPriority($js);
-        $code = '';
+        $code = '<script type="text/javascript">var BASE_URL = "' . self::$app->getBaseUrl() . '";</script>' . PHP_EOL;
         foreach (array_unique($js, SORT_REGULAR) as $e) {
             $code .= '<script type="text/javascript" src="' . self::$app->getBaseUrl() . $e['src'] . '.js"></script>' . PHP_EOL;
         }
