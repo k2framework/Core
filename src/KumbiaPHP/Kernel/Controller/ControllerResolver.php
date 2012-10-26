@@ -90,7 +90,8 @@ class ControllerResolver
      * */
     protected function camelcase($string, $firstLower = FALSE)
     {
-        $string = str_replace(' ', '', ucwords(str_replace('_', ' ', strtolower($string))));
+        $string = str_replace(' ', '', ucwords(preg_replace('@(.+)_(\w)@', '$1 $2', strtolower($string))));
+                
         if ($firstLower) {
             // Notacion lowerCamelCase
             $string[0] = strtolower($string[0]);

@@ -100,6 +100,13 @@ class View
     {
         return self::$container->get('flash');
     }
+    /**
+     * @return \KumbiaPHP\Kernel\AppContext
+     */
+    public static function app()
+    {
+        return self::$container->get('app.context');
+    }
 
     /**
      *
