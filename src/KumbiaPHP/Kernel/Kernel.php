@@ -156,7 +156,7 @@ abstract class Kernel implements KernelInterface
             $this->request = $request;
             self::$container->get('app.context')->setRequest($this->request);
         }
-
+        
         //ejecutamos el evento request
         $this->dispatcher->dispatch(KumbiaEvents::REQUEST, $event = new RequestEvent($request));
 
@@ -237,6 +237,10 @@ abstract class Kernel implements KernelInterface
     public static function get($service)
     {
         return self::$container->get($service);
+    }
+    public static function getParam($param)
+    {
+        return self::$container->getParameter($param);
     }
 
     public static function getContainer()
