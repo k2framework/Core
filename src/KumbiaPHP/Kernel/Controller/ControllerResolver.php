@@ -77,6 +77,7 @@ class ControllerResolver
         $app = $this->container->get('app.context');
         $app->setCurrentModule($module);
         $app->setCurrentController($controller);
+        $app->setCurrentAction($action);
 
         return $this->createController($params);
     }
@@ -147,7 +148,7 @@ class ControllerResolver
 
         $this->controller = $reflectionClass->newInstanceArgs(array($this->container));
         $this->setViewDefault($this->action);
-
+        
         return array($this->controller, $this->action, $params);
     }
 
