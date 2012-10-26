@@ -21,7 +21,7 @@ class Form extends AbstractLogin
             $this->container->get('session')
                     ->set('target_login', $currentUrl, 'security');
         }
-        return $this->container->get('router')->forward($login_url);
+        return $this->container->get('router')->redirect($login_url);
     }
 
 }
