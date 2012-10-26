@@ -37,27 +37,35 @@ class Firewall
     {
         Reader::readSecurityConfig($this->container->get('app.context'));
 
-
         $url = $event->getRequest()->getRequestUrl();
+        //verificamos la existencia del token en la session.
         if (!$logged = $this->container->get('session')->has('token', 'security')) {
-            if ($url === Reader::get('security.login_url')) {//
+            if ($url === Reader::get('security.login_url') && !$event->getRequest()->isMethod('post')) {
+                //si no existe el token y la url es la del logueo, nos vamos.
                 return;
-            } elseif ($url === '/_autenticate' ||
+            } elseif (($this->isSecure($url) && $event->getRequest()->isMethod('post')) ||
                     ('http' === Reader::get('security.type') &&
                     $event->getRequest()->server->get('PHP_AUTH_USER') &&
-                    $event->getRequest()->server->get('PHP_AUTH_PW'))) {
+                    $event->getRequest()->server->get('PHP_AUTH_PW'))
+            ) {
+                //si estamos verificando los datos de acceso.
                 $event->stopPropagation();
-                return $this->loginCheck();
+                $event->setResponse($this->loginCheck());
+                return;
             }
-        } elseif ($url == Reader::get('security.login_url') || $url === '/_autenticate') {
+        } elseif ($url === Reader::get('security.login_url')) {
+            //si ya existe el token y estamos en la url del form de logueo, mandamos al target_login
             $event->stopPropagation();
-            return $this->container->get('router')
-                            ->redirect(Reader::get('security.target_login'));
+            $event->setResponse($this->container->get('router')
+                            ->redirect(Reader::get('security.target_login')));
+            return;
         }
 
-        if ($url === Reader::get('security.logout_url')) {//
+        if ($url === Reader::get('security.logout_url')) {
+            //Si estoy en la pagina de logout, realizo el cierre de sesión.
             $event->stopPropagation();
-            return $this->logout();
+            $event->setResponse($this->logout());
+            return;
         }
 
         if ($roles = $this->isSecure($url)) { //si la url es segura
@@ -67,7 +75,7 @@ class Firewall
             }
             //si aun no está logueado
             $event->stopPropagation();
-            return $this->showLogin();
+            $event->setResponse($this->showLogin());
         }
     }
 
@@ -124,6 +132,7 @@ class Firewall
     {
         try {
             list ($provider, $token) = $this->getProviderAndToken(Reader::get('security.provider'));
+
             $auth = new AuthManager($provider);
 
             $auth->autenticate($token);
