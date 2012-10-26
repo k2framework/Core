@@ -38,7 +38,7 @@ class ExceptionHandler
     public static function createException(\Exception $e)
     {
         /* @var $app \KumbiaPHP\Kernel\AppContext */
-        $app = self::$kernel->getContainer()->get('app.context');
+        $app = self::$kernel->get('app.context');
 
         $code = $e->getCode();
 

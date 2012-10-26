@@ -170,7 +170,7 @@ abstract class Kernel implements KernelInterface
             list($controller, $action, $params) = $resolver->getController($request);
 
             $event = new ControllerEvent($request, array($controller, $action, $params));
-            
+
             //ejecutamos el evento controller.
             $this->dispatcher->dispatch(KumbiaEvents::CONTROLLER, $event);
 
@@ -232,6 +232,11 @@ abstract class Kernel implements KernelInterface
     public function isProduction()
     {
         return $this->production;
+    }
+
+    public static function get($service)
+    {
+        return self::$container->get($service);
     }
 
     public static function getContainer()

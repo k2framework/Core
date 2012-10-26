@@ -42,7 +42,7 @@ class AppCache implements KernelInterface
 
         $this->kernel->init($request);
 
-        $this->cache = $this->kernel->getContainer()->get('cache');
+        $this->cache = $this->kernel->get('cache');
 
         $id = md5($request->getRequestUrl() . $request->server->get('QUERY_STRING'));
 
