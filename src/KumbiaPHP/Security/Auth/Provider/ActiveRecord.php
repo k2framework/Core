@@ -23,7 +23,8 @@ class ActiveRecord extends AbstractProvider
     //put your code here
     public function loadUser(TokenInterface $token)
     {
-        $user = $token->getUser()->findBy($this->config['username'], $token->getUsername());
+        $user = $token->getUser();
+        $user = $user::findBy($this->config['username'], $token->getUsername());
 
         if (!$user instanceof UserInterface) {
             throw new UserNotFoundException("No existe el Usuario {$token->getUsername()} en la Base de Datos");
