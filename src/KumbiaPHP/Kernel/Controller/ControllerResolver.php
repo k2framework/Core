@@ -39,6 +39,7 @@ class ControllerResolver
         $contSmall = 'index';
         $action = 'index'; //accion por defecto si no se especifica.
         $actionSmall = 'index';
+        $module = '/';
         $params = array(); //parametros de la url, de existir.
         //obtenemos la url actual de la petición.
         $currentUrl = '/' . trim($this->container->get('app.context')->getCurrentUrl(), '/');
@@ -52,14 +53,6 @@ class ControllerResolver
             //ahora obtengo el controlador
             if (current($url)) {
                 //si no es un controlador lanzo la excepcion
-                if (!$this->isController($module, current($url))) {
-                    $controller = $this->camelcase($contSmall = current($url));
-                    if ('/' !== $module) {
-                        throw new NotFoundException(sprintf("El controlador \"%sController\" para el Módulo \"%s\" no Existe", $controller, $module), 404);
-                    } else {
-                        throw new NotFoundException(sprintf("La ruta \"%s\" no concuerda con ningún módulo ni controlador en la App", $currentUrl), 404);
-                    }
-                }
                 $controller = $this->camelcase($contSmall = current($url));
                 next($url);
             }
@@ -80,7 +73,7 @@ class ControllerResolver
         $this->parameters = $params;
 
         $app = $this->container->get('app.context');
-        
+
         $app->setCurrentModule($module);
         $app->setCurrentController($contSmall);
         $app->setCurrentAction($actionSmall);
@@ -108,6 +101,10 @@ class ControllerResolver
 
     protected function getModule($url)
     {
+        if (0 === strpos($url, '/logout') && 7 === strlen($url)) {
+            return '/logout';
+        }
+
         $routes = array_keys($this->container->get('app.context')->getModules());
 
         usort($routes, function($a, $b) {
@@ -127,14 +124,11 @@ class ControllerResolver
         return FALSE;
     }
 
-    protected function isController($module, $controller)
-    {
-        $path = $this->container->get('app.context')->getModules($module);
-        return is_file("{$path}/Controller/{$this->camelcase($controller)}Controller.php");
-    }
-
     public function getController()
     {
+        if ('/logout' === $this->module) {
+            throw new NotFoundException(sprintf("La ruta \"%s\" no concuerda con ningún módulo ni controlador en la App", $this->module), 404);
+        }
         //creo el namespace para poder crear la instancia del controlador
         $currentPath = $this->container->get('app.context')->getModules($this->module);
         $modulesPath = $this->container->get('app.context')->getModulesPath();
@@ -147,7 +141,7 @@ class ControllerResolver
         try {
             $reflectionClass = new ReflectionClass($controllerClass);
         } catch (\Exception $e) {
-            throw new NotFoundException(sprintf("No exite el controlador \"%s\" en el Módulo \"%sController/\"", $controllerName, $currentPath), 404);
+            throw new NotFoundException(sprintf("No exite el controlador \"%s\" en la ruta \"%sController/%s.php\"", $controllerName, $currentPath, $controllerName), 404);
         }
 
         $this->controller = $reflectionClass->newInstanceArgs(array($this->container));
