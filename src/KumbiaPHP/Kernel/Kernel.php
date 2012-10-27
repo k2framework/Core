@@ -156,14 +156,13 @@ abstract class Kernel implements KernelInterface
             $this->request = $request;
             self::$container->get('app.context')->setRequest($this->request);
         }
-        
+        //creamos el resolver, para que encuentre el modulo, controlador y accion a ejecutar.
+        $resolver = new ControllerResolver(self::$container);
+
         //ejecutamos el evento request
         $this->dispatcher->dispatch(KumbiaEvents::REQUEST, $event = new RequestEvent($request));
 
         if (!$event->hasResponse()) {
-
-            //si el evento no devuelve una respuesta, ejecutamos el controlador.
-            $resolver = new ControllerResolver(self::$container);
 
             //obtenemos la instancia del controlador, el nombre de la accion
             //a ejecutar, y los parametros que recibirá dicha acción
@@ -238,6 +237,7 @@ abstract class Kernel implements KernelInterface
     {
         return self::$container->get($service);
     }
+
     public static function getParam($param)
     {
         return self::$container->getParameter($param);
