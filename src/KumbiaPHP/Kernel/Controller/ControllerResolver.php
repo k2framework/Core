@@ -111,7 +111,7 @@ class ControllerResolver
         $routes = array_keys($this->container->get('app.context')->getModules());
 
         usort($routes, function($a, $b) {
-                    return trim(strlen($a) > strlen($b)) ? -1 : 1;
+                    return strlen($a) > strlen($b) ? -1 : 1;
                 }
         );
 
