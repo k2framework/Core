@@ -55,11 +55,15 @@ class Security
      * Verifica que el usuario actual tenga permisos para acceder a la 
      * ruta especificada.
      * @param string $route
-     * @return boolean 
+     * @return boolean|NULL TRUE p FALSE si está logueado, sino devuelve NULL
      */
     public function hasPermissions($route)
     {
-        return AclManager::checkRoute($this->getToken(), $route);
+        if ($this->isLogged()) {
+            return (boolean) AclManager::checkRoute($this->getToken(), $route);
+        } else {
+            return NULL;
+        }
     }
 
 }
