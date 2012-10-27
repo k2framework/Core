@@ -70,8 +70,9 @@ class Request
      * de ofrecer una arquitectura de comunicacion con estos valores orientada 
      * a objetos. 
      */
-    public function __construct()
+    public function __construct($baseUrl = NULL)
     {
+        $this->baseUrl = $baseUrl;
         $this->server = new Collection($_SERVER);
         $this->request = new Collection($_POST);
         $this->query = new Collection($_GET);
