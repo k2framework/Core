@@ -2,6 +2,7 @@
 
 namespace KumbiaPHP\Kernel\Session;
 
+use KumbiaPHP\Kernel\Request;
 use KumbiaPHP\Kernel\Session\SessionInterface;
 
 /**
@@ -14,9 +15,9 @@ class Session implements SessionInterface
 
     protected $namespaceApp;
 
-    public function __construct($namespace = 'default')
+    public function __construct(Request $request)
     {
-        $this->namespaceApp = $namespace;
+        $this->namespaceApp = $request->getAppContext()->getAppPath();
         $this->start();
     }
 
