@@ -25,7 +25,7 @@ abstract class Acl implements AclInterface {
     public static function factory($adapter = 'simple') {
         return new Adapter\Simple();
     }
-
+    
     protected function getRole($role) {
         if ($role instanceof RoleInterface) {
             $role = $role->getName();

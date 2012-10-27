@@ -12,20 +12,26 @@ use KumbiaPHP\Security\Auth\User\UserInterface;
  * @category   Kumbia
  * @package    Acl
  */
-class Simple extends Acl {
+class Simple extends Acl
+{
 
     protected $roles;
     protected $users;
 
-    public function allow($role, array $resources = array()) {
-
-        $this->roles[$this->getRole($role)]['resources'] = $resources;
+    public function allow($role, array $resources = array())
+    {
+        foreach ($resources as $resource) {
+            $this->roles[$this->getRole($role)]['resources'][] = $this->getResource($resource);
+        }
 
         return $this;
     }
 
-    public function check(UserInterface $user, $resource) {
-        foreach ((array) $user->getRoles() as $role) {
+    public function check(UserInterface $user, $resource)
+    {
+        $roles = $user->getRoles();
+
+        foreach ((array) $roles as $role) {
             if ($this->isAllowed($role, $resource)) {
                 return TRUE;
             }
@@ -33,17 +39,20 @@ class Simple extends Acl {
         return FALSE;
     }
 
-    public function parents($role, array $parents = array()) {
+    public function parents($role, array $parents = array())
+    {
         $this->roles[$this->getRole($role)]['parents'] = $parents;
         return $this;
     }
 
-    public function user(UserInterface $user) {
-        $this->users[$user->getUsername()] = $user->getRoles();
+    public function user(UserInterface $user, array $roles = array())
+    {
+        $this->users[$user->getUsername()] = count($roles) ? $roles : $user->getRoles();
         return $this;
     }
 
-    protected function isAllowed($role, $resource) {
+    protected function isAllowed($role, $resource)
+    {
 
         $role = $this->getRole($role);
         $resource = $this->getResource($resource);
