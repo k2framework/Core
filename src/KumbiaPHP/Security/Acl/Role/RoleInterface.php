@@ -9,4 +9,5 @@ namespace KumbiaPHP\Security\Acl\Role;
 interface RoleInterface
 {
     public function getName();
+    public function getResources();
 }

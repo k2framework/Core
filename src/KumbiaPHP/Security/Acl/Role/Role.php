@@ -24,4 +24,9 @@ class Role implements RoleInterface
         return $this->name;
     }
 
+    public function getResources()
+    {
+        return array();
+    }
+
 }
