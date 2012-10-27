@@ -25,16 +25,20 @@ class ControllerResolver
     protected $controller;
     protected $contShortName;
     protected $action;
+    protected $parameters;
 
     public function __construct(ContainerInterface $con)
     {
         $this->container = $con;
+        $this->parseUrl();
     }
 
-    public function getController()
+    public function parseUrl()
     {
         $controller = 'Index'; //controlador por defecto si no se especifica.
+        $contSmall = 'index';
         $action = 'index'; //accion por defecto si no se especifica.
+        $actionSmall = 'index';
         $params = array(); //parametros de la url, de existir.
         //obtenemos la url actual de la petición.
         $currentUrl = '/' . trim($this->container->get('app.context')->getCurrentUrl(), '/');
@@ -49,19 +53,19 @@ class ControllerResolver
             if (current($url)) {
                 //si no es un controlador lanzo la excepcion
                 if (!$this->isController($module, current($url))) {
-                    $controller = $this->camelcase(current($url));
+                    $controller = $this->camelcase($contSmall = current($url));
                     if ('/' !== $module) {
                         throw new NotFoundException(sprintf("El controlador \"%sController\" para el Módulo \"%s\" no Existe", $controller, $module), 404);
                     } else {
                         throw new NotFoundException(sprintf("La ruta \"%s\" no concuerda con ningún módulo ni controlador en la App", $currentUrl), 404);
                     }
                 }
-                $controller = $this->camelcase(current($url));
+                $controller = $this->camelcase($contSmall = current($url));
                 next($url);
             }
             //luego obtenemos la acción
             if (current($url)) {
-                $action = $this->camelcase(current($url), TRUE);
+                $action = $this->camelcase($actionSmall = current($url), TRUE);
                 next($url);
             }
             //por ultimo los parametros
@@ -73,13 +77,13 @@ class ControllerResolver
         $this->module = $module;
         $this->contShortName = $controller;
         $this->action = $action;
+        $this->parameters = $params;
 
         $app = $this->container->get('app.context');
+        
         $app->setCurrentModule($module);
-        $app->setCurrentController($controller);
-        $app->setCurrentAction($action);
-
-        return $this->createController($params);
+        $app->setCurrentController($contSmall);
+        $app->setCurrentAction($actionSmall);
     }
 
     /**
@@ -92,7 +96,7 @@ class ControllerResolver
     protected function camelcase($string, $firstLower = FALSE)
     {
         $string = str_replace(' ', '', ucwords(preg_replace('@(.+)_(\w)@', '$1 $2', strtolower($string))));
-                
+
         if ($firstLower) {
             // Notacion lowerCamelCase
             $string[0] = strtolower($string[0]);
@@ -107,7 +111,7 @@ class ControllerResolver
         $routes = array_keys($this->container->get('app.context')->getModules());
 
         usort($routes, function($a, $b) {
-                    return (strlen($a) > strlen($b)) ? -1 : 1;
+                    return trim(strlen($a) > strlen($b)) ? -1 : 1;
                 }
         );
 
@@ -129,7 +133,7 @@ class ControllerResolver
         return is_file("{$path}/Controller/{$this->camelcase($controller)}Controller.php");
     }
 
-    protected function createController($params)
+    public function getController()
     {
         //creo el namespace para poder crear la instancia del controlador
         $currentPath = $this->container->get('app.context')->getModules($this->module);
@@ -148,8 +152,8 @@ class ControllerResolver
 
         $this->controller = $reflectionClass->newInstanceArgs(array($this->container));
         $this->setViewDefault($this->action);
-        
-        return array($this->controller, $this->action, $params);
+
+        return array($this->controller, $this->action, $this->parameters);
     }
 
     public function executeAction(ControllerEvent $controllerEvent)
