@@ -14,7 +14,7 @@ use KumbiaPHP\Kernel\Collection;
  *
  * @author manuel
  */
-class Flash
+class Flash implements \Serializable
 {
 
     /**
@@ -133,6 +133,16 @@ class Flash
         }
         $code .= '<u/l>' . PHP_EOL;
         return $code;
+    }
+
+    public function serialize()
+    {
+        return serialize($this->messages);
+    }
+
+    public function unserialize($serialized)
+    {
+        $this->messages = unserialize($serialized);
     }
 
 }
