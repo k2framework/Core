@@ -2,6 +2,7 @@
 
 namespace KumbiaPHP\Security\Auth\Token;
 
+use KumbiaPHP\Security\Acl\Role\RoleInterface;
 use KumbiaPHP\Security\Auth\User\UserInterface;
 use KumbiaPHP\Security\Auth\Token\TokenInterface;
 
@@ -54,6 +55,9 @@ abstract class AbstractToken implements TokenInterface
     public function unserialize($serialized)
     {
         list($this->user, $this->valid) = unserialize($serialized);
+        if (method_exists($this->user, '__construct')) {
+            $this->user->__construct();
+        }
     }
 
     public function setAutenticated($autenticate)
