@@ -22,7 +22,7 @@ class Memory extends AbstractProvider
     public function loadUser(TokenInterface $token)
     {
         $users = (array) Reader::get('users');
-        
+
         if (!isset($users[$token->getUsername()])) {
             throw new UserNotFoundException("No existe el Usuario {$token->getUsername()} en la Base de Datos");
         }
@@ -30,7 +30,7 @@ class Memory extends AbstractProvider
         $data['username'] = $token->getUsername();
         $data['password'] = key($users[$token->getUsername()]);
         $data['roles'] = explode(',', $users[$token->getUsername()][$data['password']]);
-        
+
         $userClass = get_class($token->getUser());
 
         return new $userClass($data);
@@ -41,6 +41,7 @@ class Memory extends AbstractProvider
         $this->config = $config;
 
         isset($config['username']) || $config['username'] = 'username';
+        isset($config['password']) || $config['password'] = 'password';
 
         $request = $this->container->get('request');
 
@@ -49,20 +50,23 @@ class Memory extends AbstractProvider
             'password' => $request->server->get('PHP_AUTH_PW'),
                 ));
 
-        if ($config && isset($config['class'])) {
+        $form['username'] = $form[$config['username']];
+        $form['password'] = $form[$config['password']];
 
-            if (!class_exists($config['class'])) {
-                throw new AuthException("No existe la clase {$config['class']}");
-            }
-
-            $user = new $config['class']($form);
-
-            if (!($user instanceof UserInterface)) {
-                throw new AuthException("La clase {$config['class']} debe implementar la interface de UserInterface");
-            }
-        } else {
-            $user = new User($form);
-        }
+//        if ($config && isset($config['class'])) {
+//
+//            if (!class_exists($config['class'])) {
+//                throw new AuthException("No existe la clase {$config['class']}");
+//            }
+//
+//            $user = new $config['class']($form);
+//
+//            if (!($user instanceof UserInterface)) {
+//                throw new AuthException("La clase {$config['class']} debe implementar la interface de UserInterface");
+//            }
+//        } else {
+        $user = new User($form); //por ahora siempre usaran las clase de usuario Memory
+//        }
 
         return new Token($user);
     }

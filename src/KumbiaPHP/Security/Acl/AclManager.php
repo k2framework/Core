@@ -22,6 +22,7 @@ class AclManager
      * @var Acl 
      */
     protected static $acl;
+    protected static $resources;
 
     protected static function createPermisions(TokenInterface $token)
     {
@@ -33,24 +34,45 @@ class AclManager
             if ($role instanceof RoleInterface) {
                 $resources = $role->getResources();
                 self::$acl->allow($role, $resources);
+            } else {
+                self::$acl->allow($role, self::getResources($role));
             }
         }
+
         self::$acl->user($token->getUser(), $roles);
     }
 
     public static function check(TokenInterface $token, Request $request)
     {
+        $url = trim($request->getRequestUrl(), '/');
+
+        return self::checkRoute($token, $url);
+    }
+
+    public static function checkRoute(TokenInterface $token, $route)
+    {
         if (!self::$acl) {
             self::createPermisions($token);
         }
 
-        $module = trim($request->getAppContext()->getCurrentModule(), '/');
-        $controller = $request->getAppContext()->getCurrentController();
-        $action = $request->getAppContext()->getCurrentAction();
+        return self::$acl->check($token->getUser(), $route);
+    }
 
-        return self::$acl->check($token->getUser(), "$module/*") ||
-                self::$acl->check($token->getUser(), "$module/$controller/*") ||
-                self::$acl->check($token->getUser(), "$module/$controller/$action");
+    protected static function getResources($role = NULL)
+    {
+        if (!self::$resources) {
+            foreach ((array) Reader::get('routes') as $route => $roles) {
+                foreach (explode(',', $roles) as $r) {
+                    self::$resources[trim($r)][] = $route;
+                }
+            }
+        }
+        if (NULL === $role) {
+            return self::$resources;
+        } else {
+            //aqui buscamos los recursos para un rol
+            return isset(self::$resources[$role]) ? self::$resources[$role] : array();
+        }
     }
 
 }

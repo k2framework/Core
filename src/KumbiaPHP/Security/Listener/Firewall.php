@@ -9,6 +9,7 @@ use KumbiaPHP\Security\Auth\AuthManager;
 use KumbiaPHP\Di\Container\ContainerInterface;
 use KumbiaPHP\Security\Exception\AuthException;
 use KumbiaPHP\Security\Exception\UserNotFoundException;
+use KumbiaPHP\Security\Exception\UserNotAuthorizedException;
 
 /**
  * Description of Firewall
@@ -74,7 +75,9 @@ class Firewall
                 $token = $this->container->get('security')->getToken();
                 //si hay definidos modelos para el ACL
                 if (!AclManager::check($token, $event->getRequest())) {
-                    throw new \Exception("no permisos");
+                    $user = $token->getUsername();
+                    $uri = $event->getRequest()->getRequestUrl();
+                    throw new UserNotAuthorizedException("el usuario \"$user\" no tiene permisos para acceder al recurso \"$url\"");
                 }
                 return;
             }

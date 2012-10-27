@@ -2,6 +2,7 @@
 
 namespace KumbiaPHP\Security;
 
+use KumbiaPHP\Security\Acl\AclManager;
 use KumbiaPHP\Kernel\Session\SessionInterface;
 use KumbiaPHP\Security\Auth\Token\TokenInterface;
 
@@ -48,6 +49,17 @@ class Security
     public function getToken()
     {
         return $this->session->get('token', 'security');
+    }
+
+    /**
+     * Verifica que el usuario actual tenga permisos para acceder a la 
+     * ruta especificada.
+     * @param string $route
+     * @return boolean 
+     */
+    public function hasPermissions($route)
+    {
+        return AclManager::checkRoute($this->getToken(), $route);
     }
 
 }

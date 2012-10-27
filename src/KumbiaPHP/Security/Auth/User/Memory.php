@@ -2,6 +2,7 @@
 
 namespace KumbiaPHP\Security\Auth\User;
 
+use KumbiaPHP\Security\Config\Reader;
 use KumbiaPHP\Security\Auth\User\User;
 
 /**
