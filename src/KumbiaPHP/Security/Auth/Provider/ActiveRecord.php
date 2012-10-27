@@ -25,7 +25,7 @@ class ActiveRecord extends AbstractProvider
     {
         $user = $token->getUser();
         $user = $user::findBy($this->config['username'], $token->getUsername());
-        
+
         if (!$user instanceof UserInterface) {
             throw new UserNotFoundException("No existe el Usuario {$token->getUsername()} en la Base de Datos");
         }
@@ -46,11 +46,11 @@ class ActiveRecord extends AbstractProvider
         if (!isset($config['class'])) {
             throw new AuthException("Debe definir un valor para el índice user[class] en el security.ini");
         }
-        
+
         if (!isset($config['username'])) {
             throw new AuthException("Debe definir un valor para el índice user[username] en el security.ini");
         }
-        
+
         if (!class_exists($config['class'])) {
             throw new AuthException("No existe la clase {$config['class']}");
         }

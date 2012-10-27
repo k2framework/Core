@@ -3,6 +3,7 @@
 namespace KumbiaPHP\Security\Listener;
 
 use KumbiaPHP\Security\Config\Reader;
+use KumbiaPHP\Security\Acl\AclManager;
 use KumbiaPHP\Kernel\Event\RequestEvent;
 use KumbiaPHP\Security\Auth\AuthManager;
 use KumbiaPHP\Di\Container\ContainerInterface;
@@ -39,7 +40,7 @@ class Firewall
 
         $url = $event->getRequest()->getRequestUrl();
         //verificamos la existencia del token en la session.
-        if (!$logged = $this->container->get('session')->has('token', 'security')) {
+        if (!$this->container->get('session')->has('token', 'security')) {
             if ($url === Reader::get('security.login_url') && !$event->getRequest()->isMethod('post')) {
                 //si no existe el token y la url es la del logueo, nos vamos.
                 return;
@@ -68,9 +69,13 @@ class Firewall
             return;
         }
 
-        if ($roles = $this->isSecure($url)) { //si la url es segura
-            if ($logged && $this->container->get('session')
-                            ->get('token', 'security')->isValid()) {
+        if ($this->isSecure($url)) { //si la url es segura
+            if ($this->container->get('security')->isLogged()) {
+                $token = $this->container->get('security')->getToken();
+                //si hay definidos modelos para el ACL
+                if (!AclManager::check($token, $event->getRequest())) {
+                    throw new \Exception("no permisos");
+                }
                 return;
             }
             //si aun no está logueado
@@ -125,7 +130,7 @@ class Firewall
             throw new AuthException("la clase proveedora de usuarios debe implementar la interface UserProviderInterface");
         }
 
-        return array($provider, $provider->getToken((array) Reader::get('security.user')));
+        return array($provider, $provider->getToken((array) Reader::get('model_config.user')));
     }
 
     protected function loginCheck()
@@ -135,7 +140,7 @@ class Firewall
 
             $auth = new AuthManager($provider);
 
-            $auth->autenticate($token);//si falla el logueo, tira una excepcion.
+            $auth->autenticate($token); //si falla el logueo, tira una excepcion.
 
             $this->container->get('session')->set('token', $token, 'security');
             if ($url = $this->container->get('session')->get('target_login', 'security')) {
