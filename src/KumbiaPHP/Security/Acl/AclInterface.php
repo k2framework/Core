@@ -12,31 +12,29 @@ use KumbiaPHP\Security\Acl\Resource\ResourceInterface;
  */
 interface AclInterface
 {
-
-    public function addResource(ResourceInterface $resource);
-
-    public function setResources(array $resources);
-
     /**
      * Establece los recursos a los que el rol puede acceder
      *
-     * @param RoleInterface $role nombre de rol
+     * @param RoleInterface|string $role nombre de rol
      * @param array $resources recursos a los que puede acceder el rol
+     * @return AclInterface
      */
-    public function allow(RoleInterface $role, $resourceName);
+    public function allow($role, array $resources = array());
 
     /**
      * Establece los padres del rol
      *
-     * @param RoleInterface $role rol
+     * @param RoleInterface|string $role rol
      * @param array $parents padres del rol
+     * @return AclInterface
      */
-    public function parents(RoleInterface $role, $parents);
+    public function parents($role, array $parents = array());
 
     /**
      * Adiciona un usuario a la lista
      *
      * @param UserInterface $user
+     * @return AclInterface
      */
     public function user(UserInterface $user);
 
@@ -44,8 +42,8 @@ interface AclInterface
      * Verifica si el usuario puede acceder al recurso
      * 
      * @param UserInterface $user usuario de la acl
-     * @param ResourceInterface $resource recurso al cual se verificará acceso
+     * @param ResourceInterface|string $resource recurso al cual se verificará acceso
      * @return boolean
      */
-    public function check(UserInterface $user, ResourceInterface $resource);
+    public function check(UserInterface $user,$resource);
 }

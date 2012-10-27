@@ -47,6 +47,10 @@ class ActiveRecord extends AbstractProvider
             throw new AuthException("Debe definir un valor para el índice user[class] en el security.ini");
         }
         
+        if (!isset($config['username'])) {
+            throw new AuthException("Debe definir un valor para el índice user[username] en el security.ini");
+        }
+        
         if (!class_exists($config['class'])) {
             throw new AuthException("No existe la clase {$config['class']}");
         }
