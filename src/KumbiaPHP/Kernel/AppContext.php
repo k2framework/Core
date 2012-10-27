@@ -203,7 +203,7 @@ class AppContext
      */
     public function getCurrentAction()
     {
-        return $this->currentController;
+        return $this->currentAction;
     }
 
     /**
@@ -224,8 +224,6 @@ class AppContext
             $url = $this->currentController . '/' . $this->currentAction;
         }
 
-        $url = $this->toSmallCase($url);
-
         if ($parameters) {
             $url .= substr($this->currentUrl, strlen($url) + 1);
         }
@@ -244,14 +242,7 @@ class AppContext
 
     public function getControllerUrl()
     {
-        return $this->getBaseUrl() . trim($this->currentModule, '/') . '/' . $this->toSmallCase($this->currentController);
-    }
-
-    protected function toSmallCase($string)
-    {
-        $string[0] = strtolower($string[0]);
-        
-        return strtolower(preg_replace('/\w([A-Z])/', "_$1", $string));
+        return $this->getBaseUrl() . trim($this->currentModule, '/') . '/' . $this->currentController;
     }
 
 }
