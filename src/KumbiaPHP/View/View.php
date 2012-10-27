@@ -100,6 +100,7 @@ class View
     {
         return self::$container->get('flash');
     }
+
     /**
      * @return \KumbiaPHP\Kernel\AppContext
      */
@@ -183,7 +184,7 @@ class View
         $app = self::$container->get('app.context');
 
         $module = $app->getCurrentModule();
-        $controller = $app->getCurrentController();
+        $controller = $this->camelcase($app->getCurrentController());
         $file = rtrim($app->getModules($module), '/') . '/View/' . $controller . '/' . $view . '.phtml';
         if (!file_exists($file)) {
             if (is_string($scaffold)) {
@@ -197,6 +198,18 @@ class View
         }
 
         return $file;
+    }
+
+    /**
+     * Convierte la cadena con espacios o guión bajo en notacion camelcase
+     *
+     * @param string $s cadena a convertir
+     * @param boolean $firstLower indica si es lower camelcase
+     * @return string
+     * */
+    private function camelcase($string)
+    {
+        return str_replace(' ', '', ucwords(preg_replace('@(.+)_(\w)@', '$1 $2', strtolower($string))));
     }
 
 }
