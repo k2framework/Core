@@ -97,7 +97,6 @@ class Form implements ArrayAccess, Validatable
                 $this->initFromModel($model);
             } else {
                 $this->init();
-                $this->setData(get_object_vars($model));
             }
         } else {
             $this->name = $model;
@@ -156,6 +155,9 @@ class Form implements ArrayAccess, Validatable
         $this->fields[$index] = $field;
         if ($field instanceof Field\File) {
             $this->attrs(array('enctype' => 'multipart/form-data'));
+        }
+        if (($this->model instanceof ActiveRecord ) && isset($this->model->{$index})) {
+            $field->setValue($this->model->{$index});
         }
         return $field;
     }
@@ -366,8 +368,15 @@ class Form implements ArrayAccess, Validatable
     public function setData(array $data)
     {
         /* @var $field Field */
-        foreach ($this->fields as $fieldName => $field) {
-            $field->setValue(isset($data[$fieldName]) ? $data[$fieldName] : NULL);
+        if ($this->model instanceof ActiveRecord) {
+            foreach ($this->fields as $fieldName => $field) {
+                $field->setValue(isset($data[$fieldName]) ? $data[$fieldName] : NULL);
+                $this->model->{$fieldName} = $field->getValue();
+            }
+        } else {
+            foreach ($this->fields as $fieldName => $field) {
+                $field->setValue(isset($data[$fieldName]) ? $data[$fieldName] : NULL);
+            }
         }
         return $this;
     }
@@ -393,9 +402,6 @@ class Form implements ArrayAccess, Validatable
     public function getData()
     {
         if ($this->model instanceof ActiveRecord) {
-            foreach ($this->fields as $fieldName => $field) {
-                $this->model->{$fieldName} = $field->getValue();
-            }
             return $this->model;
         } else {
             $values = array();
