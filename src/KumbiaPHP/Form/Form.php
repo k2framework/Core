@@ -536,8 +536,8 @@ class Form implements ArrayAccess, Validatable
     {
         if (isset($this[$field])) {
             $this[$field]->addError($message);
-            $this->errors[] = $message;
         }
+        $this->errors[] = $message;
         return $this;
     }
 
