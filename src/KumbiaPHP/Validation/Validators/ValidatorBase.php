@@ -62,5 +62,29 @@ abstract class ValidatorBase
         }
     }
 
+    protected static function createErrorMessage(Validatable $object, $column, $params)
+    {
+        if (isset($params['message'])) {
+
+            if (preg_match_all("/{(?'item'.+?)}/", $params['message'], $matches)) {
+                foreach ($matches['item'] as $item) {
+                    if ('label' === $item && $object instanceof \KumbiaPHP\Form\Form) {
+                        $value = $object[$column]['label'];
+                    } else {
+                        if (!isset($params[$item])) {
+                            continue;
+                        }
+                        $value = $params[$item];
+                    }
+                    $params['message'] = str_replace('{' . $item . '}', $value, $params['message']);
+                }
+            }
+        } else {
+            $params['message'] = NULL;
+        }
+
+        self::$lastError = $params['message'];
+    }
+
 }
 

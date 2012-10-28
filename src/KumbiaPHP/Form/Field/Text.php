@@ -3,17 +3,15 @@
 namespace KumbiaPHP\Form\Field;
 
 use KumbiaPHP\Form\Field\AbstractField;
-use KumbiaPHP\Form\Field\MaxLengthInterface;
 
 /**
  * Description of FormFieldText
  *
  * @author manuel
  */
-class Text extends AbstractField implements MaxLengthInterface
+class Text extends AbstractField
 {
 
-    
     public function __construct($fieldName)
     {
         parent::__construct($fieldName);
@@ -25,14 +23,23 @@ class Text extends AbstractField implements MaxLengthInterface
         return '<input ' . $this->attrsToString() . ' />' . PHP_EOL;
     }
 
-    public function maxLength($max, $min = 0, $message = 'El campo %s debe tener mínimo %s caracteres y maximo %s')
+    public function maxLength($max, $min = 0, $message = 'El campo {label} debe tener mínimo {min} caracteres y maximo {max}')
     {
         $this->validationBuilder->lengthBetween($this->getFieldName(), array(
-            'message' => vsprintf($message, array($this->getLabel(), $min, $max)),
+            'message' => $message,
             'max' => $max,
             'min' => $min,
         ));
         return $this->attrs(array('maxlength' => $max));
+    }
+
+    public function equalTo($field, $message = 'El campo {label} debe ser igual al campo {field}')
+    {
+        $this->validationBuilder->equalTo($this->getFieldName(), array(
+            'message' => $message,
+            'field' => $field,
+        ));
+        return $this;
     }
 
 }

@@ -71,16 +71,16 @@ abstract class AbstractChoice extends AbstractField implements ChoiceInterface
         $this->separator = $separator;
     }
 
-    public function inListValidation($message = 'El valor del campo %s no está en la lista de opciones')
+    public function inListValidation($message = 'El valor del campo {label} no está en la lista de opciones')
     {
         $this->validationBuilder->inList($this->getFieldName(), array(
-            'message' => sprintf($message, $this->getLabel()),
+            'message' => $message,
             'list' => $this->getOptions()
         ));
         return $this;
     }
 
-    public function required($required = TRUE, $message = 'Debe seleccionar al menos una opción para el campo %s')
+    public function required($required = TRUE, $message = 'Debe seleccionar al menos una opción para el campo {label}')
     {
         parent::required($required, $message);
         unset($this->_attrs['required']);

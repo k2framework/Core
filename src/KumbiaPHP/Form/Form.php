@@ -121,7 +121,7 @@ class Form implements ArrayAccess, Validatable
      * @param string|\KumbiaPHP\Form\Field\Field $fieldName
      * @param string $type
      * @param array $options
-     * @return \KumbiaPHP\Form\Field\Field|\KumbiaPHP\Form\Field\Choice
+     * @return \KumbiaPHP\Form\Field\Text|\KumbiaPHP\Form\Field\AbstractChoice
      * @throws Exception 
      */
     public function add($fieldName, $type = 'text', array $options = array())

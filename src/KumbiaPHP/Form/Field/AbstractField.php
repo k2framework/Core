@@ -177,11 +177,11 @@ abstract class AbstractField implements ArrayAccess
      * @param string $message Mensaje a mostrar en caso de error al validar.
      * @return Field 
      */
-    public function required($required = TRUE, $message = 'El campo %s es requerido')
+    public function required($required = TRUE, $message = 'El campo {label} es requerido')
     {
         if ($required) {
             $this->validationBuilder->notNull($this->getFieldName(), array(
-                'message' => sprintf($message, $this->getLabel())
+                'message' => $message
             ));
             return $this->attrs(array('required' => 'required'));
         } else {

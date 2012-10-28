@@ -2,7 +2,7 @@
 
 namespace KumbiaPHP\Validation\Validators;
 
-use KumbiaPHP\Validation\Validators\ValidatorBase;
+use KumbiaPHP\Validation\Validators\ValidatorInterface;
 use KumbiaPHP\Validation\Validatable;
 
 /**
@@ -18,8 +18,7 @@ use KumbiaPHP\Validation\Validatable;
  * obtain it through the world-wide-web, please send an email
  * to license@kumbiaphp.com so we can send you a copy immediately.
  *
- * Realiza validacion para campo con longitud de caracteres
- * comprendida en un rango de valores
+ * Realiza validacion para campo con valor no nulo
  *
  * @category   Kumbia
  * @package    ActiveRecord
@@ -27,7 +26,7 @@ use KumbiaPHP\Validation\Validatable;
  * @copyright  Copyright (c) 2005-2010 Kumbia Team (http://www.kumbiaphp.com)
  * @license    http://wiki.kumbiaphp.com/Licencia     New BSD License
  */
-class LengthBetween extends ValidatorBase
+class EqualTo extends ValidatorBase
 {
 
     /**
@@ -41,10 +40,14 @@ class LengthBetween extends ValidatorBase
      */
     public static function validate(Validatable $object, $column, $params = NULL, $update = FALSE)
     {
-        $value = self::getValue($object, $column);
-        if (strlen($value) < $params['min'] || strlen($value) > $params['max']) {
+        $value1 = self::getValue($object, $column);
+        $value2 = self::getValue($object, $params['field']);
+        if ($value1 !== $value2) {
             if (!isset($params['message'])) {
-                $params['message'] = "El campo $column debe estár entre {$params['min']} y {$params['max']}";
+                $params['message'] =  "El campo $column debe ser igual al campo {$params['field']}";
+            }
+            if ( $object instanceof \KumbiaPHP\Form\Form){
+                $params['field'] = $object[$params['field']]['label'];
             }
             self::createErrorMessage($object, $column, $params);
             return FALSE;

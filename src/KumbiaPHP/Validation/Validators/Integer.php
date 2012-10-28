@@ -41,11 +41,10 @@ class Integer extends ValidatorBase
     public static function validate(Validatable $object, $column, $params = NULL, $update = FALSE)
     {
         if (!filter_var(self::getValue($object, $column), FILTER_VALIDATE_INT)) {
-            if ($params && isset($params['message'])) {
-                self::$lastError = $params['message'];
-            } else {
-                self::$lastError = "El campo $column debe ser un número entero";
+            if (!isset($params['message'])) {
+                $params['message'] = "El campo $column debe ser un número entero";
             }
+            self::createErrorMessage($object, $column, $params);
             return FALSE;
         }
 
