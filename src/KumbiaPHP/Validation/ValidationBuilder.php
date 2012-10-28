@@ -88,8 +88,8 @@ class ValidationBuilder
             }
         } else {
             foreach ($this->valitations as $type => $fields) {
-                if (isset($fileds[$field]) && $this->has($type, $fileds[$field])) {
-                    unset($this->valitations[$type][$field]);
+                if (isset($fields[$field])) {
+                    $this->remove($field, $type);
                 }
             }
         }
