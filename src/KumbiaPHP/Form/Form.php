@@ -369,6 +369,7 @@ class Form implements ArrayAccess, Validatable
         foreach ($this->fields as $fieldName => $field) {
             $field->setValue(isset($data[$fieldName]) ? $data[$fieldName] : NULL);
         }
+        return $this;
     }
 
     /**
@@ -381,14 +382,7 @@ class Form implements ArrayAccess, Validatable
      */
     public function bindRequest(Request $request)
     {
-        /* @var $field Field */
-        if ($data = $request->get($this->name, FALSE)) {
-            foreach ($this->fields as $fieldName => $field) {
-                $field->setValue(isset($data[$fieldName]) ? $data[$fieldName] : NULL);
-            }
-        }
-
-        return $this;
+        return $this->setData($request->get($this->name, array()));
     }
 
     /**
