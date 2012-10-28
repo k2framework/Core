@@ -84,8 +84,8 @@ class Form implements ArrayAccess, Validatable
      * validaciones a partir de la lectura de los requerimientos del mismo.
      * por lo que estará validado con html y con la lib FormBuilder.
      * 
-     * @pa
-     * 
+     * @param ActiveRecord|string $model modelo AR ó nombre del form
+     * @param boolean $createFields indica si se crearan los campos a partir del modelo.
      */
     final public function __construct($model = NULL, $createFields = FALSE)
     {
@@ -110,9 +110,24 @@ class Form implements ArrayAccess, Validatable
         self::$validator = $container->get('validator');
     }
 
+    /**
+     * Devuelve el nombre del formulario
+     * @return string 
+     */
     public function getName()
     {
         return $this->name;
+    }
+
+    /**
+     * Establece un nombre para el formulario
+     * @param string $name
+     * @return \KumbiaPHP\Form\Form 
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+        return $this;
     }
 
     /**
