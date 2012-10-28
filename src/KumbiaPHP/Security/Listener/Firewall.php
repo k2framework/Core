@@ -41,7 +41,8 @@ class Firewall
 
         $url = $event->getRequest()->getRequestUrl();
         //verificamos la existencia del token en la session.
-        if (!$this->container->get('session')->has('token', 'security')) {
+        //if (!$this->container->get('session')->has('token', 'security')) {
+        if (!$this->container->get('security')->isLogged()) {
             if ($url === Reader::get('security.login_url') && !$event->getRequest()->isMethod('post')) {
                 //si no existe el token y la url es la del logueo, nos vamos.
                 return;
