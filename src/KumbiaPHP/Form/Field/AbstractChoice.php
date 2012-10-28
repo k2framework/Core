@@ -87,4 +87,20 @@ abstract class AbstractChoice extends AbstractField implements ChoiceInterface
         return $this;
     }
 
+    public function setValue($value)
+    {
+        if (is_array($value) && count($value) &&
+                (current($value) instanceof \KumbiaPHP\ActiveRecord\ActiveRecord)) {
+            $values = array();
+            foreach ($value as $item) {
+                if (isset($item->{$item->metadata()->getPK()})) {
+                    $values[] = $item->{$item->metadata()->getPK()};
+                }
+            }
+            return parent::setValue($values);
+        } else {
+            return parent::setValue($value);
+        }
+    }
+
 }
