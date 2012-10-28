@@ -32,7 +32,7 @@ return $result;
 <div class="exception">
 <div class="error flash round">
 <p><strong>
-<?php echo basename(get_class($e)) ?>: <?php echo htmlspecialchars("{$e->getMessage()} ({$e->getCode() })", ENT_NOQUOTES, 'UTF-8') ?>
+<?php echo basename(get_class($e)) ?>: <?php echo "{$e->getMessage()} ({$e->getCode() })" ?>
 </strong></p>
 <p>En el archivo <em><?php echo htmlspecialchars($e->getFile(), ENT_NOQUOTES, 'UTF-8') ?></em> en la línea: <em><?php echo $e->getLine() ?></em></p>
 </div>
