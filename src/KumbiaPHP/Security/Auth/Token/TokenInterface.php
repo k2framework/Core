@@ -17,7 +17,7 @@ interface TokenInterface extends Serializable
 
     public function getRoles();
     
-    public function getAttributes();
+    public function getAttributes($attr = NULL);
 
     public function setUser($user);
 

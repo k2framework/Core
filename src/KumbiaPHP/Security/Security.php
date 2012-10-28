@@ -46,9 +46,14 @@ class Security
      *
      * @return TokenInterface 
      */
-    public function getToken()
+    public function getToken($attr = NULL)
     {
-        return $this->session->get('token', 'security');
+        if (NULL === $attr) {
+            return $this->session->get('token', 'security');
+        } else {
+            return $this->session->get('token', 'security')
+                            ->getAttributes($attr);
+        }
     }
 
     /**

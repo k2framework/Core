@@ -70,9 +70,17 @@ abstract class AbstractToken implements TokenInterface
         return $this->user->getRoles();
     }
 
-    public function getAttributes()
+    public function getAttributes($attr = NULL)
     {
-        return $this->attributes;
+        if (NULL === $attr) {
+            return $this->attributes;
+        } else {
+            if (is_object($this->user) && isset($this->user->{$attr})) {
+                return $this->user->{$attr};
+            } else {
+                return isset($this->attributes[$attr]) ? $this->attributes[$attr] : NULL;
+            }
+        }
     }
 
 }
