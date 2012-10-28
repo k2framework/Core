@@ -80,10 +80,18 @@ class ValidationBuilder
         return isset($this->valitations[$type]) && isset($this->valitations[$type][$field]);
     }
 
-    public function remove($type, $field)
+    public function remove($field, $type = NULL)
     {
-        if ($this->has($type, $field)) {
-            unset($this->valitations[$type][$field]);
+        if (NULL !== $type) {
+            if ($this->has($type, $field)) {
+                unset($this->valitations[$type][$field]);
+            }
+        } else {
+            foreach ($this->valitations as $type => $fields) {
+                if (isset($fileds[$field]) && $this->has($type, $fileds[$field])) {
+                    unset($this->valitations[$type][$field]);
+                }
+            }
         }
     }
 
