@@ -4,7 +4,7 @@ namespace KumbiaPHP\Form;
 
 use \ArrayAccess;
 use KumbiaPHP\Kernel\Request;
-use KumbiaPHP\Form\Field\Field;
+use KumbiaPHP\Form\Field\AbstractField as Field;
 use KumbiaPHP\ActiveRecord\ActiveRecord;
 use KumbiaPHP\Form\Exception\FormException;
 use KumbiaPHP\Validation\ValidationBuilder;

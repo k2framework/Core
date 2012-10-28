@@ -2,31 +2,29 @@
 
 namespace KumbiaPHP\Form\Field;
 
-use KumbiaPHP\Form\Field\Field;
+use KumbiaPHP\Form\Field\AbstractField;
+use KumbiaPHP\Form\Field\MaxLengthInterface;
 
 /**
  * Description of FormFieldText
  *
  * @author manuel
  */
-class Text extends Field
+class Text extends AbstractField implements MaxLengthInterface
 {
 
+    
     public function __construct($fieldName)
     {
         parent::__construct($fieldName);
         $this->setType('text');
     }
 
-    /**
-     * Valida que un campo tenga un numero de caracteres comprendido entre un
-     * minimo y un maximo establecidos.
-     * 
-     * @param int $max
-     * @param int $min
-     * @param string $message
-     * @return TextField 
-     */
+    public function render()
+    {
+        return '<input ' . $this->attrsToString() . ' />' . PHP_EOL;
+    }
+
     public function maxLength($max, $min = 0, $message = 'El campo %s debe tener mínimo %s caracteres y maximo %s')
     {
         $this->validationBuilder->lengthBetween($this->getFieldName(), array(
@@ -38,3 +36,4 @@ class Text extends Field
     }
 
 }
+

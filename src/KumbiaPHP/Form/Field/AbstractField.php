@@ -10,7 +10,7 @@ use KumbiaPHP\Validation\ValidationBuilder;
  *
  * @author manuel
  */
-abstract class Field implements ArrayAccess, Validatable
+abstract class AbstractField implements ArrayAccess, Validatable
 {
 
     protected $formName;
@@ -251,7 +251,6 @@ abstract class Field implements ArrayAccess, Validatable
                 'value' => htmlspecialchars($this->getValue(), ENT_COMPAT),
             ));
         }
-        return $this->attrs;
     }
 
     /**
@@ -262,7 +261,8 @@ abstract class Field implements ArrayAccess, Validatable
     protected function attrsToString()
     {
         $string = NULL;
-        foreach ($this->prepareAttrs() as $attr => $value) {
+        $this->prepareAttrs();
+        foreach ($this->attrs as $attr => $value) {
             $string .= "$attr=\"$value\" ";
         }
         return $string;
@@ -273,10 +273,7 @@ abstract class Field implements ArrayAccess, Validatable
      *
      * @return string 
      */
-    public function render()
-    {
-        return '<input ' . $this->attrsToString() . ' />' . PHP_EOL;
-    }
+    abstract public function render();
 
     public function addError($index, $message)
     {

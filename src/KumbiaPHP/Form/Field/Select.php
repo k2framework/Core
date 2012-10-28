@@ -2,14 +2,14 @@
 
 namespace KumbiaPHP\Form\Field;
 
-use KumbiaPHP\Form\Field\Choice;
+use KumbiaPHP\Form\Field\AbstractChoice;
 
 /**
  * Description of FormFieldText
  *
  * @author manuel
  */
-class Select extends Choice
+class Select extends AbstractChoice
 {
 
     public function __construct($fieldName)
@@ -24,7 +24,7 @@ class Select extends Choice
      * @param string $separator
      * @return string 
      */
-    public function render($separator = NULL)
+    public function render()
     {
         $html = '<select ' . $this->attrsToString() . ' >' . PHP_EOL;
         foreach ($this->getOptions() as $value => $label) {
@@ -40,9 +40,11 @@ class Select extends Choice
 
     protected function prepareAttrs()
     {
-        $attrs = parent::prepareAttrs();
-        unset($attrs['type']);
-        return $attrs;
+        if (isset($this->attrs['multiple'])) {
+            $this->attrs['name'] = $this->formName . '[' . $this->getFieldName() . '][]';
+        } else {
+            $this->attrs['name'] = $this->formName . '[' . $this->getFieldName() . ']';            
+        }
     }
 
 }
