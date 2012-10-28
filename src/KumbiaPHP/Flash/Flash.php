@@ -127,11 +127,11 @@ class Flash implements \Serializable
 
     public function __toString()
     {
-        $code = '<ul class="messages-flash">' . PHP_EOL;
+        $code = '<div class="messages-flash">' . PHP_EOL;
         foreach ((array) $this->getAll() as $type => $message) {
             $code.= "<div class=\"flash $type\">$message</div>" . PHP_EOL;
         }
-        $code .= '<u/l>' . PHP_EOL;
+        $code .= '</div>' . PHP_EOL;
         return $code;
     }
 
