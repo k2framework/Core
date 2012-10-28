@@ -4,18 +4,19 @@ namespace KumbiaPHP\Form;
 
 use \ArrayAccess;
 use KumbiaPHP\Kernel\Request;
-use KumbiaPHP\Form\Field\AbstractField as Field;
+use KumbiaPHP\Validation\Validatable;
 use KumbiaPHP\ActiveRecord\ActiveRecord;
 use KumbiaPHP\Form\Exception\FormException;
 use KumbiaPHP\Validation\ValidationBuilder;
 use KumbiaPHP\Di\Container\ContainerInterface;
+use KumbiaPHP\Form\Field\AbstractField as Field;
 
 /**
  * 
  *
  * @author programador.manuel@gmail.com
  */
-class Form implements ArrayAccess
+class Form implements ArrayAccess, Validatable
 {
 
     protected $name;
@@ -70,6 +71,11 @@ class Form implements ArrayAccess
      * @var type 
      */
     protected static $validator;
+
+    /**
+     * @var ValidationBuilder 
+     */
+    protected $validationBuilder;
 
     /**
      * Constructor de la clase.
@@ -137,14 +143,16 @@ class Form implements ArrayAccess
     /**
      * Agrega un elemento al formulario.
      *
-     * @param \KumbiaPHP\Form\Field\Field $field elemento a agregar.
+     * @param Field $field elemento a agregar.
      * 
-     * @return \KumbiaPHP\Form\Field\Field objeto que se cre�.
+     * @return Field objeto que se cre�.
      */
     protected function _add(Field $field)
     {
         //$index = preg_replace('/\[.*\]/i', '', $formField->getFieldName());
-        $index = $field->setFormName($this->getName())->getFieldName();
+        $index = $field->setFormName($this->getName())
+                ->setValidationBuilder($this->validationBuilder)
+                ->getFieldName();
         $this->fields[$index] = $field;
         if ($field instanceof Field\File) {
             $this->attrs(array('enctype' => 'multipart/form-data'));
@@ -192,7 +200,7 @@ class Form implements ArrayAccess
     }
 
     /**
-     * Devuelve la acci�n a la que apunta el formulario actualmente.
+     * Devuelve la acción a la que apunta el formulario actualmente.
      * 
      * @return string 
      */
@@ -269,7 +277,7 @@ class Form implements ArrayAccess
      *
      * @param string $element Nombre del campo a obtener.
      * 
-     * @return Field\Hidden objeto que se encuentra en el form  � 
+     * @return Field objeto que se encuentra en el form  � 
      * NULL si el elemento no existe.
      */
     public function getField($element)
@@ -292,6 +300,7 @@ class Form implements ArrayAccess
     {
         if (array_key_exists($element, $this->fields)) {
             unset($this->fields[$element]);
+            $this->validationBuilder->remove($element);
         }
         return $this;
     }
@@ -334,7 +343,8 @@ class Form implements ArrayAccess
      */
     public function isValid()
     {
-        /* @var $field \KumbiaPHP\Form\Field\Field */
+        return self::$validator->validate($this);
+        /* @var $field Field */
         $valid = TRUE;
 
         foreach ($this->fields as $index => $field) {
@@ -355,7 +365,7 @@ class Form implements ArrayAccess
      */
     public function setData(array $data)
     {
-        /* @var $field \KumbiaPHP\Form\Field\Field */
+        /* @var $field Field */
         foreach ($this->fields as $fieldName => $field) {
             $field->setValue(isset($data[$fieldName]) ? $data[$fieldName] : NULL);
         }
@@ -371,12 +381,13 @@ class Form implements ArrayAccess
      */
     public function bindRequest(Request $request)
     {
-        /* @var $field \KumbiaPHP\Form\Field\Field */
+        /* @var $field Field */
         if ($data = $request->get($this->name, FALSE)) {
             foreach ($this->fields as $fieldName => $field) {
                 $field->setValue(isset($data[$fieldName]) ? $data[$fieldName] : NULL);
             }
         }
+
         return $this;
     }
 
@@ -519,6 +530,20 @@ class Form implements ArrayAccess
                 }
             }
         }
+    }
+
+    public function addError($field, $message)
+    {
+        if (isset($this[$field])) {
+            $this[$field]->addError($message);
+            $this->errors[] = $message;
+        }
+        return $this;
+    }
+
+    public function getValidations()
+    {
+        return $this->validationBuilder;
     }
 
 }

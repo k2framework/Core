@@ -3,14 +3,13 @@
 namespace KumbiaPHP\Form\Field;
 
 use \ArrayAccess;
-use KumbiaPHP\Validation\Validatable;
 use KumbiaPHP\Validation\ValidationBuilder;
 
 /**
  *
  * @author manuel
  */
-abstract class AbstractField implements ArrayAccess, Validatable
+abstract class AbstractField implements ArrayAccess
 {
 
     protected $formName;
@@ -69,13 +68,18 @@ abstract class AbstractField implements ArrayAccess, Validatable
     public function __construct($fieldName)
     {
         $this->setFieldName($fieldName);
-        $this->validationBuilder = new ValidationBuilder();
     }
 
     public function setFormName($formName)
     {
         $this->formName = $formName;
         return $this->attrs(array('id' => $this->createId()));
+    }
+
+    public function setValidationBuilder(ValidationBuilder $vb)
+    {
+        $this->validationBuilder = $vb;
+        return $this;
     }
 
     /**
@@ -275,7 +279,7 @@ abstract class AbstractField implements ArrayAccess, Validatable
      */
     abstract public function render();
 
-    public function addError($index, $message)
+    public function addError($message)
     {
         $this->errors[] = $message;
     }

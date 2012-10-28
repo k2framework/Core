@@ -37,6 +37,7 @@ class Check extends AbstractChoice
     {
         $this->attrs['name'] = $this->formName . '[' . $this->getFieldName() . '][]';
         $this->attrs['type'] = $this->getType();
+        unset($this->attrs['required']);
     }
 
 }
