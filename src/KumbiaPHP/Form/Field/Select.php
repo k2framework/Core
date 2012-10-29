@@ -12,6 +12,8 @@ use KumbiaPHP\Form\Field\AbstractChoice;
 class Select extends AbstractChoice
 {
 
+    protected $default;
+
     public function __construct($fieldName)
     {
         parent::__construct($fieldName);
@@ -27,6 +29,9 @@ class Select extends AbstractChoice
     public function render()
     {
         $html = '<select ' . $this->attrsToString() . ' >' . PHP_EOL;
+        if (NULL !== $this->default && FALSE !== $this->default) {
+            $html .= '<option value="">' . htmlspecialchars($this->default, ENT_COMPAT) . '</option>';
+        }
         foreach ($this->getOptions() as $value => $label) {
             $html .= '<option value="' . htmlspecialchars($value, ENT_COMPAT) . '" ';
             if (in_array($value, (array) $this->getValue())) {
@@ -38,12 +43,17 @@ class Select extends AbstractChoice
         return $html;
     }
 
+    public function setDefault($default)
+    {
+        $this->default = NULL;
+    }
+
     protected function prepareAttrs()
     {
         if (isset($this->attrs['multiple'])) {
             $this->attrs['name'] = $this->formName . '[' . $this->getFieldName() . '][]';
         } else {
-            $this->attrs['name'] = $this->formName . '[' . $this->getFieldName() . ']';            
+            $this->attrs['name'] = $this->formName . '[' . $this->getFieldName() . ']';
         }
     }
 
