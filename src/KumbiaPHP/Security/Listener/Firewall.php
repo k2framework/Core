@@ -33,7 +33,6 @@ class Firewall
     /**
      * metodo que será llamado por el dispatcher en el evento kumbia.request
      * @param RequestEvent $event
-     * @return NULL|\KumbiaPHP\Kernel\Response 
      */
     public function onKernelRequest(RequestEvent $event)
     {
