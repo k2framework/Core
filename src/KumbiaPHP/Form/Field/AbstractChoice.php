@@ -69,6 +69,7 @@ abstract class AbstractChoice extends AbstractField implements ChoiceInterface
     public function setSeparator($separator)
     {
         $this->separator = $separator;
+        return $this;
     }
 
     public function inListValidation($message = 'El valor del campo {label} no está en la lista de opciones')
