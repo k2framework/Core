@@ -167,6 +167,7 @@ class Form implements ArrayAccess, Validatable
         $index = $field->setFormName($this->getName())
                 ->setValidationBuilder($this->validationBuilder)
                 ->getFieldName();
+        $field->init(); //inicializaciones especiales.
         $this->fields[$index] = $field;
         if ($field instanceof Field\File) {
             $this->attrs(array('enctype' => 'multipart/form-data'));

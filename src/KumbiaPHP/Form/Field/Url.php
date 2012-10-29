@@ -15,16 +15,21 @@ class Url extends Text
     public function __construct($fieldName)
     {
         parent::__construct($fieldName);
-        $this->setType('url')->urlValidation();
+        $this->setType('url');
     }
 
-    public function urlValidation($message = 'El campo %s debe ser una URL valida')
+    public function init()
     {
-        return $this->setValidations(array('url' => array(
-                        'value' => $this->getValue(),
-                        'message' => $message,
-                    )
-                ));
+        $this->urlValidation();
+    }
+
+    public function urlValidation($message = 'El campo {label} debe ser una URL valida')
+    {
+        $this->validationBuilder->url($this->getFieldName(), array(
+            'message' => $message
+        ));
+
+        return $this;
     }
 
 }

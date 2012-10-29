@@ -45,7 +45,8 @@ class Select extends AbstractChoice
 
     public function setDefault($default)
     {
-        $this->default = NULL;
+        $this->default = $default;
+        return $this;
     }
 
     protected function prepareAttrs()

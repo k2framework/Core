@@ -33,4 +33,9 @@ class Date extends Text
         return $this;
     }
 
+    public function init()
+    {
+        $this->dateValidation();
+    }
+
 }

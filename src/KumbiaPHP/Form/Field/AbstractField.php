@@ -368,4 +368,9 @@ abstract class AbstractField implements ArrayAccess
         return $this->formName . '_' . preg_replace('/(\[(.*)\])/i', '_$2', $this->getFieldName());
     }
 
+    public function init()
+    {
+        
+    }
+
 }
