@@ -13,15 +13,25 @@ use KumbiaPHP\Kernel\Event\RequestEvent;
  */
 class ExceptionEvent extends RequestEvent
 {
+
     /**
      *
      * @var \Exception 
      */
     protected $exception;
 
-    function __construct(\Exception $e, Request $request)
+    public function __construct(\Exception $e, Request $request)
     {
-        $this->request = $request;
+        parent::__construct($request);
+        $this->exception = $e;
     }
-
+    
+    /**
+     * Devuelve la Excepción que se disparó
+     * @return \Exception 
+     */
+    public function getException()
+    {
+        return $this->exception;
+    }
 }
