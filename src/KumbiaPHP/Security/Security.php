@@ -51,8 +51,12 @@ class Security
         if (NULL === $attr) {
             return $this->session->get('token', 'security');
         } else {
-            return $this->session->get('token', 'security')
-                            ->getAttributes($attr);
+            if ($this->session->has('token', 'security')) {
+                return $this->session->get('token', 'security')
+                                ->getAttributes($attr);
+            } else {
+                return NULL;
+            }
         }
     }
 
