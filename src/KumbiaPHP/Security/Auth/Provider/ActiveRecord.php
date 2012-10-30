@@ -52,7 +52,7 @@ class ActiveRecord extends AbstractProvider
         }
 
         if (!class_exists($config['class'])) {
-            throw new AuthException("No existe la clase {$config['class']}");
+            throw new AuthException("No existe la clase de usuario '{$config['class']}'<br/>en el security.ini en la seccion  '[model_config]'");
         }
 
         $user = new $config['class']($form);
