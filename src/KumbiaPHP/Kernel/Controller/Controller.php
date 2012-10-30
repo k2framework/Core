@@ -56,7 +56,7 @@ class Controller
      * Constructor de la clase
      * @param ContainerInterface $container
      */
-    public function __construct(ContainerInterface $container)
+    public final function __construct(ContainerInterface $container)
     {
         $this->container = $container;
     }
