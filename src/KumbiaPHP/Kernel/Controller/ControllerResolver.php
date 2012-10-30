@@ -2,11 +2,12 @@
 
 namespace KumbiaPHP\Kernel\Controller;
 
-use KumbiaPHP\Di\Container\ContainerInterface;
-use KumbiaPHP\Kernel\Exception\NotFoundException;
 use \ReflectionClass;
 use \ReflectionObject;
+use KumbiaPHP\Kernel\Response;
 use KumbiaPHP\Kernel\Event\ControllerEvent;
+use KumbiaPHP\Di\Container\ContainerInterface;
+use KumbiaPHP\Kernel\Exception\NotFoundException;
 
 /**
  * Description of ControllerResolver
@@ -157,7 +158,9 @@ class ControllerResolver
 
         $controller = new ReflectionObject($this->controller);
 
-        $this->executeBeforeFilter($controller);
+        if (($response = $this->executeBeforeFilter($controller)) instanceof Response) {
+            return $response;
+        }
 
         if (FALSE === $this->action) {
             return NULL; //si el before devuelve false, es porque no queremos que se ejecute nuestra acción.
@@ -247,8 +250,11 @@ class ControllerResolver
                     $this->container->get('app.context')->setCurrentAction(FALSE);
                     return;
                 }
+                if ($result instanceof Response) {
+                    return $result; //devolvemos el objeto Response.
+                }
                 if (!is_string($result)) {
-                    throw new NotFoundException(sprintf("El método \"beforeFilter\" solo puede devolver una cadena, en el Controlador \"%sController\"", $this->contShortName));
+                    throw new NotFoundException(sprintf("El método \"beforeFilter\" solo puede devolver un <b>FALSE, una cadena, ó un objeto Response<b> en el Controlador \"%sController\"", $this->contShortName));
                 }
                 if (!$controller->hasMethod($result)) {
                     throw new NotFoundException(sprintf("El método \"beforeFilter\" está devolviendo el nombre de una acción inexistente \"%s\" en el Controlador \"%sController\"", $result, $this->contShortName));
