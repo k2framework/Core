@@ -28,6 +28,7 @@ class Firewall
     function __construct(ContainerInterface $container)
     {
         $this->container = $container;
+        Reader::readSecurityConfig($container->get('app.context'));
     }
 
     /**
@@ -36,7 +37,6 @@ class Firewall
      */
     public function onKernelRequest(RequestEvent $event)
     {
-        Reader::readSecurityConfig($this->container->get('app.context'));
 
         $url = $event->getRequest()->getRequestUrl();
         //verificamos la existencia del token en la session.
@@ -163,7 +163,7 @@ class Firewall
      * @return \KumbiaPHP\Kernel\Response
      * @throws AuthException 
      */
-    protected function showLogin()
+    public function showLogin()
     {
         $typeLoginClassName = 'KumbiaPHP\\Security\\Auth\\Login\\' . ucfirst(Reader::get('security.type'));
         if (!class_exists($typeLoginClassName)) {
@@ -178,7 +178,7 @@ class Firewall
      * Desloguea al usuario del sistema.
      * @return \KumbiaPHP\Kernel\Response 
      */
-    protected function logout()
+    public function logout()
     {
         $typeLoginClassName = 'KumbiaPHP\\Security\\Auth\\Login\\' . ucfirst(Reader::get('security.type'));
 
