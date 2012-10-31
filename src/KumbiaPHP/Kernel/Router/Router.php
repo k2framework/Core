@@ -9,7 +9,7 @@ use KumbiaPHP\Kernel\KernelInterface;
 use KumbiaPHP\Kernel\Request;
 
 /**
- * Description of Router
+ * Servicio Router del framework
  *
  * @author manuel
  */
@@ -36,7 +36,7 @@ class Router implements RouterInterface
     }
 
     /**
-     *
+     * Redirije la petición a otro modulo/controlador/accion de la aplicación.
      * @param string $url
      * @return \KumbiaPHP\Kernel\RedirectResponse 
      */
@@ -47,7 +47,7 @@ class Router implements RouterInterface
     }
 
     /**
-     *
+     * Redirije la petición a otra acción del mismo controlador.
      * @param type $action
      * @return \KumbiaPHP\Kernel\RedirectResponse 
      */
@@ -58,7 +58,8 @@ class Router implements RouterInterface
     }
 
     /**
-     *
+     * Redirije la petición a otro modulo/controlador/accion de la aplicación internamente,
+     * es decir, la url del navegador no va a cambiar para el usuario.
      * @param type $url
      * @return type
      * @throws \LogicException 
