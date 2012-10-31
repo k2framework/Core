@@ -142,7 +142,7 @@ class ControllerResolver
         try {
             $reflectionClass = new ReflectionClass($controllerClass);
         } catch (\Exception $e) {
-            throw new NotFoundException(sprintf("No exite el controlador \"%s\" en la ruta \"%sController/%s.php\"", $controllerName, $currentPath, $controllerName), 404);
+            throw new NotFoundException(sprintf("No existe el controlador \"%s\" en la ruta \"%sController/%s.php\"", $controllerName, $currentPath, $controllerName), 404);
         }
 
         $this->controller = $reflectionClass->newInstanceArgs(array($this->container));
@@ -202,7 +202,7 @@ class ControllerResolver
         }
         //verificamos la existencia del metodo.
         if (!$controller->hasMethod($this->action)) {
-            throw new NotFoundException(sprintf("No exite el metodo \"%s\" en el controlador \"%sController\"", $this->action, $this->contShortName), 404);
+            throw new NotFoundException(sprintf("No existe el metodo \"%s\" en el controlador \"%sController\"", $this->action, $this->contShortName), 404);
         }
 
         $reflectionMethod = $controller->getMethod($this->action);
@@ -219,7 +219,7 @@ class ControllerResolver
         //el nombre del metodo debe ser exactamente igual al camelCase
         //de la porcion de url
         if ($reflectionMethod->getName() !== $this->action) {
-            throw new NotFoundException(sprintf("No exite el metodo <b>%s</b> en el controlador \"%sController\"", $this->action, $this->contShortName), 404);
+            throw new NotFoundException(sprintf("No existe el metodo <b>%s</b> en el controlador \"%sController\"", $this->action, $this->contShortName), 404);
         }
 
         //se verifica que el metodo sea public
