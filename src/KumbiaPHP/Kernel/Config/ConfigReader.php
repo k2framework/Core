@@ -23,15 +23,13 @@ class ConfigReader
     {
         if($app->inProduction()){
             $configFile = $app->getAppPath() . '/config/config.php';
-            if (file_exists($configFile)){
-                require_once $configFile;
-                $this->config = $config;
+            if (file_exists($configFile)){                ;
+                $this->config = require_once $configFile;
                 return;
             }else{
                 $this->config = $this->compile($app);
-                $phpCode = "<?php\n\$config = ";
-                $phpCode .= var_export($this->config, true) . ';';			
-                file_put_contents($configFile, $phpCode);
+                $config = var_export($this->config, true);			
+                file_put_contents($configFile,"<?php\nreturn $config;");
             }
         }else{
         $this->config = $this->compile($app);		
