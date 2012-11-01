@@ -21,7 +21,21 @@ class ConfigReader
 
     public function __construct(AppContext $app)
     {
-        $this->config = $this->compile($app);
+        if($app->inProduction()){
+            $configFile = $app->getAppPath() . '/config/config.php';
+            if (file_exists($configFile)){
+                require_once $configFile;
+                $this->config = $config;
+                return;
+            }else{
+                $this->config = $this->compile($app);
+                $phpCode = "<?php\n\$config = ";
+                $phpCode .= var_export($this->config, true) . ';';			
+                file_put_contents($configFile, $phpCode);
+            }
+        }else{
+        $this->config = $this->compile($app);		
+        } 
     }
 
     /**
