@@ -2,9 +2,9 @@
 
 namespace KumbiaPHP\ActiveRecord\Config;
 
-use \AppKernel;
-use ActiveRecord\Config\Parameters;
+use KumbiaPHP\Kernel\Kernel;
 use ActiveRecord\Config\Config;
+use ActiveRecord\Config\Parameters;
 
 /**
  * Description of Reader
@@ -17,14 +17,14 @@ class Reader
     public static function readDatabases()
     {
         /* @var $app \KumbiaPHP\Kernel\AppContext */
-        $app = AppKernel::getContainer()->get('app.context');
+        $app = Kernel::get('app.context');
         $ini = $app->getAppPath() . 'config/databases.ini';
         foreach (parse_ini_file($ini, TRUE) as $configName => $params) {
             Config::add(new Parameters($configName, $params));
         }
-        if (AppKernel::getContainer()->hasParameter('config.database')) {
+        if (Kernel::getParam('config.database')) {
             //lo seteamos solo si se ha definido.
-            $database = AppKernel::getContainer()->getParameter('config.database');
+            $database = Kernel::getParam('config.database');
             if ( !Config::has($database) ){
                 throw new \LogicException("El valor database=$database del config.ini no concuerda con ninguna sección del databases.ini");
             }

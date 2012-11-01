@@ -4,9 +4,9 @@ namespace KumbiaPHP\ActiveRecord;
 
 use ActiveRecord\Model;
 use ActiveRecord\Config\Config;
-use KumbiaPHP\ActiveRecord\Config\Reader;
 use KumbiaPHP\Validation\Validator;
 use KumbiaPHP\Validation\Validatable;
+use KumbiaPHP\ActiveRecord\Config\Reader;
 use KumbiaPHP\ActiveRecord\Validation\ValidationBuilder;
 
 /**
@@ -81,5 +81,5 @@ if (!Config::initialized()) {
     //lo inicializamos.
     Reader::readDatabases();
     //establecemos el validador a usar por el active record
-    ActiveRecord::setValidator(\KumbiaPHP\Kernel\Kernel::getContainer()->get('validator'));
+    ActiveRecord::setValidator(\KumbiaPHP\Kernel\Kernel::get('validator'));
 }

@@ -41,12 +41,10 @@ class MaxLength extends ValidatorBase
     public static function validate(Validatable $object, $column, $params = NULL, $update = FALSE)
     {
         if (strlen(self::getValue($object, $column)) > $params['max']) {
-            if (isset($params['message'])) {
-                self::$lastError = $params['message'];
-            } else {
-                self::$lastError = "El campo $column debe tener menos de {$params['max']} caracteres";
+            if (!isset($params['message'])) {
+                $params['message'] ="El campo $column debe tener menos de {$params['max']} caracteres";
             }
-
+            self::createErrorMessage($object, $column, $params);
             return FALSE;
         }
 

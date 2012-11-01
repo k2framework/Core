@@ -28,10 +28,7 @@ class Textarea extends Text
 
     protected function prepareAttrs()
     {
-        $attrs = parent::prepareAttrs();
-        unset($attrs['value']);
-        unset($attrs['type']);
-        return $attrs;
+        $this->attrs['name'] = $this->formName . '[' . $this->getFieldName() . ']';
     }
 
 }

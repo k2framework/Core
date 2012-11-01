@@ -34,6 +34,13 @@ class Controller
     protected $template = 'default';
 
     /**
+     * Tiempo de cacheado ( debe ser una fecha relativa ).
+     * 
+     * @var string 
+     */
+    protected $cache = NULL;
+
+    /**
      * indica si se deben limitar el numero de parametros en las acciones ó no.
      * @var boolean 
      */
@@ -49,7 +56,7 @@ class Controller
      * Constructor de la clase
      * @param ContainerInterface $container
      */
-    public function __construct(ContainerInterface $container)
+    public final function __construct(ContainerInterface $container)
     {
         $this->container = $container;
     }
@@ -127,15 +134,32 @@ class Controller
     }
 
     /**
-     * Sirve para enviar al servicio de template "view" una respuesta
-     * especifica con los parametros pasados a este metodo.
-     * @param Response $response
-     * @param array $params
-     * @return type 
+     * Especifica un tiempo de cache para la vista.
+     * 
+     * Debe ser una cadena que represente un formato de fecha relativa.
+     * 
+     * @example $this->cache("+2 days");
+     * @example $this->cache("+3 hours");
+     * @example $this->cache("+10 sec");
+     * 
+     * @param string $time
      */
-    protected function render(Response $response, array $params = array())
+    protected function cache($time = FALSE)
     {
-        return $this->get('view')->render($this->template, $this->view, $params, $response);
+        $this->cache = $time;
+    }
+
+    /**
+     * Sirve para llamar al servicio de template "view" pasandole
+     * unos parametros  y especificando el tiempo de cache.
+     * 
+     * @param array $params
+     * @param type $time
+     * @return Response 
+     */
+    protected function render(array $params = array(), $time = NULL)
+    {
+        return $this->get('view')->render($this->template, $this->view, $params, $time);
     }
 
 }

@@ -32,7 +32,7 @@ return $result;
 <div class="exception">
 <div class="error flash round">
 <p><strong>
-<?php echo basename(get_class($e)) ?>: <?php echo htmlspecialchars("{$e->getMessage()} ({$e->getCode() })", ENT_NOQUOTES, 'UTF-8') ?>
+<?php echo basename(get_class($e)) ?>: <?php echo "{$e->getMessage()} ({$e->getCode() })" ?>
 </strong></p>
 <p>En el archivo <em><?php echo htmlspecialchars($e->getFile(), ENT_NOQUOTES, 'UTF-8') ?></em> en la línea: <em><?php echo $e->getLine() ?></em></p>
 </div>
@@ -81,17 +81,21 @@ $line = explode(" ", $line);
 <div class="exception_information">
 <h2>Información Adicional</h2>
 <strong>En producción:</strong> <?php echo $app->InProduction() ? 'Sí' : 'No' ?><br />
-<strong>Ubicación actual:</strong> <?php echo $app->getBaseUrl(), $app->getCurrentUrl() ?><br />
+<strong>Ubicación actual:</strong> <?php echo $app->getCurrentUrl() ?><br />
 <strong>Server: </strong> <?php echo $_SERVER['SERVER_SOFTWARE'] ?><br />
 <strong>IP Server: </strong> <?php echo $_SERVER['SERVER_ADDR'] ?><br />
 <strong>IP Visitante: </strong> <?php echo $_SERVER['REMOTE_ADDR'] ?><br />
 </div>
 
 <table><thead><tr>
-<th><h3><?php echo number_format(memory_get_usage() / 1048576, 2), ' MB'; ?></h3>Memoria Usada</th><th><h3><?php echo count($files) ?> ficheros</h3>Includes</th>
+<th><h3><?php echo round((microtime(1)-START_TIME),4),' seg.'?></h3>Tiempo</th>
+<th><h3><?php echo number_format(memory_get_usage() / 1048576, 2), ' MB'; ?></h3>Memoria Usada</th>
+<th><h3><?php echo count($files) ?> ficheros</h3>Includes</th>
 </tr>
 <tr>
-<th><h3><?php echo ini_get('memory_limit'); ?></h3>Memoria PHP</th><th><h3><?php echo PHP_VERSION ?></h3>Versión PHP</th>
+<th><h3><?php echo ini_get('max_execution_time'),' seg.'?></h3>Tiempo Máximo PHP</th>
+<th><h3><?php echo ini_get('memory_limit'); ?></h3>Memoria PHP</th>
+<th><h3><?php echo PHP_VERSION ?></h3>Versión PHP</th>
 </tr>
 </thead>
 </table>

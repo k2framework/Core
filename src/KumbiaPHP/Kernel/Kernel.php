@@ -3,19 +3,22 @@
 namespace KumbiaPHP\Kernel;
 
 use KumbiaPHP\Loader\Autoload;
-use KumbiaPHP\Kernel\KernelInterface;
-use KumbiaPHP\Kernel\Event\RequestEvent;
 use KumbiaPHP\Kernel\AppContext;
-use KumbiaPHP\Kernel\Controller\ControllerResolver;
-use KumbiaPHP\Kernel\Event\KumbiaEvents;
-use KumbiaPHP\EventDispatcher\EventDispatcher;
-use KumbiaPHP\Kernel\Event\ControllerEvent;
-use KumbiaPHP\Kernel\Event\ResponseEvent;
-use KumbiaPHP\Kernel\Config\ConfigReader;
+use KumbiaPHP\Di\Definition\Service;
 use KumbiaPHP\Di\DependencyInjection;
 use KumbiaPHP\Di\Container\Container;
+use KumbiaPHP\Kernel\KernelInterface;
+use KumbiaPHP\Di\Definition\Parameter;
+use KumbiaPHP\Kernel\Event\KumbiaEvents;
+use KumbiaPHP\Kernel\Event\RequestEvent;
+use KumbiaPHP\Kernel\Event\ResponseEvent;
+use KumbiaPHP\Kernel\Config\ConfigReader;
+use KumbiaPHP\Kernel\Event\ExceptionEvent;
+use KumbiaPHP\Kernel\Event\ControllerEvent;
 use KumbiaPHP\Di\Definition\DefinitionManager;
+use KumbiaPHP\EventDispatcher\EventDispatcher;
 use KumbiaPHP\Kernel\Exception\ExceptionHandler;
+use KumbiaPHP\Kernel\Controller\ControllerResolver;
 
 /**
  * Kernel del FW
@@ -113,91 +116,133 @@ abstract class Kernel implements KernelInterface
      * AppContext, Container, Inyector de dependencias, Dispatcher, etc.
      *  
      */
-    protected function init()
+    public function init(Request $request)
     {
+        $this->request = $request;
         //creamos la instancia del AppContext
         $context = new AppContext($this->request, $this->production, $this->getAppPath(), $this->routes, $this->namespaces);
         //leemos la config de la app
         $config = new ConfigReader($context);
         //iniciamos el container con esa config
-        $this->initContainer($config->getConfig());
+        $this->initContainer($config);
         //asignamos el kernel al container como un servicio
         self::$container->set('app.kernel', $this);
         //iniciamos el dispatcher con esa config
-        $this->initDispatcher($config->getConfig());
+        $this->initDispatcher($config);
 
-        //le asignamos el servicio session al request
-        $this->request->setSession(self::$container->get('session'));
+        //seteamos el contexto de la aplicación como servicio
+        self::$container->set('app.context', $context);
+        //le asignamos el servicio AppContext al request
         $this->request->setAppContext($context);
 
         //agregamos el request al container
         self::$container->set('request', $this->request);
-
-        self::$container->set('app.context', $context);
     }
 
-    /**
-     * {inherit}
-     */
     public function execute(Request $request)
     {
-        $this->request = $request;
+        try {
+            return $this->_execute($request);
+        } catch (\Exception $e) {
+            return $this->exception($e);
+        }
+    }
 
+    private function _execute(Request $request)
+    {
         if (!self::$container) { //si no se ha creado el container lo creamos.
-            $this->init();
+            $this->init($request);
         } else {//si ya se creó el container solo actualizamos el app.context con el nuevo request
+            $this->request = $request;
             self::$container->get('app.context')->setRequest($this->request);
         }
+        //creamos el resolver, para que encuentre el modulo, controlador y accion a ejecutar.
+        $resolver = new ControllerResolver(self::$container);
 
         //ejecutamos el evento request
-        $response = $this->dispatcher->dispatch(KumbiaEvents::REQUEST, new RequestEvent($request));
+        $this->dispatcher->dispatch(KumbiaEvents::REQUEST, $event = new RequestEvent($request));
 
-        //si el evento devuelve una espuesta no ejecutamos el controlador.
-        if (!$response instanceof Response) {
-            //si el evento no devuelve una respuesta, ejecutamos el controlador.
-            $resolver = new ControllerResolver(self::$container);
+        if (!$event->hasResponse()) {
 
             //obtenemos la instancia del controlador, el nombre de la accion
             //a ejecutar, y los parametros que recibirá dicha acción
             list($controller, $action, $params) = $resolver->getController($request);
 
+            $event = new ControllerEvent($request, array($controller, $action, $params));
+
             //ejecutamos el evento controller.
-            $this->dispatcher
-                    ->dispatch(KumbiaEvents::CONTROLLER, $contEvent = new ControllerEvent($request, array($controller, $action, $params)));
+            $this->dispatcher->dispatch(KumbiaEvents::CONTROLLER, $event);
+
+            //asignamos la acción al AppContext
+            self::$container->get('app.context')->setCurrentAction($action);
+
             //ejecutamos la acción de controlador pasandole los parametros.
-            $response = $resolver->executeAction($contEvent);
+            $response = $resolver->executeAction($event);
 
             if (!$response instanceof Response) {
-
-                //si no es una instancia de KumbiaPHP\Kernel\Controller\Controller
-                //lanzamos una excepción
-                if (!$controller instanceof \KumbiaPHP\Kernel\Controller\Controller) {
-                    throw new \LogicException(sprintf("El controlador debe retornar una Respuesta"));
-                } else {
-                    //como la acción no devolvió respuesta, debemos
-                    //obtener la vista y el template establecidos en el controlador
-                    //para pasarlos al servicio view, y este construya la respuesta
-                    $view = $resolver->getView();
-                    $template = $resolver->getTemplate();
-                    $properties = $resolver->getPublicProperties(); //nos devuelve las propiedades publicas del controlador
-                    //llamamos al render del servicio "view" y esté nos devolverá
-                    //una instancia de response con la respuesta creada
-                    /* @var $response Response */
-                    $response = self::$container->get('view')->render($template, $view, $properties);
-                }
+                //como la acción no devolvió respuesta, debemos
+                //obtener la vista y el template establecidos en el controlador
+                //para pasarlos al servicio view, y este construya la respuesta
+                $view = $resolver->getParamValue('view');
+                $template = $resolver->getParamValue('template');
+                $cache = $resolver->getParamValue('cache');
+                $properties = $resolver->getPublicProperties(); //nos devuelve las propiedades publicas del controlador
+                //llamamos al render del servicio "view" y esté nos devolverá
+                //una instancia de response con la respuesta creada
+                /* @var $response Response */
+                $response = self::$container->get('view')->render($template, $view, $properties, $cache);
             }
+        } else {
+            $response = $event->getResponse();
         }
 
+        return $this->response($response);
+    }
+
+    private function exception(\Exception $e)
+    {
+        $event = new ExceptionEvent($e, $this->request);
+        $this->dispatcher->dispatch(KumbiaEvents::EXCEPTION, $event);
+
+        if ($event->hasResponse()) {
+            return $this->response($event->getResponse());
+        }
+
+        if ($this->production) {
+            return ExceptionHandler::createException($e);
+        }
+
+        throw $e;
+    }
+
+    private function response(Response $response)
+    {
+        $event = new ResponseEvent($this->request, $response);
         //ejecutamos el evento response.
-        $this->dispatcher->dispatch(KumbiaEvents::RESPONSE, new ResponseEvent($request, $response));
+        $this->dispatcher->dispatch(KumbiaEvents::RESPONSE, $event);
         //retornamos la respuesta
-        return $response;
+        return $event->getResponse();
     }
 
     /**
-     * Devuelve el objeto container
-     * @return \KumbiaPHP\Di\Container\ContainerInterface 
+     *
+     * @return boolean 
      */
+    public function isProduction()
+    {
+        return $this->production;
+    }
+
+    public static function get($service)
+    {
+        return self::$container->get($service);
+    }
+
+    public static function getParam($param)
+    {
+        return self::$container->getParameter($param);
+    }
+
     public static function getContainer()
     {
         return self::$container;
@@ -221,7 +266,7 @@ abstract class Kernel implements KernelInterface
      * devuelve la ruta a la carpeta app del proyecto.
      * @return string 
      */
-    private function getAppPath()
+    public function getAppPath()
     {
         if (!$this->appPath) {
             $r = new \ReflectionObject($this);
@@ -232,10 +277,10 @@ abstract class Kernel implements KernelInterface
 
     /**
      * Esta función inicializa el contenedor de servicios.
-     * @param Parameters $config toda la configuracion de los archivos de config
+     * @param Collection $reader toda la configuracion de los archivos de config
      * de cada lib y modulo compilados en uno solo.
      */
-    protected function initContainer(array $config = array())
+    protected function initContainer(ConfigReader $reader)
     {
 
         //$definitions = new DefinitionManager();
@@ -244,6 +289,8 @@ abstract class Kernel implements KernelInterface
             'parameters' => $config['parameters'],
         );
 
+        $definitions->addParam(new Parameter('app_dir', $this->getAppPath()));
+
         $this->di = new DependencyInjection();
 
         self::$container = new Container($this->di, $definitions);
@@ -251,7 +298,7 @@ abstract class Kernel implements KernelInterface
 
     /**
      * Inicializa el despachador de eventos
-     * @param Parameters $config config de todo el proyecto.
+     * @param Collection $reader config de todo el proyecto.
      */
     protected function initDispatcher(array $config = array())
     {

@@ -43,12 +43,10 @@ class LengthBetween extends ValidatorBase
     {
         $value = self::getValue($object, $column);
         if (strlen($value) < $params['min'] || strlen($value) > $params['max']) {
-            if (isset($params['message'])) {
-                self::$lastError = $params['message'];
-            } else {
-                self::$lastError = "El campo $column debe estár entre {$params['min']} y {$params['max']}";
+            if (!isset($params['message'])) {
+                $params['message'] = "El campo $column debe estár entre {$params['min']} y {$params['max']}";
             }
-
+            self::createErrorMessage($object, $column, $params);
             return FALSE;
         }
 

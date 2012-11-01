@@ -37,9 +37,6 @@ class EventDispatcher implements EventDispatcherInterface
         $this->container = $container;
     }
 
-    /**
-     * {inherit} 
-     */
     public function dispatch($eventName, Event $event)
     {
         if (!array_key_exists($eventName, $this->listeners)) {
@@ -50,15 +47,12 @@ class EventDispatcher implements EventDispatcherInterface
                 $service = $this->container->get($listener[0]);
                 call_user_func(array($service, $listener[1]), $event);
                 if ($event->isPropagationStopped()) {
-                    break;
+                    return;
                 }
             }
         }
     }
 
-    /**
-     * {inherit} 
-     */
     public function addListener($eventName, $listener)
     {
         if (!$this->hasListener($eventName, $listener)) {
@@ -66,9 +60,6 @@ class EventDispatcher implements EventDispatcherInterface
         }
     }
 
-    /**
-     * {inherit} 
-     */
     public function hasListener($eventName, $listener)
     {
         if (isset($this->listeners[$eventName])) {
@@ -78,9 +69,6 @@ class EventDispatcher implements EventDispatcherInterface
         }
     }
 
-    /**
-     * {inherit} 
-     */
     public function removeListener($eventName, $listener)
     {
         if ($this->hasListener($eventName, $listener)) {

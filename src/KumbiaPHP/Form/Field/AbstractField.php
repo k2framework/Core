@@ -3,14 +3,13 @@
 namespace KumbiaPHP\Form\Field;
 
 use \ArrayAccess;
-use KumbiaPHP\Validation\Validatable;
 use KumbiaPHP\Validation\ValidationBuilder;
 
 /**
  *
  * @author manuel
  */
-abstract class Field implements ArrayAccess, Validatable
+abstract class AbstractField implements ArrayAccess
 {
 
     protected $formName;
@@ -69,13 +68,18 @@ abstract class Field implements ArrayAccess, Validatable
     public function __construct($fieldName)
     {
         $this->setFieldName($fieldName);
-        $this->validationBuilder = new ValidationBuilder();
     }
 
     public function setFormName($formName)
     {
         $this->formName = $formName;
         return $this->attrs(array('id' => $this->createId()));
+    }
+
+    public function setValidationBuilder(ValidationBuilder $vb)
+    {
+        $this->validationBuilder = $vb;
+        return $this;
     }
 
     /**
@@ -173,11 +177,11 @@ abstract class Field implements ArrayAccess, Validatable
      * @param string $message Mensaje a mostrar en caso de error al validar.
      * @return Field 
      */
-    public function required($required = TRUE, $message = 'El campo %s es requerido')
+    public function required($required = TRUE, $message = 'El campo {label} es requerido')
     {
         if ($required) {
             $this->validationBuilder->notNull($this->getFieldName(), array(
-                'message' => sprintf($message, $this->getLabel())
+                'message' => $message
             ));
             return $this->attrs(array('required' => 'required'));
         } else {
@@ -251,7 +255,6 @@ abstract class Field implements ArrayAccess, Validatable
                 'value' => htmlspecialchars($this->getValue(), ENT_COMPAT),
             ));
         }
-        return $this->attrs;
     }
 
     /**
@@ -262,7 +265,8 @@ abstract class Field implements ArrayAccess, Validatable
     protected function attrsToString()
     {
         $string = NULL;
-        foreach ($this->prepareAttrs() as $attr => $value) {
+        $this->prepareAttrs();
+        foreach ($this->attrs as $attr => $value) {
             $string .= "$attr=\"$value\" ";
         }
         return $string;
@@ -273,12 +277,9 @@ abstract class Field implements ArrayAccess, Validatable
      *
      * @return string 
      */
-    public function render()
-    {
-        return '<input ' . $this->attrsToString() . ' />' . PHP_EOL;
-    }
+    abstract public function render();
 
-    public function addError($index, $message)
+    public function addError($message)
     {
         $this->errors[] = $message;
     }
@@ -365,6 +366,11 @@ abstract class Field implements ArrayAccess, Validatable
     protected function createId()
     {
         return $this->formName . '_' . preg_replace('/(\[(.*)\])/i', '_$2', $this->getFieldName());
+    }
+
+    public function init()
+    {
+        
     }
 
 }

@@ -41,12 +41,10 @@ class MinLength extends ValidatorBase
     public static function validate(Validatable $object, $column, $params = NULL, $update = FALSE)
     {
         if (strlen($object->$column) < $params['min']) {
-            if (isset($params['message'])) {
-                self::$lastError = $params['message'];
-            } else {
-                self::$lastError = "El campo $column debe tener mas de {$params['min']} caracteres";
+            if (!isset($params['message'])) {
+                $params['message'] = "El campo $column debe tener mas de {$params['min']} caracteres";
             }
-
+            self::createErrorMessage($object, $column, $params);
             return FALSE;
         }
 

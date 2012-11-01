@@ -4,18 +4,19 @@ namespace KumbiaPHP\Form;
 
 use \ArrayAccess;
 use KumbiaPHP\Kernel\Request;
-use KumbiaPHP\Form\Field\Field;
+use KumbiaPHP\Validation\Validatable;
 use KumbiaPHP\ActiveRecord\ActiveRecord;
 use KumbiaPHP\Form\Exception\FormException;
 use KumbiaPHP\Validation\ValidationBuilder;
 use KumbiaPHP\Di\Container\ContainerInterface;
+use KumbiaPHP\Form\Field\AbstractField as Field;
 
 /**
  * 
  *
  * @author programador.manuel@gmail.com
  */
-class Form implements ArrayAccess
+class Form implements ArrayAccess, Validatable
 {
 
     protected $name;
@@ -72,14 +73,19 @@ class Form implements ArrayAccess
     protected static $validator;
 
     /**
+     * @var ValidationBuilder 
+     */
+    protected $validationBuilder;
+
+    /**
      * Constructor de la clase.
      * 
      * Más Adelante podrá recibir un objeto Active Record, y crear las 
      * validaciones a partir de la lectura de los requerimientos del mismo.
      * por lo que estará validado con html y con la lib FormBuilder.
      * 
-     * @pa
-     * 
+     * @param ActiveRecord|string $model modelo AR ó nombre del form
+     * @param boolean $createFields indica si se crearan los campos a partir del modelo.
      */
     final public function __construct($model = NULL, $createFields = FALSE)
     {
@@ -89,11 +95,13 @@ class Form implements ArrayAccess
             $this->model = $model;
             if ($createFields) {
                 $this->initFromModel($model);
+            } else {
+                $this->init();
             }
         } else {
             $this->name = $model;
+            $this->init();
         }
-        $this->init();
     }
 
     public static function injectServices(ContainerInterface $container)
@@ -102,9 +110,24 @@ class Form implements ArrayAccess
         self::$validator = $container->get('validator');
     }
 
+    /**
+     * Devuelve el nombre del formulario
+     * @return string 
+     */
     public function getName()
     {
         return $this->name;
+    }
+
+    /**
+     * Establece un nombre para el formulario
+     * @param string $name
+     * @return \KumbiaPHP\Form\Form 
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+        return $this;
     }
 
     /**
@@ -112,7 +135,7 @@ class Form implements ArrayAccess
      * @param string|\KumbiaPHP\Form\Field\Field $fieldName
      * @param string $type
      * @param array $options
-     * @return \KumbiaPHP\Form\Field\Field|\KumbiaPHP\Form\Field\Choice
+     * @return \KumbiaPHP\Form\Field\Text|\KumbiaPHP\Form\Field\AbstractChoice
      * @throws Exception 
      */
     public function add($fieldName, $type = 'text', array $options = array())
@@ -122,7 +145,7 @@ class Form implements ArrayAccess
         } elseif (is_string($fieldName)) {
             $type = 'KumbiaPHP\\Form\\Field\\' . ucwords($type);
             if (!class_exists($type)) {
-                throw new Exception("No existe el tipo de Campo <b>$type</b> en la Lib Form");
+                throw new FormException("No existe el tipo de Campo <b>$type</b> en la Lib Form");
             }
 
             return $this->_add(new $type($fieldName));
@@ -134,17 +157,23 @@ class Form implements ArrayAccess
     /**
      * Agrega un elemento al formulario.
      *
-     * @param \KumbiaPHP\Form\Field\Field $field elemento a agregar.
+     * @param Field $field elemento a agregar.
      * 
-     * @return \KumbiaPHP\Form\Field\Field objeto que se cre�.
+     * @return Field objeto que se cre�.
      */
     protected function _add(Field $field)
     {
         //$index = preg_replace('/\[.*\]/i', '', $formField->getFieldName());
-        $index = $field->setFormName($this->getName())->getFieldName();
+        $index = $field->setFormName($this->getName())
+                ->setValidationBuilder($this->validationBuilder)
+                ->getFieldName();
+        $field->init(); //inicializaciones especiales.
         $this->fields[$index] = $field;
         if ($field instanceof Field\File) {
             $this->attrs(array('enctype' => 'multipart/form-data'));
+        }
+        if (($this->model instanceof ActiveRecord ) && isset($this->model->{$index})) {
+            $field->setValue($this->model->{$index});
         }
         return $field;
     }
@@ -184,12 +213,12 @@ class Form implements ArrayAccess
      */
     public function setAction($action)
     {
-        $this->action = $this->action;
+        $this->action = $action;
         return $this;
     }
 
     /**
-     * Devuelve la acci�n a la que apunta el formulario actualmente.
+     * Devuelve la acción a la que apunta el formulario actualmente.
      * 
      * @return string 
      */
@@ -266,7 +295,7 @@ class Form implements ArrayAccess
      *
      * @param string $element Nombre del campo a obtener.
      * 
-     * @return Field\Hidden objeto que se encuentra en el form  � 
+     * @return Field objeto que se encuentra en el form  � 
      * NULL si el elemento no existe.
      */
     public function getField($element)
@@ -289,6 +318,7 @@ class Form implements ArrayAccess
     {
         if (array_key_exists($element, $this->fields)) {
             unset($this->fields[$element]);
+            $this->validationBuilder->remove($element);
         }
         return $this;
     }
@@ -331,7 +361,8 @@ class Form implements ArrayAccess
      */
     public function isValid()
     {
-        /* @var $field \KumbiaPHP\Form\Field\Field */
+        return self::$validator->validate($this);
+        /* @var $field Field */
         $valid = TRUE;
 
         foreach ($this->fields as $index => $field) {
@@ -352,10 +383,18 @@ class Form implements ArrayAccess
      */
     public function setData(array $data)
     {
-        /* @var $field \KumbiaPHP\Form\Field\Field */
-        foreach ($this->fields as $fieldName => $field) {
-            $field->setValue(isset($data[$fieldName]) ? $data[$fieldName] : NULL);
+        /* @var $field Field */
+        if ($this->model instanceof ActiveRecord) {
+            foreach ($this->fields as $fieldName => $field) {
+                $field->setValue(isset($data[$fieldName]) ? $data[$fieldName] : NULL);
+                $this->model->{$fieldName} = $field->getValue();
+            }
+        } else {
+            foreach ($this->fields as $fieldName => $field) {
+                $field->setValue(isset($data[$fieldName]) ? $data[$fieldName] : NULL);
+            }
         }
+        return $this;
     }
 
     /**
@@ -368,13 +407,7 @@ class Form implements ArrayAccess
      */
     public function bindRequest(Request $request)
     {
-        /* @var $field \KumbiaPHP\Form\Field\Field */
-        if ($data = $request->get($this->name, FALSE)) {
-            foreach ($this->fields as $fieldName => $field) {
-                $field->setValue(isset($data[$fieldName]) ? $data[$fieldName] : NULL);
-            }
-        }
-        return $this;
+        return $this->setData($request->get($this->name, array()));
     }
 
     /**
@@ -385,9 +418,6 @@ class Form implements ArrayAccess
     public function getData()
     {
         if ($this->model instanceof ActiveRecord) {
-            foreach ($this->fields as $fieldName => $field) {
-                $this->model->{$fieldName} = $field->getValue();
-            }
             return $this->model;
         } else {
             $values = array();
@@ -516,6 +546,20 @@ class Form implements ArrayAccess
                 }
             }
         }
+    }
+
+    public function addError($field, $message)
+    {
+        if (isset($this[$field])) {
+            $this[$field]->addError($message);
+        }
+        $this->errors[] = $message;
+        return $this;
+    }
+
+    public function getValidations()
+    {
+        return $this->validationBuilder;
     }
 
 }

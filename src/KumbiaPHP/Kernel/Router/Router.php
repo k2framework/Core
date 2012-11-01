@@ -9,7 +9,7 @@ use KumbiaPHP\Kernel\KernelInterface;
 use KumbiaPHP\Kernel\Request;
 
 /**
- * Description of Router
+ * Servicio Router del framework
  *
  * @author manuel
  */
@@ -36,29 +36,30 @@ class Router implements RouterInterface
     }
 
     /**
-     *
+     * Redirije la petición a otro modulo/controlador/accion de la aplicación.
      * @param string $url
      * @return \KumbiaPHP\Kernel\RedirectResponse 
      */
-    public function redirect($url = NULL)
+    public function redirect($url = NULL, $status = 302)
     {
         $url = $this->app->getBaseUrl() . ltrim($url, '/');
-        return new RedirectResponse($url);
+        return new RedirectResponse($url, $status);
     }
 
     /**
-     *
+     * Redirije la petición a otra acción del mismo controlador.
      * @param type $action
      * @return \KumbiaPHP\Kernel\RedirectResponse 
      */
-    public function toAction($action)
+    public function toAction($action = NULL, $status = 302)
     {
         $url = $this->app->getControllerUrl() . '/' . $action;
-        return new RedirectResponse($url);
+        return new RedirectResponse($url, $status);
     }
 
     /**
-     *
+     * Redirije la petición a otro modulo/controlador/accion de la aplicación internamente,
+     * es decir, la url del navegador no va a cambiar para el usuario.
      * @param type $url
      * @return type
      * @throws \LogicException 
@@ -69,7 +70,7 @@ class Router implements RouterInterface
             throw new \LogicException("Se ha detectado un ciclo de redirección Infinito...!!!");
         }
         //obtengo el request y le asigno la nueva url.
-        $request = $this->kernel->getContainer()->get('request');
+        $request = \KumbiaPHP\Kernel\Kernel::get('request');
         $request->query->set('_url', $url);
 
         //retorno la respuesta del kernel.

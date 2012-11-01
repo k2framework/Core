@@ -42,12 +42,10 @@ class NotNull extends ValidatorBase
     {
         $value = self::getValue($object, $column);
         if (NULL === $value || '' === $value) {
-            if (is_array($params) && isset($params['message'])) {
-                self::$lastError = $params['message'];
-            } else {
-                self::$lastError = "El campo $column no puede ser nulo";
+            if (!isset($params['message'])) {
+                $params['message'] = "El campo $column no puede ser nulo";
             }
-
+            self::createErrorMessage($object, $column, $params);
             return FALSE;
         }
 

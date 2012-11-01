@@ -3,7 +3,6 @@
 namespace KumbiaPHP\Kernel\Config;
 
 use KumbiaPHP\Kernel\AppContext;
-//use KumbiaPHP\Kernel\Parameters;
 
 /**
  * Description of ConfigContainer
@@ -15,7 +14,7 @@ class ConfigReader
 
     /**
      *
-     * @var Parameters
+     * @var Collection
      */
     protected $config;
     private $sectionsValid = array('config', 'parameters');
@@ -94,8 +93,8 @@ class ConfigReader
      * 
      * mi_servico.nombre_app = 'Nuevo nombre asignado'
      * 
-     * @param Parameters $services
-     * @param Parameters $params 
+     * @param Collection $services
+     * @param Collection $params 
      */
     protected function explodeIndexes(array $section)
     {

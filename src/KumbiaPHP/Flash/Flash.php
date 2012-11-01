@@ -3,7 +3,7 @@
 namespace KumbiaPHP\Flash;
 
 use KumbiaPHP\Kernel\Session\SessionInterface;
-use KumbiaPHP\Kernel\Parameters;
+use KumbiaPHP\Kernel\Collection;
 
 /**
  * Clase que permite el envio de mensajes flash desde un controlador,
@@ -14,13 +14,13 @@ use KumbiaPHP\Kernel\Parameters;
  *
  * @author manuel
  */
-class Flash
+class Flash implements \Serializable
 {
 
     /**
      * Contiene los mensajes que se van enviando.
      *
-     * @var Parameters 
+     * @var Collection 
      */
     private $messages;
 
@@ -33,7 +33,7 @@ class Flash
     {
         //si no existe el indice en la sesión, lo creamos.
         if (!$session->has('messages.flash')) {
-            $session->set('messages.flash', new Parameters());
+            $session->set('messages.flash', new Collection());
         }
         //le pasamos el objeto parameters
         $this->messages = $session->get('messages.flash');
@@ -57,7 +57,7 @@ class Flash
      */
     public function has($type)
     {
-        return $this->messages->has(trim($type), $message);
+        return $this->messages->has(trim($type));
     }
 
     /**
@@ -123,6 +123,26 @@ class Flash
     public function error($message)
     {
         $this->set('error', $message);
+    }
+
+    public function __toString()
+    {
+        $code = '<div class="messages-flash">' . PHP_EOL;
+        foreach ((array) $this->getAll() as $type => $message) {
+            $code.= "<div class=\"flash $type\">$message</div>" . PHP_EOL;
+        }
+        $code .= '</div>' . PHP_EOL;
+        return $code;
+    }
+
+    public function serialize()
+    {
+        return serialize($this->messages);
+    }
+
+    public function unserialize($serialized)
+    {
+        $this->messages = unserialize($serialized);
     }
 
 }

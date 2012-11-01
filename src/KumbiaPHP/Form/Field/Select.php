@@ -2,15 +2,17 @@
 
 namespace KumbiaPHP\Form\Field;
 
-use KumbiaPHP\Form\Field\Choice;
+use KumbiaPHP\Form\Field\AbstractChoice;
 
 /**
  * Description of FormFieldText
  *
  * @author manuel
  */
-class Select extends Choice
+class Select extends AbstractChoice
 {
+
+    protected $default;
 
     public function __construct($fieldName)
     {
@@ -24,9 +26,12 @@ class Select extends Choice
      * @param string $separator
      * @return string 
      */
-    public function render($separator = NULL)
+    public function render()
     {
         $html = '<select ' . $this->attrsToString() . ' >' . PHP_EOL;
+        if (NULL !== $this->default && FALSE !== $this->default) {
+            $html .= '<option value="">' . htmlspecialchars($this->default, ENT_COMPAT) . '</option>';
+        }
         foreach ($this->getOptions() as $value => $label) {
             $html .= '<option value="' . htmlspecialchars($value, ENT_COMPAT) . '" ';
             if (in_array($value, (array) $this->getValue())) {
@@ -38,11 +43,19 @@ class Select extends Choice
         return $html;
     }
 
+    public function setDefault($default)
+    {
+        $this->default = $default;
+        return $this;
+    }
+
     protected function prepareAttrs()
     {
-        $attrs = parent::prepareAttrs();
-        unset($attrs['type']);
-        return $attrs;
+        if (isset($this->attrs['multiple'])) {
+            $this->attrs['name'] = $this->formName . '[' . $this->getFieldName() . '][]';
+        } else {
+            $this->attrs['name'] = $this->formName . '[' . $this->getFieldName() . ']';
+        }
     }
 
 }

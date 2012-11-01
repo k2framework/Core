@@ -24,13 +24,18 @@ class Date extends Text
      * @param string $message
      * @return DateField 
      */
-    protected function dateValidation($format = 'd-m-Y', $message = 'El campo %s debe ser una fecha Valida')
+    protected function dateValidation($format = 'd-m-Y', $message = 'El campo {label} debe ser una fecha Valida')
     {
         $this->validationBuilder->date($this->getFieldName(), array(
-            'message' => sprintf($message, $this->getLabel()),
+            'message' => $message,
             'format' => $format,
         ));
         return $this;
+    }
+
+    public function init()
+    {
+        $this->dateValidation();
     }
 
 }

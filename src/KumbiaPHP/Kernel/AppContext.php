@@ -62,6 +62,12 @@ class AppContext
     protected $currentController;
 
     /**
+     * Contiene el nombre de la acción actual ejecutandose en el proyecto
+     * @var string 
+     */
+    protected $currentAction;
+
+    /**
      * indica si el proyecto está en producción ó no.
      * @var boolean 
      */
@@ -192,6 +198,40 @@ class AppContext
     }
 
     /**
+     * Devuelve el nombre de la accion actual en ejecución
+     * @return string 
+     */
+    public function getCurrentAction()
+    {
+        return $this->currentAction;
+    }
+
+    /**
+     * Establece el nombre de la accion actual en ejecución
+     * @param string $currentController
+     */
+    public function setCurrentAction($currentAction)
+    {
+        $this->currentAction = $currentAction;
+    }
+
+    public function createUrl($parameters = FALSE)
+    {
+        if ('/' !== $this->currentModule) {
+            $url = $this->currentModule . '/' . $this->currentController .
+                    '/' . $this->currentAction;
+        } else {
+            $url = $this->currentController . '/' . $this->currentAction;
+        }
+
+        if ($parameters) {
+            $url .= substr($this->currentUrl, strlen($url) + 1);
+        }
+
+        return trim($url, '/') . '/';
+    }
+
+    /**
      * devuelve TRUE si la app se encuentra en producción.
      * @return boolean 
      */
@@ -202,14 +242,7 @@ class AppContext
 
     public function getControllerUrl()
     {
-        return $this->getBaseUrl() . trim($this->currentModule, '/') . '/' . $this->toSmallCase($this->currentController);
-    }
-
-    protected function toSmallCase($string)
-    {
-        $string[0] = strtolower($string[0]);
-
-        return strtolower(preg_replace('/([A-Z])/', "_$1", $string));
+        return $this->getBaseUrl() . trim($this->currentModule, '/') . '/' . $this->currentController;
     }
 
 }

@@ -2,14 +2,14 @@
 
 namespace KumbiaPHP\Form\Field;
 
-use KumbiaPHP\Form\Field\Field;
+use KumbiaPHP\Form\Field\AbstractField;
 
 /**
  * Description of FormFieldText
  *
  * @author manuel
  */
-class Text extends Field
+class Text extends AbstractField
 {
 
     public function __construct($fieldName)
@@ -18,23 +18,29 @@ class Text extends Field
         $this->setType('text');
     }
 
-    /**
-     * Valida que un campo tenga un numero de caracteres comprendido entre un
-     * minimo y un maximo establecidos.
-     * 
-     * @param int $max
-     * @param int $min
-     * @param string $message
-     * @return TextField 
-     */
-    public function maxLength($max, $min = 0, $message = 'El campo %s debe tener mínimo %s caracteres y maximo %s')
+    public function render()
+    {
+        return '<input ' . $this->attrsToString() . ' />' . PHP_EOL;
+    }
+
+    public function maxLength($max, $min = 0, $message = 'El campo {label} debe tener mínimo {min} caracteres y maximo {max}')
     {
         $this->validationBuilder->lengthBetween($this->getFieldName(), array(
-            'message' => vsprintf($message, array($this->getLabel(), $min, $max)),
+            'message' => $message,
             'max' => $max,
             'min' => $min,
         ));
         return $this->attrs(array('maxlength' => $max));
     }
 
+    public function equalTo($field, $message = 'El campo {label} debe ser igual al campo {field}')
+    {
+        $this->validationBuilder->equalTo($this->getFieldName(), array(
+            'message' => $message,
+            'field' => $field,
+        ));
+        return $this;
+    }
+
 }
+

@@ -17,7 +17,8 @@ class ValidationBuilder
     const IN_LIST = 'KumbiaPHP\\Validation\\Validators\\InList';
     const DATE = 'KumbiaPHP\\Validation\\Validators\\Date';
     const RANGE = 'KumbiaPHP\\Validation\\Validators\\Range';
-    const Url = 'KumbiaPHP\\Validation\\Validators\\Url';
+    const URL = 'KumbiaPHP\\Validation\\Validators\\Url';
+    const EQUAL_TO = 'KumbiaPHP\\Validation\\Validators\\EqualTo';
 
     protected $valitations = array();
 
@@ -71,7 +72,13 @@ class ValidationBuilder
 
     public function url($field, array $params = array())
     {
-        $this->valitations[self::RANGE][$field] = $params;
+        $this->valitations[self::URL][$field] = $params;
+        return $this;
+    }
+
+    public function equalTo($field, array $params = array())
+    {
+        $this->valitations[self::EQUAL_TO][$field] = $params;
         return $this;
     }
 
@@ -80,10 +87,18 @@ class ValidationBuilder
         return isset($this->valitations[$type]) && isset($this->valitations[$type][$field]);
     }
 
-    public function remove($type, $field)
+    public function remove($field, $type = NULL)
     {
-        if ($this->has($type, $field)) {
-            unset($this->valitations[$type][$field]);
+        if (NULL !== $type) {
+            if ($this->has($type, $field)) {
+                unset($this->valitations[$type][$field]);
+            }
+        } else {
+            foreach ($this->valitations as $type => $fields) {
+                if (isset($fields[$field])) {
+                    $this->remove($field, $type);
+                }
+            }
         }
     }
 

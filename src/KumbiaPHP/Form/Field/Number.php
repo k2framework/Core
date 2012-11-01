@@ -26,10 +26,10 @@ class Number extends Text
      * @param string $message
      * @return NumberField 
      */
-    public function range($min, $max = NULL, $message = 'El campo %s debe ser un numero entre %s y %s')
+    public function range($min, $max = NULL, $message = 'El campo {label} debe ser un numero entre {min} y {max}')
     {
         $this->validationBuilder->range($this->getFieldName(), array(
-            'message' => sprintf($message, $this->getFieldName(), $min, $max),
+            'message' => $message,
             'min' => $min,
             'max' => $max,
         ));
