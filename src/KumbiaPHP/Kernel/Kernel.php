@@ -124,11 +124,11 @@ abstract class Kernel implements KernelInterface
         //leemos la config de la app
         $config = new ConfigReader($context);
         //iniciamos el container con esa config
-        $this->initContainer($config);
+        $this->initContainer($config->getConfig());
         //asignamos el kernel al container como un servicio
         self::$container->set('app.kernel', $this);
         //iniciamos el dispatcher con esa config
-        $this->initDispatcher($config);
+        $this->initDispatcher($config->getConfig());
 
         //seteamos el contexto de la aplicación como servicio
         self::$container->set('app.context', $context);
@@ -280,7 +280,7 @@ abstract class Kernel implements KernelInterface
      * @param Collection $reader toda la configuracion de los archivos de config
      * de cada lib y modulo compilados en uno solo.
      */
-    protected function initContainer(ConfigReader $reader)
+    protected function initContainer(array $config = array())
     {
 
         //$definitions = new DefinitionManager();
@@ -289,7 +289,7 @@ abstract class Kernel implements KernelInterface
             'parameters' => $config['parameters'],
         );
 
-        $definitions->addParam(new Parameter('app_dir', $this->getAppPath()));
+        $definitions['parameters']['app_dir'] = $this->getAppPath();
 
         $this->di = new DependencyInjection();
 
