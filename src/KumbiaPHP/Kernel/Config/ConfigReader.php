@@ -32,7 +32,7 @@ class ConfigReader
                 file_put_contents($configFile,"<?php\nreturn $config;");
             }
         }else{
-        $this->config = $this->compile($app);		
+            $this->config = $this->compile($app);		
         } 
     }
 
