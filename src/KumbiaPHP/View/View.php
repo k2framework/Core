@@ -41,6 +41,7 @@ class View
 
     public function render($template, $view, array $params = array(), $cacheTime = NULL)
     {
+        self::$content = NULL;
         $this->template = $template;
         $this->view = $view;
         self::$variables = array_merge($params, self::$variables);
