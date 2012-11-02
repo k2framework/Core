@@ -28,8 +28,9 @@ class ConfigReader
                 return;
             } else {
                 $this->config = $this->compile($app);
-                $config = var_export($this->config, true);
-                file_put_contents($configFile, '<?php' . "\nreturn $config;");
+                $config = PHP_EOL . PHP_EOL . 'return '
+                        . var_export($this->config, true);
+                file_put_contents($configFile, "<?php$config;");
             }
         } else {
             $this->config = $this->compile($app);
