@@ -53,7 +53,7 @@ class ConfigReader
 
         $dirs = array_merge($app->getNamespaces(), array_values($app->getModules()), array($app->getAppPath()));
 
-        foreach (array_unique($dirs) as $namespace => $dir) {
+        foreach ($dirs as $namespace => $dir) {
             if (is_numeric($namespace)) {
                 $configFile = rtrim($dir, '/') . '/config/config.ini';
                 $servicesFile = rtrim($dir, '/') . '/config/services.ini';
