@@ -169,16 +169,11 @@ abstract class Kernel implements KernelInterface
             list($controller, $action, $params) = $resolver->getController($request);
 
             $event = new ControllerEvent($request, array($controller, $action, $params));
-
             //ejecutamos el evento controller.
             $this->dispatcher->dispatch(KumbiaEvents::CONTROLLER, $event);
 
-            //asignamos la acción al AppContext
-            self::$container->get('app.context')->setCurrentAction($action);
-
             //ejecutamos la acción de controlador pasandole los parametros.
             $response = $resolver->executeAction($event);
-
             if (!$response instanceof Response) {
                 //como la acción no devolvió respuesta, debemos
                 //obtener la vista y el template establecidos en el controlador
