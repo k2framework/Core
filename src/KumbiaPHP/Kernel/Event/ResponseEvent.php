@@ -18,6 +18,7 @@ class ResponseEvent extends RequestEvent
 
     function __construct(Request $request, Response $response)
     {
+        parent::__construct($request);
         $this->response = $response;
     }
 
