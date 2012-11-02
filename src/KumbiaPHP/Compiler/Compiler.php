@@ -80,11 +80,11 @@ class Compiler implements CompilerInterface
 
     public function compile()
     {
-        $compiled = str_replace('<?php', '', $this->code);
+        $compiled = str_replace("\n<?php", '', $this->code);
 
         $compiled = preg_replace('@/\*(.*)\*/@Us', '', $compiled);
 
-        file_put_contents($this->filename, "<?php$compiled");
+        file_put_contents($this->filename, $compiled);
     }
 
     protected function excludedNamespaces()
