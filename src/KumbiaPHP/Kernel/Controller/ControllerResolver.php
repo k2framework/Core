@@ -40,16 +40,18 @@ class ControllerResolver
         $contSmall = 'index';
         $action = 'index'; //accion por defecto si no se especifica.
         $actionSmall = 'index';
-        $module = '/';
+        $moduleUrl = '/';
         $params = array(); //parametros de la url, de existir.
         //obtenemos la url actual de la petición.
         $currentUrl = '/' . trim($this->container->get('app.context')->getCurrentUrl(), '/');
 
-        if (!$module = $this->getModule($currentUrl)) {
+        list($moduleUrl, $module) = $this->getModule($currentUrl);
+
+        if (!$moduleUrl) {
             throw new NotFoundException(sprintf("La ruta \"%s\" no concuerda con ningún módulo ni controlador en la App", $currentUrl), 404);
         }
 
-        if ($url = explode('/', trim(substr($currentUrl, strlen($module)), '/'))) {
+        if ($url = explode('/', trim(substr($currentUrl, strlen($moduleUrl)), '/'))) {
 
             //ahora obtengo el controlador
             if (current($url)) {
@@ -76,6 +78,7 @@ class ControllerResolver
         $app = $this->container->get('app.context');
 
         $app->setCurrentModule($module);
+        $app->setCurrentModuleUrl($moduleUrl);
         $app->setCurrentController($contSmall);
         $app->setCurrentAction($actionSmall);
     }
@@ -106,7 +109,7 @@ class ControllerResolver
             return '/logout';
         }
 
-        $routes = array_keys($this->container->get('app.context')->getModules());
+        $routes = array_keys($this->container->get('app.context')->getRoutes());
 
         usort($routes, function($a, $b) {
                     return strlen($a) > strlen($b) ? -1 : 1;
@@ -116,9 +119,9 @@ class ControllerResolver
         foreach ($routes as $route) {
             if (0 === strpos($url, $route)) {
                 if ('/' === $route) {
-                    return $route;
+                    return array($route, $this->container->get('app.context')->getRoutes('/'));
                 } elseif ('/' === substr($url, strlen($route), 1) || strlen($url) === strlen($route)) {
-                    return $route;
+                    return array($route, $this->container->get('app.context')->getRoutes($route));
                 }
             }
         }
@@ -130,19 +133,16 @@ class ControllerResolver
         if ('/logout' === $this->module) {
             throw new NotFoundException(sprintf("La ruta \"%s\" no concuerda con ningún módulo ni controlador en la App", $this->module), 404);
         }
-        //creo el namespace para poder crear la instancia del controlador
-        $currentPath = $this->container->get('app.context')->getModules($this->module);
-        $modulesPath = $this->container->get('app.context')->getModulesPath();
-        $namespace = substr($currentPath, strlen($modulesPath));
+        $modulePath = $this->container->get('app.context')->getPath($this->module);
         //creo el nombre del controlador con el sufijo Controller
         $controllerName = $this->contShortName . 'Controller';
         //uno el namespace y el nombre del controlador.
-        $controllerClass = str_replace('/', '\\', $namespace . 'Controller/') . $controllerName;
+        $controllerClass = str_replace('/', '\\', $this->module) . "\\Controller\\$controllerName";
 
         try {
             $reflectionClass = new ReflectionClass($controllerClass);
         } catch (\Exception $e) {
-            throw new NotFoundException(sprintf("No existe el controlador \"%s\" en la ruta \"%sController/%s.php\"", $controllerName, $currentPath, $controllerName), 404);
+            throw new NotFoundException(sprintf("No existe el controlador \"%s\" en la ruta \"%sController/%s.php\"", $controllerName, $modulePath, $controllerName), 404);
         }
 
         $this->controller = $reflectionClass->newInstanceArgs(array($this->container));
@@ -181,7 +181,7 @@ class ControllerResolver
 
     public function getModulePath()
     {
-        $namespaces = $this->container->get('app.context')->getModules();
+        $namespaces = $this->container->get('app.context')->getRoutes();
         return rtrim($namespaces[$this->module] . '/') . '/' . $this->module;
     }
 

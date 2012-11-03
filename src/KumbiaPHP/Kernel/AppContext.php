@@ -38,22 +38,28 @@ class AppContext
     protected $currentUrl;
 
     /**
-     * Areglo con las rutas y prefijos de los modulos del proyecto
+     * Areglo con las nombres y directorios de los modulos del proyecto
      * @var array 
      */
     protected $modules;
 
     /**
-     * Areglo con las rutas y nombres de los namespaces del proyecto
+     * Arreglo con los prefijos de rutas de los modulos del proyecto
      * @var array 
      */
-    protected $namespaces;
+    protected $routes;
 
     /**
      * Contiene el prefijo actual que representa a un modulo en el proyecto
      * @var string 
      */
     protected $currentModule;
+
+    /**
+     * Contiene el prefijo actual que representa a un modulo en el proyecto
+     * @var string 
+     */
+    protected $currentModuleUrl;
 
     /**
      * Contiene el nombre del controlador actual ejecutandose en el proyecto
@@ -81,7 +87,7 @@ class AppContext
      * @param type $modules
      * @param type $namespaces 
      */
-    public function __construct(Request $request, $inProduction, $appPath, $modules, $namespaces)
+    public function __construct(Request $request, $inProduction, $appPath, $modules, $routes)
     {
         $this->baseUrl = $request->getBaseUrl();
         $this->inProduction = $inProduction;
@@ -89,7 +95,7 @@ class AppContext
         $this->currentUrl = $request->getRequestUrl();
         $this->modulesPath = $appPath . 'modules/';
         $this->modules = $modules;
-        $this->namespaces = $namespaces;
+        $this->routes = $routes;
     }
 
     /**
@@ -138,26 +144,43 @@ class AppContext
     }
 
     /**
-     * devuelve los namespaces registrados en el proyecto
-     * @return array 
+     * Devuelve la ruta hacia la carpeta de los modulos de la app
+     * @return string 
      */
-    public function getNamespaces()
+    public function getPath($module)
     {
-        return $this->namespaces;
+        if (isset($this->modules[$module])) {
+            return rtrim($this->modules[$module], '/') . "/{$module}/";
+        } else {
+            return NULL;
+        }
     }
 
     /**
      * devuelve los modulos registrados en el proyecto
+     * @return array 
+     */
+    public function getModules($module = NULL)
+    {
+        if ($module) {
+            return isset($this->modules[$module]) ? $this->modules[$module] : NULL;
+        } else {
+            return $this->modules;
+        }
+    }
+
+    /**
+     * devuelve las rutas registrados en el proyecto
      * @param string $route si se suministra un prefijo, devuelve solo
      * el valor de la ruta para ese prefijo.
      * @return array|string|NULL 
      */
-    public function getModules($route = NULL)
+    public function getRoutes($route = NULL)
     {
         if ($route) {
-            return isset($this->modules[$route]) ? $this->modules[$route] : NULL;
+            return isset($this->routes[$route]) ? $this->routes[$route] : NULL;
         } else {
-            return $this->modules;
+            return $this->routes;
         }
     }
 
@@ -217,8 +240,8 @@ class AppContext
 
     public function createUrl($parameters = FALSE)
     {
-        if ('/' !== $this->currentModule) {
-            $url = $this->currentModule . '/' . $this->currentController .
+        if ('/' !== $this->currentModuleUrl) {
+            $url = $this->currentModuleUrl . '/' . $this->currentController .
                     '/' . $this->currentAction;
         } else {
             $url = $this->currentController . '/' . $this->currentAction;
@@ -242,7 +265,17 @@ class AppContext
 
     public function getControllerUrl()
     {
-        return $this->getBaseUrl() . trim($this->currentModule, '/') . '/' . $this->currentController;
+        return $this->getBaseUrl() . trim($this->currentModuleUrl, '/') . '/' . $this->currentController;
+    }
+
+    public function getCurrentModuleUrl()
+    {
+        return $this->currentModuleUrl;
+    }
+
+    public function setCurrentModuleUrl($currentModuleUrl)
+    {
+        $this->currentModuleUrl = $currentModuleUrl;
     }
 
 }

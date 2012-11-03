@@ -32,7 +32,7 @@ abstract class Kernel implements KernelInterface
      * Arreglo con los namespaces definidos en la aplicación
      * @var array 
      */
-    protected $namespaces;
+    protected $modules;
 
     /**
      * Arreglo con los prefijos de las rutas para los modulos usados en la aplicación
@@ -92,7 +92,7 @@ abstract class Kernel implements KernelInterface
         $this->production = $production;
 
         Autoload::registerDirectories(
-                $this->namespaces = $this->registerNamespaces()
+                $this->modules = $this->registerModules()
         );
 
         Autoload::register();
@@ -120,7 +120,7 @@ abstract class Kernel implements KernelInterface
     {
         $this->request = $request;
         //creamos la instancia del AppContext
-        $context = new AppContext($this->request, $this->production, $this->getAppPath(), $this->routes, $this->namespaces);
+        $context = new AppContext($this->request, $this->production, $this->getAppPath(), $this->modules, $this->routes);
         //leemos la config de la app
         $config = new ConfigReader($context);
         //iniciamos el container con esa config
@@ -248,7 +248,7 @@ abstract class Kernel implements KernelInterface
      * del proyecto, donde se especifican las rutas y los namespaces que trabajará 
      * la aplicación, permite instalar librerias, etc.
      */
-    abstract protected function registerNamespaces();
+    abstract protected function registerModules();
 
     /**
      * clase abstracta que está implementada en el AppKernel de la carpeta app

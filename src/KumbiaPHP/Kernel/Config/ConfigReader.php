@@ -51,17 +51,12 @@ class ConfigReader
         $section['services'] = array();
         $section['parameters'] = array();
 
-        $dirs = array_merge($app->getNamespaces(), array_values($app->getModules()), array($app->getAppPath()));
+        $dirs = array_merge($app->getModules(), array('app' => dirname($app->getAppPath())));
 
         foreach ($dirs as $namespace => $dir) {
-            if (is_numeric($namespace)) {
-                $configFile = rtrim($dir, '/') . '/config/config.ini';
-                $servicesFile = rtrim($dir, '/') . '/config/services.ini';
-            } else {
-                $configFile = rtrim($dir, '/') . '/' . $namespace . '/config/config.ini';
-                $servicesFile = rtrim($dir, '/') . '/' . $namespace . '/config/services.ini';
-            }
-
+            $configFile = rtrim($dir, '/') . '/' . $namespace . '/config/config.ini';
+            $servicesFile = rtrim($dir, '/') . '/' . $namespace . '/config/services.ini';
+            
             if (is_file($configFile)) {
                 foreach (parse_ini_file($configFile, TRUE) as $sectionType => $values) {
 
