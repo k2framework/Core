@@ -136,7 +136,7 @@ class View
         $partial = explode(':', $partial);
 
         if (count($partial) > 1) {
-            $modulePath = rtrim($app->getModulesPath(), '/') . '/' . $partial[0];
+            $modulePath = $this->findModulePath($module);
             $file = $modulePath . '/View/_shared/partials/' . $partial[1] . '.phtml';
         } else {
             $file = rtrim($app->getAppPath(), '/') . '/view/partials/' . $partial[0] . '.phtml';
@@ -168,7 +168,7 @@ class View
         $template = explode(':', $template);
 
         if (count($template) > 1) {
-            $modulePath = rtrim($app->getModulesPath(), '/') . '/' . $template[0];
+            $modulePath = $this->findModulePath($module);
             $file = $modulePath . '/View/_shared/templates/' . $template[1] . '.phtml';
         } else {
             $file = rtrim($app->getAppPath(), '/') . '/view/templates/' . $template[0] . '.phtml';
@@ -184,9 +184,23 @@ class View
         /* @var $app \KumbiaPHP\Kernel\AppContext */
         $app = self::$container->get('app.context');
 
-        $module = $app->getCurrentModule();
-        $controller = $this->camelcase($app->getCurrentController());
-        $file = rtrim($app->getModules($module), '/') . '/View/' . $controller . '/' . $view . '.phtml';
+        $view = explode(':', $view);
+
+        if (count($view) > 1) {
+            if (3 !== count($view)) {
+                $view = join(':', $view);
+                throw new \LogicException("No se está especificando el \"Módulo:controlador:vista\" en el nombre de la vista correctamente $view");
+            }
+            $module = $view[0];
+            $controller = $view[1];
+            $view = $view[2];
+        } else {
+            $module = $app->getCurrentModule();
+            $controller = $this->camelcase($app->getCurrentController());
+            $view = $view[0];
+        }
+
+        $file = $this->findModulePath($module) . '/View/' . $controller . '/' . $view . '.phtml';
         if (!file_exists($file)) {
             if (is_string($scaffold)) {
                 $view = '/view/scaffolds/' . $scaffold . '/' . $view . '.phtml';
@@ -199,6 +213,35 @@ class View
         }
 
         return $file;
+    }
+
+    protected function findModulePath($module)
+    {
+        /* @var $app \KumbiaPHP\Kernel\AppContext */
+        $app = self::$container->get('app.context');
+
+        $namespaces = $app->getNamespaces();
+
+        if (null !== ($path = $app->getModules($module) )) {//si el módulo está en las rutas registradas.
+            //acá entramos si la variable $module representa
+            //una porción de la URL.
+            return rtrim($path, '/');
+        }
+
+        if (array_key_exists($module, $namespaces)) { //si el módulo está en los namespaces registrados
+            return rtrim($namespaces[$module], '/') . $module;
+        }
+
+        //si llegamos acá es porque tal vez se ha especificado el nombre del módulo
+        //y no la ruta en la url para el mismo.
+
+        $path = rtrim($app->getModulesPath(), '/') . '/' . $module;
+
+        if (is_dir($path)) {//si el módulo está dentro de app/modules.
+            return $path;
+        }
+
+        throw new \LogicException("No existe el Modulo $module");
     }
 
     /**
