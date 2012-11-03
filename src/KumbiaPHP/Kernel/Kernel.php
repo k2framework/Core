@@ -245,7 +245,7 @@ abstract class Kernel implements KernelInterface
 
     /**
      * clase abstracta que está implementada en el AppKernel de la carpeta app
-     * del proyecto, donde se especifican las rutas y los namespaces que trabajará 
+     * del proyecto, donde se especifican las rutas y los modulos que trabajará 
      * la aplicación, permite instalar librerias, etc.
      */
     abstract protected function registerModules();
