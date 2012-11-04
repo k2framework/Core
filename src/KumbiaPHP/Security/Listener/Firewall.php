@@ -63,7 +63,7 @@ class Firewall
             return;
         }
 
-        if ($url === Reader::get('security.logout_url')) {
+        if ('/logout' === $url) {
             //Si estoy en la pagina de logout, realizo el cierre de sesión.
             $event->stopPropagation();
             $event->setResponse($this->logout());

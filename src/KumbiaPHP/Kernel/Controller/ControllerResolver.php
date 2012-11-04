@@ -46,8 +46,8 @@ class ControllerResolver
         $currentUrl = '/' . trim($this->container->get('app.context')->getCurrentUrl(), '/');
 
         list($moduleUrl, $module) = $this->getModule($currentUrl);
-
-        if (!$moduleUrl) {
+        
+        if (!$moduleUrl || !$module) {
             throw new NotFoundException(sprintf("La ruta \"%s\" no concuerda con ningún módulo ni controlador en la App", $currentUrl), 404);
         }
 
@@ -105,8 +105,8 @@ class ControllerResolver
 
     protected function getModule($url)
     {
-        if (0 === strpos($url, '/logout') && 7 === strlen($url)) {
-            return '/logout';
+        if ('/logout' === $url) {
+            return array($url, $url);
         }
 
         $routes = array_keys($this->container->get('app.context')->getRoutes());

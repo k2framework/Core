@@ -178,7 +178,11 @@ class AppContext
     public function getRoutes($route = NULL)
     {
         if ($route) {
-            return isset($this->routes[$route]) ? $this->routes[$route] : NULL;
+            if (isset($this->routes[$route])) {
+                return isset($this->modules[$this->routes[$route]]) ? $this->routes[$route] : NULL;
+            } else {
+                return NULL;
+            }
         } else {
             return $this->routes;
         }
