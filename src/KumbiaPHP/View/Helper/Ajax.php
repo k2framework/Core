@@ -1,4 +1,5 @@
 <?php
+
 /**
  * KumbiaPHP web & app Framework
  *
@@ -20,6 +21,7 @@
 //namespace KumbiaPHP\View\Helper;
 
 use KumbiaPHP\View\Helper\AbstractHelper;
+
 /**
  * Helper que utiliza Ajax
  *
@@ -39,12 +41,15 @@ class Ajax extends AbstractHelper
      * @param string|array $attrs atributos adicionales
      * @return string
      */
-    public static function link($action, $text, $update, $class=NULL, $attrs=NULL)
+    public static function link($action, $text, $update, $class = NULL, $attrs = NULL)
     {
         if (is_array($attrs)) {
             $attrs = self::getAttrs($attrs);
         }
-        return '<a href="' . self::$app->getBaseUrl() . "$action\" class=\"js-remote $class\" rel=\"#{$update}\" $attrs>$text</a>";
+
+        $action = self::$app->createUrl($action);
+
+        return '<a href="' . "$action\" class=\"js-remote $class\" rel=\"#{$update}\" $attrs>$text</a>";
     }
 
     /**
@@ -57,7 +62,7 @@ class Ajax extends AbstractHelper
      * @param string|array $attrs atributos adicionales
      * @return string
      */
-    public static function linkAction($action, $text, $update, $class=NULL, $attrs=NULL)
+    public static function linkAction($action, $text, $update, $class = NULL, $attrs = NULL)
     {
         if (is_array($attrs)) {
             $attrs = self::getAttrs($attrs);
@@ -77,12 +82,15 @@ class Ajax extends AbstractHelper
      * @param string|array $attrs atributos adicionales
      * @return string
      */
-    public static function linkConfirm($action, $text, $update, $confirm, $class=NULL, $attrs=NULL)
+    public static function linkConfirm($action, $text, $update, $confirm, $class = NULL, $attrs = NULL)
     {
         if (is_array($attrs)) {
             $attrs = self::getAttrs($attrs);
         }
-        return '<a href="' . self::$app->getBaseUrl() . "$action\" class=\"js-remote-confirm $class\" rel=\"#{$update}\" title=\"$confirm\" $attrs>$text</a>";
+
+        $action = self::$app->createUrl($action);
+
+        return '<a href="' . "$action\" class=\"js-remote-confirm $class\" rel=\"#{$update}\" title=\"$confirm\" $attrs>$text</a>";
     }
 
     /**
@@ -97,7 +105,7 @@ class Ajax extends AbstractHelper
      * @param string|array $attrs atributos adicionales
      * @return string
      */
-    public static function linkActionConfirm($action, $text, $update, $confirm, $class=NULL, $attrs=NULL)
+    public static function linkActionConfirm($action, $text, $update, $confirm, $class = NULL, $attrs = NULL)
     {
         if (is_array($attrs)) {
             $attrs = self::getAttrs($attrs);
@@ -115,14 +123,13 @@ class Ajax extends AbstractHelper
      * @param string $class
      * @param string|array $attrs
      */
-    public static function select($field, $data, $update, $action, $class=null, $attrs=null)
+    public static function select($field, $data, $update, $action, $class = null, $attrs = null)
     {
         if (is_array($attrs)) {
             $attrs = self::getAttrs($attrs);
         }
 
-        // ruta a la accion
-        $action = self::$app->getBaseUrl() . rtrim($action, '/') . '/';
+        $action = self::$app->createUrl($action);
 
         // genera el campo
         return Form::select($field, $data, "class=\"js-remote $class\" data-update=\"$update\" data-action=\"$action\" $attrs");
@@ -140,14 +147,13 @@ class Ajax extends AbstractHelper
      * @param string $class
      * @param string|array $attrs
      */
-    public static function dbSelect($field, $show, $data, $update, $action, $blank=null, $class=null, $attrs=null)
+    public static function dbSelect($field, $show, $data, $update, $action, $blank = null, $class = null, $attrs = null)
     {
         if (is_array($attrs)) {
             $attrs = self::getAttrs($attrs);
         }
 
-        // ruta a la accion
-        $action = self::$app->getBaseUrl() . rtrim($action, '/') . '/';
+        $action = self::$app->createUrl($action);
 
         // genera el campo
         return Form::dbSelect($field, $show, $data, $blank, "class=\"js-remote $class\" data-update=\"$update\" data-action=\"$action\" $attrs");
@@ -169,7 +175,7 @@ class Ajax extends AbstractHelper
             $attrs = self::getAttrs($attrs);
         }
         if ($action) {
-            $action = self::$app->getBaseUrl() . $action;
+            $action = self::$app->createUrl($action);
         } else {
             $action = self::$app->getBaseUrl() . ltrim(self::$app->getCurrentUrl(), '/');
         }

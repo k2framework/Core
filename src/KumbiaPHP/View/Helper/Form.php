@@ -1,4 +1,5 @@
 <?php
+
 /**
  * KumbiaPHP web & app Framework
  *
@@ -17,7 +18,6 @@
  * @copyright  Copyright (c) 2005-2012 KumbiaPHP Team (http://www.kumbiaphp.com)
  * @license    http://wiki.kumbiaphp.com/Licencia     New BSD License
  */
-
 //namespace KumbiaPHP\View\Helper;
 
 use KumbiaPHP\View\View;
@@ -240,9 +240,9 @@ class Form extends AbstractHelper
             $attrs = self::getAttrs($attrs);
         }
         if ($action) {
-            $action = self::$app->getBaseUrl() . $action;
+            $action = self::$app->createUrl($action);
         } else {
-            $action = self::$app->getBaseUrl() . ltrim(self::$app->getCurrentUrl(), '/');
+            $action = self::$app->getBaseUrl() . ltrim(self::$app->getCurrentUrl(true), '/');
         }
         return "<form action=\"$action\" method=\"$method\" $attrs>";
     }
@@ -263,7 +263,7 @@ class Form extends AbstractHelper
         if ($action) {
             $action = self::$app->getBaseUrl() . $action;
         } else {
-            $action = self::$app->getBaseUrl() . substr(self::$app->getCurrentUrl(), 1);
+            $action = self::$app->getBaseUrl() . substr(self::$app->getCurrentUrl(true), 1);
         }
         return "<form action=\"$action\" method=\"post\" enctype=\"multipart/form-data\" $attrs>";
     }

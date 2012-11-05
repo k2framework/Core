@@ -3,6 +3,7 @@
 namespace KumbiaPHP\Kernel;
 
 use KumbiaPHP\Kernel\Request;
+use KumbiaPHP\Kernel\Exception\NotFoundException;
 
 /**
  * Clase que contiene la info del contexto en el que se encuentra la aplicación
@@ -35,7 +36,7 @@ class AppContext
      * Contiene la url actual de la petición
      * @var string 
      */
-    protected $currentUrl;
+    protected $requestUrl;
 
     /**
      * Areglo con las nombres y directorios de los modulos del proyecto
@@ -92,7 +93,7 @@ class AppContext
         $this->baseUrl = $request->getBaseUrl();
         $this->inProduction = $inProduction;
         $this->appPath = $appPath;
-        $this->currentUrl = $request->getRequestUrl();
+        $this->requestUrl = $request->getRequestUrl();
         $this->modulesPath = $appPath . 'modules/';
         $this->modules = $modules;
         $this->routes = $routes;
@@ -104,7 +105,7 @@ class AppContext
      */
     public function setRequest(Request $request)
     {
-        $this->currentUrl = $request->getRequestUrl();
+        $this->requestUrl = $request->getRequestUrl();
     }
 
     /**
@@ -129,9 +130,9 @@ class AppContext
      * devuelve la url actual de la petición
      * @return string 
      */
-    public function getCurrentUrl()
+    public function getRequestUrl()
     {
-        return $this->currentUrl;
+        return $this->requestUrl;
     }
 
     /**
@@ -242,7 +243,7 @@ class AppContext
         $this->currentAction = $currentAction;
     }
 
-    public function createUrl($parameters = FALSE)
+    public function getCurrentUrl($parameters = FALSE)
     {
         if ('/' !== $this->currentModuleUrl) {
             $url = $this->currentModuleUrl . '/' . $this->currentController .
@@ -252,7 +253,7 @@ class AppContext
         }
 
         if ($parameters) {
-            $url .= substr($this->currentUrl, strlen($url) + 1);
+            $url .= substr($this->requestUrl, strlen($url));
         }
 
         return trim($url, '/') . '/';
@@ -267,19 +268,62 @@ class AppContext
         return $this->inProduction;
     }
 
+    /**
+     * Devuelve la ruta hasta el controlador actual ejecutandose.
+     * @return string 
+     */
     public function getControllerUrl()
     {
         return $this->getBaseUrl() . trim($this->currentModuleUrl, '/') . '/' . $this->currentController;
     }
 
+    /**
+     * Devuulve el prefijo de la ruta que apunta al modulo actual.
+     * @return string 
+     */
     public function getCurrentModuleUrl()
     {
         return $this->currentModuleUrl;
     }
 
+    /**
+     * Establece el prefijo de la url que identifica al modulo de la petición.
+     * @param string $currentModuleUrl 
+     */
     public function setCurrentModuleUrl($currentModuleUrl)
     {
         $this->currentModuleUrl = $currentModuleUrl;
+    }
+
+    /**
+     * Crea una url válida. todos las libs y helpers la usan.
+     * 
+     * Ejemplos:
+     * 
+     * $this->createUrl('admin/usuarios/perfil');
+     * $this->createUrl('admin/roles');
+     * $this->createUrl('admin/recursos/editar/2');
+     * $this->createUrl('K2/Backend:usuarios'); módulo:controlador/accion/params
+     * 
+     * El ultimo ejemplo es una forma especial de crear rutas
+     * donde especificamos el nombre del módulo en vez del prefijo.
+     * ya que el prefijo lo podemos cambiar a nuestro antojo.
+     * 
+     * @param string $url
+     * @return string
+     * @throws NotFoundException si no existe el módulo
+     */
+    public function createUrl($url)
+    {
+        $url = explode(':', $url);
+        if (count($url) > 1) {
+            if (!$route = array_search($url[0], $this->routes)) {
+                throw new NotFoundException("No Existe el módulo {$url[0]}, no se pudo crear la url");
+            }
+            return $this->getBaseUrl() . trim($route, '/') . '/' . $url[1];
+        } else {
+            return $this->getBaseUrl() . ltrim($url[0], '/');
+        }
     }
 
 }

@@ -43,7 +43,7 @@ class ControllerResolver
         $moduleUrl = '/';
         $params = array(); //parametros de la url, de existir.
         //obtenemos la url actual de la petición.
-        $currentUrl = '/' . trim($this->container->get('app.context')->getCurrentUrl(), '/');
+        $currentUrl = '/' . trim($this->container->get('app.context')->getRequestUrl(), '/');
 
         list($moduleUrl, $module) = $this->getModule($currentUrl);
         

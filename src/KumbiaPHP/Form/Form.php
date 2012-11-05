@@ -227,7 +227,7 @@ class Form implements ArrayAccess, Validatable
         if ($this->action) {
             return self::$app->getBaseUrl() . $this->action;
         } else {
-            return self::$app->getBaseUrl() . ltrim(self::$app->getCurrentUrl(), '/');
+            return self::$app->getBaseUrl() . ltrim(self::$app->getCurrentUrl(true), '/');
         }
     }
 

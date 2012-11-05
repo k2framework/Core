@@ -2,11 +2,11 @@
 
 namespace KumbiaPHP\Kernel\Router;
 
-use KumbiaPHP\Kernel\Router\RouterInterface;
-use KumbiaPHP\Kernel\AppContext;
-use KumbiaPHP\Kernel\RedirectResponse;
-use KumbiaPHP\Kernel\KernelInterface;
 use KumbiaPHP\Kernel\Request;
+use KumbiaPHP\Kernel\AppContext;
+use KumbiaPHP\Kernel\KernelInterface;
+use KumbiaPHP\Kernel\RedirectResponse;
+use KumbiaPHP\Kernel\Router\RouterInterface;
 
 /**
  * Servicio Router del framework
@@ -42,8 +42,7 @@ class Router implements RouterInterface
      */
     public function redirect($url = NULL, $status = 302)
     {
-        $url = $this->app->getBaseUrl() . ltrim($url, '/');
-        return new RedirectResponse($url, $status);
+        return new RedirectResponse($this->app->createUrl($url), $status);
     }
 
     /**
@@ -71,7 +70,8 @@ class Router implements RouterInterface
         }
         //obtengo el request y le asigno la nueva url.
         $request = \KumbiaPHP\Kernel\Kernel::get('request');
-        $request->query->set('_url', $url);
+
+        $request->query->set('_url', $this->app->createUrl($url));
 
         //retorno la respuesta del kernel.
         return $this->kernel->execute($request);

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * KumbiaPHP web & app Framework
  *
@@ -17,7 +18,6 @@
  * @copyright  Copyright (c) 2005-2012 KumbiaPHP Team (http://www.kumbiaphp.com)
  * @license    http://wiki.kumbiaphp.com/Licencia     New BSD License
  */
-
 //namespace KumbiaPHP\View\Helper;
 
 use KumbiaPHP\View\Helper\AbstractHelper;
@@ -47,7 +47,10 @@ class Js extends AbstractHelper
         if (is_array($attrs)) {
             $attrs = self::getAttrs($attrs);
         }
-        return '<a href="' . self::$app->getBaseUrl() . "$action\" title=\"$confirm\" class=\"js-confirm $class\" $attrs>$text</a>";
+
+        $action = self::$app->createUrl($action);
+
+        return '<a href="' . "$action\" title=\"$confirm\" class=\"js-confirm $class\" $attrs>$text</a>";
     }
 
     /**

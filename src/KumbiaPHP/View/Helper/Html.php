@@ -63,7 +63,10 @@ class Html extends AbstractHelper
         if (is_array($attrs)) {
             $attrs = self::getAttrs($attrs);
         }
-        return '<a href="' . self::$app->getBaseUrl() . "$action\" $attrs >$text</a>";
+
+        $action = self::$app->createUrl($action);
+
+        return '<a href="' . "$action\" $attrs >$text</a>";
     }
 
     /**
@@ -78,7 +81,7 @@ class Html extends AbstractHelper
      */
     public static function url($action)
     {
-        return self::$app->getBaseUrl() . $action;
+        return self::$app->createUrl($action);
     }
 
     /**
