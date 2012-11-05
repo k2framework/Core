@@ -243,6 +243,11 @@ abstract class Kernel implements KernelInterface
         return self::$container;
     }
 
+    public function getDispatcher()
+    {
+        return $this->dispatcher;
+    }
+
     /**
      * clase abstracta que está implementada en el AppKernel de la carpeta app
      * del proyecto, donde se especifican las rutas y los modulos que trabajará 
