@@ -82,4 +82,7 @@ if (!Config::initialized()) {
     Reader::readDatabases();
     //establecemos el validador a usar por el active record
     ActiveRecord::setValidator(\KumbiaPHP\Kernel\Kernel::get('validator'));
+    \ActiveRecord\DbPool\DbPool::setAttributes(array(
+        \PDO::ATTR_STATEMENT_CLASS => array('KumbiaPHP\\ActiveRecord\\PDOStatement')
+    ));
 }
