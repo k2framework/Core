@@ -24,6 +24,8 @@ class AfterQueryEvent extends BeforeQueryEvent
         $this->statement = $statement;
         $this->setQuery($event->getQuery());
         $this->setParameters($event->getParameters());
+        //que no los construya, eso debe hacerlo el programador si lo necesita.
+        $this->queryType = $event->getQueryType(false);
     }
 
     /**
