@@ -32,7 +32,7 @@ class PDOStatement extends Base
         //despachamos los eventos que están escuchando
         self::$dispatcher->dispatch(Events::BEFORE_QUERY, $event);
 
-        $this->result = parent::execute($input_parameters);
+        $this->result = parent::execute($event->getParameters());
 
         //creamos el evento after_query
         $event = new AfterQueryEvent($this, $event);
