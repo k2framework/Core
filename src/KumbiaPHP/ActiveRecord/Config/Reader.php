@@ -28,7 +28,7 @@ class Reader
             if ( !Config::has($database) ){
                 throw new \LogicException("El valor database=$database del config.ini no concuerda con ninguna sección del databases.ini");
             }
-            Config::setDefault($database);
+            Config::setDefaultId($database);
         }
     }
 
