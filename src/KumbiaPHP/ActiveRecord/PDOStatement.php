@@ -40,7 +40,7 @@ class PDOStatement extends Base
         //despachamos los eventos que están escuchando
         self::$dispatcher->dispatch(Events::AFTER_QUERY, $event);
 
-        return $this->result;
+        return $this;
     }
 
     public function getResult()
