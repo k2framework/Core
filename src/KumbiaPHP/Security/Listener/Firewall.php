@@ -38,7 +38,7 @@ class Firewall
     public function onKernelRequest(RequestEvent $event)
     {
 
-        $url = $event->getRequest()->getRequestUrl();
+        $url = rtrim($event->getRequest()->getRequestUrl(), '/');
         //verificamos la existencia del token en la session.
         //if (!$this->container->get('session')->has('token', 'security')) {
         if (!$this->container->get('security')->isLogged()) {
