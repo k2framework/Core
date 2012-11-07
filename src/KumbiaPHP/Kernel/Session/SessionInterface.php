@@ -50,7 +50,7 @@ interface SessionInterface
      *
      * @param string $key
      */
-    public function delete($key, $namespace = 'default');
+    public function delete($key = null, $namespace = 'default');
 
     /**
      * Devuelve todos los elementos de la sessión.

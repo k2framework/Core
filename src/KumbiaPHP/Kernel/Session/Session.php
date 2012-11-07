@@ -24,7 +24,7 @@ class Session implements SessionInterface
     public function start()
     {
         session_name($this->namespaceApp);
-        session_id($this->namespaceApp);//die("Que gran peo");
+        session_id($this->namespaceApp); //die("Que gran peo");
         session_start();
     }
 
@@ -51,10 +51,15 @@ class Session implements SessionInterface
         $_SESSION[$this->namespaceApp][$namespace][$key] = $value;
     }
 
-    public function delete($key, $namespace = 'default')
+    public function delete($key = null, $namespace = 'default')
     {
-        if ($this->has($key, $namespace)) {
-            unset($_SESSION[$this->namespaceApp][$namespace][$key]);
+        if ($key !== null) {
+            if ($this->has($key, $namespace)) {
+                unset($_SESSION[$this->namespaceApp][$namespace][$key]);
+            }
+        } elseif (isset($_SESSION[$this->namespaceApp]) &&
+                isset($_SESSION[$this->namespaceApp][$namespace])) {
+            unset($_SESSION[$this->namespaceApp][$namespace]);
         }
     }
 
