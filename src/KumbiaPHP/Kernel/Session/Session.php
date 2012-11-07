@@ -17,12 +17,14 @@ class Session implements SessionInterface
 
     public function __construct(Request $request)
     {
-        $this->namespaceApp = $request->getAppContext()->getAppPath();
+        $this->namespaceApp = md5($request->getAppContext()->getAppPath());
         $this->start();
     }
 
     public function start()
     {
+        session_name($this->namespaceApp);
+        session_id($this->namespaceApp);//die("Que gran peo");
         session_start();
     }
 
@@ -53,6 +55,18 @@ class Session implements SessionInterface
     {
         if ($this->has($key, $namespace)) {
             unset($_SESSION[$this->namespaceApp][$namespace][$key]);
+        }
+    }
+
+    public function all($namespace = null)
+    {
+        if (null !== $namespace) {
+            return isset($_SESSION[$this->namespaceApp]) &&
+                    isset($_SESSION[$this->namespaceApp][$namespace]) ?
+                    $_SESSION[$this->namespaceApp][$namespace] : array();
+        } else {
+            return isset($_SESSION[$this->namespaceApp]) ?
+                    $_SESSION[$this->namespaceApp] : array();
         }
     }
 

@@ -51,4 +51,13 @@ interface SessionInterface
      * @param string $key
      */
     public function delete($key, $namespace = 'default');
+
+    /**
+     * Devuelve todos los elementos de la sessión.
+     * 
+     * @param string $namespace si se indica, devuelve solo los elementos
+     * de ese espacio de nombres.
+     * @return array
+     */
+    public function all($namespace = null);
 }
