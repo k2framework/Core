@@ -58,7 +58,7 @@ final class Autoload
         $fileName .= str_replace('_', DIRECTORY_SEPARATOR, $className) . '.php';
 
         foreach (self::$directories as $folder) {
-            if (file_exists($file = $folder . DIRECTORY_SEPARATOR . $fileName)) {
+            if (file_exists($file = rtrim($folder, '/') . DIRECTORY_SEPARATOR . $fileName)) {
                 return require_once $file;
             }
             //var_dump($file,$fileName);
