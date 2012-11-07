@@ -3,6 +3,7 @@
 namespace KumbiaPHP\ActiveRecord;
 
 use ActiveRecord\Model;
+use KumbiaPHP\Kernel\Kernel;
 use ActiveRecord\Config\Config;
 use KumbiaPHP\Validation\Validator;
 use KumbiaPHP\Validation\Validatable;
@@ -29,12 +30,6 @@ class ActiveRecord extends Model implements Validatable
      */
     protected $errors;
 
-    /**
-     * 
-     * @var Validator 
-     */
-    private static $validator;
-
     public static function setValidator(Validator $validator)
     {
         self::$validator = $validator;
@@ -48,9 +43,9 @@ class ActiveRecord extends Model implements Validatable
     protected function validate($update = FALSE)
     {
         if ($update) {
-            return self::$validator->validateOnUpdate($this);
+            return Kernel::get('validator')->validateOnUpdate($this);
         } else {
-            return self::$validator->validate($this);
+            return Kernel::get('validator')->validate($this);
         }
     }
 
@@ -80,8 +75,6 @@ if (!Config::initialized()) {
     //si no está inicializada la configuración que usa el Active Record,
     //lo inicializamos.
     Reader::readDatabases();
-    //establecemos el validador a usar por el active record
-    ActiveRecord::setValidator(\KumbiaPHP\Kernel\Kernel::get('validator'));
     \ActiveRecord\DbPool\DbPool::setAttributes(array(
         \PDO::ATTR_STATEMENT_CLASS => array('KumbiaPHP\\ActiveRecord\\PDOStatement')
     ));
