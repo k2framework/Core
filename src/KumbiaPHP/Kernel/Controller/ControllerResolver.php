@@ -46,7 +46,7 @@ class ControllerResolver
         $currentUrl = '/' . trim($this->container->get('app.context')->getRequestUrl(), '/');
 
         list($moduleUrl, $module) = $this->getModule($currentUrl);
-        
+
         if (!$moduleUrl || !$module) {
             throw new NotFoundException(sprintf("La ruta \"%s\" no concuerda con ningún módulo ni controlador en la App", $currentUrl), 404);
         }
@@ -276,20 +276,20 @@ class ControllerResolver
         }
     }
 
-    public function getParamValue($propertie)
+    public function callMethod($method)
     {
         $reflection = new \ReflectionClass($this->controller);
 
-        if ($reflection->hasProperty($propertie)) {
+        if ($reflection->hasMethod($method)) {
 
             //obtengo el parametro del controlador.
-            $propertie = $reflection->getProperty($propertie);
+            $method = $reflection->getMethod($method);
 
             //lo hago accesible para poderlo leer
-            $propertie->setAccessible(true);
+            $method->setAccessible(true);
 
             //y retorno su valor
-            return $propertie->getValue($this->controller);
+            return $method->invoke($this->controller);
         } else {
             return NULL;
         }

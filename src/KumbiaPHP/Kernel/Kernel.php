@@ -175,23 +175,33 @@ abstract class Kernel implements KernelInterface
             //ejecutamos la acción de controlador pasandole los parametros.
             $response = $resolver->executeAction($event);
             if (!$response instanceof Response) {
-                //como la acción no devolvió respuesta, debemos
-                //obtener la vista y el template establecidos en el controlador
-                //para pasarlos al servicio view, y este construya la respuesta
-                $view = $resolver->getParamValue('view');
-                $template = $resolver->getParamValue('template');
-                $cache = $resolver->getParamValue('cache');
-                $properties = $resolver->getPublicProperties(); //nos devuelve las propiedades publicas del controlador
-                //llamamos al render del servicio "view" y esté nos devolverá
-                //una instancia de response con la respuesta creada
-                /* @var $response Response */
-                $response = self::$container->get('view')->render($template, $view, $properties, $cache);
+                $response = $this->createResponse($resolver);
             }
         } else {
             $response = $event->getResponse();
         }
 
         return $this->response($response);
+    }
+
+    /**
+     * Crea una respuesta a partir de  la vista y template seleccionados
+     * en el controlador.
+     * @param ControllerResolver $resolver
+     * @return Response
+     */
+    private function createResponse(ControllerResolver $resolver)
+    {
+        //como la acción no devolvió respuesta, debemos
+        //obtener la vista y el template establecidos en el controlador
+        //para pasarlos al servicio view, y este construya la respuesta
+        $view = $resolver->callMethod('getView');
+        $template = $resolver->callMethod('getTemplate');
+        $cache = $resolver->callMethod('getCache');
+        $properties = $resolver->getPublicProperties(); //nos devuelve las propiedades publicas del controlador
+        //llamamos al render del servicio "view" y esté nos devolverá
+        //una instancia de response con la respuesta creada
+        return self::$container->get('view')->render($template, $view, $properties, $cache);
     }
 
     private function exception(\Exception $e)

@@ -149,6 +149,11 @@ class Controller
         $this->cache = $time;
     }
 
+    protected function getCache()
+    {
+        return $this->cache;
+    }
+
     /**
      * Sirve para llamar al servicio de template "view" pasandole
      * unos parametros  y especificando el tiempo de cache.
@@ -159,7 +164,7 @@ class Controller
      */
     protected function render(array $params = array(), $time = NULL)
     {
-        return $this->get('view')->render($this->template, $this->view, $params, $time);
+        return $this->get('view')->render($this->getTemplate(), $this->getView(), $params, $time);
     }
 
 }
