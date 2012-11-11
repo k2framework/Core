@@ -73,7 +73,7 @@ class AppContextTest extends PHPUnit_Framework_TestCase
 
         $this->assertNull($app->getRoutes('/ninguno'));
         $this->assertEquals('Index', $app->getRoutes('/'));
-        
+
         $request->query->set('_url', '/admin/usuarios/index/');
 
         $app->setRequest($request);
@@ -87,14 +87,14 @@ class AppContextTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($this->modules['K2/Backend'], $app->getModules($app->getCurrentModule()));
 
         $backendPath = $this->modules['K2/Backend'] . 'K2/Backend/';
-        
+
         $this->assertEquals($backendPath, $app->getPath($app->getRoutes($app->getCurrentModuleUrl())));
         $this->assertEquals($backendPath, $app->getPath($app->getCurrentModule()));
-        
+
         $this->assertEquals('http://localhost/k2/admin/usuarios', $app->getControllerUrl());
         $this->assertEquals('admin/usuarios/index/', $app->getCurrentUrl());
         $this->assertEquals('admin/usuarios/index/', $app->getCurrentUrl(true));
-        
+
         $request->query->set('_url', '/admin/usuarios/edit/4');
 
         $app->setRequest($request);
@@ -103,7 +103,6 @@ class AppContextTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('usuarios', $app->getCurrentController());
         $this->assertEquals('edit', $app->getCurrentAction());
         $this->assertEquals(array(4), $app->getCurrentParameters());
-        
     }
 
 }
