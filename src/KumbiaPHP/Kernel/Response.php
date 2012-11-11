@@ -188,12 +188,6 @@ class Response implements \Serializable
         return $this->cache;
     }
 
-    public function setNotModified()
-    {
-//        $this->setStatusCode(304);
-//        $this->setContent(NULL);
-    }
-
     /**
      * imprime el contenido de la respuesta.
      */
