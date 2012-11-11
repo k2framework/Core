@@ -132,7 +132,7 @@ class Collection implements \Serializable
      */
     public function getInt($key, $default = 0)
     {
-        return (int) $this->get($key, $default, $deep);
+        return (int) $this->get($key, $default);
     }
 
     /**
@@ -148,11 +148,13 @@ class Collection implements \Serializable
     }
 
     /**
+     * @todo pendiente con getAlnum, no funciona bien por el momento.
      * Devuelve los caracteres alfanumericos de un parametro, ó
      * los caracteres alfanumericos del valor por defecto si no existe el param.
      * @param string $key
      * @param string $default
      * @return string 
+     * 
      */
     public function getAlnum($key, $default = '')
     {
