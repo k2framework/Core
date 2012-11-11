@@ -2,8 +2,8 @@
 
 namespace KumbiaPHP\Flash;
 
+use KumbiaPHP\Flash\FlashCollection;
 use KumbiaPHP\Kernel\Session\SessionInterface;
-use KumbiaPHP\Kernel\Collection;
 
 /**
  * Clase que permite el envio de mensajes flash desde un controlador,
@@ -14,13 +14,13 @@ use KumbiaPHP\Kernel\Collection;
  *
  * @author manuel
  */
-class Flash implements \Serializable
+class Flash
 {
 
     /**
      * Contiene los mensajes que se van enviando.
      *
-     * @var Collection 
+     * @var FlashCollection 
      */
     private $messages;
 
@@ -32,11 +32,11 @@ class Flash implements \Serializable
     public function __construct(SessionInterface $session)
     {
         //si no existe el indice en la sesión, lo creamos.
-        if (!$session->has('messages.flash')) {
-            $session->set('messages.flash', new Collection());
+        if (!$session->has('messages', 'flash')) {
+            $session->set('messages', new FlashCollection(), 'flash');
         }
         //le pasamos el objeto parameters
-        $this->messages = $session->get('messages.flash');
+        $this->messages = $session->get('messages', 'flash');
     }
 
     /**
@@ -47,7 +47,7 @@ class Flash implements \Serializable
      */
     public function set($type, $message)
     {
-        $this->messages->set(trim($type), $message);
+        $this->messages->add($type, $message);
     }
 
     /**
@@ -57,22 +57,20 @@ class Flash implements \Serializable
      */
     public function has($type)
     {
-        return $this->messages->has(trim($type));
+        return $this->messages->has($type);
     }
 
     /**
-     * Devuelve un mensaje que ha sido previamente guardado, si existe.
+     * Devuelve los mensajes que han sido previamente guardados, si existen.
      * 
-     * antes de devolver el mensaje lo borra de la sesión.
+     * antes de devolverlos, son borrados de la sesión.
      * 
      * @param string $type
-     * @return string|NULL 
+     * @return array|NULL 
      */
     public function get($type)
     {
-        $message = $this->messages->get(trim($type), NULL);
-        $this->messages->delete(trim($type));
-        return $message;
+        return $this->messages->get($type);
     }
 
     /**
@@ -84,9 +82,7 @@ class Flash implements \Serializable
      */
     public function getAll()
     {
-        $messages = $this->messages->all();
-        $this->messages->clear();
-        return $messages;
+        return $this->messages->all();
     }
 
     /**
@@ -128,21 +124,13 @@ class Flash implements \Serializable
     public function __toString()
     {
         $code = '<div class="messages-flash">' . PHP_EOL;
-        foreach ((array) $this->getAll() as $type => $message) {
-            $code.= "<div class=\"flash $type\">$message</div>" . PHP_EOL;
+        foreach ((array) $this->getAll() as $type => $messages) {
+            foreach ((array) $messages as $message) {
+                $code.= "<div class=\"flash $type\">$message</div>" . PHP_EOL;
+            }
         }
         $code .= '</div>' . PHP_EOL;
         return $code;
-    }
-
-    public function serialize()
-    {
-        return serialize($this->messages);
-    }
-
-    public function unserialize($serialized)
-    {
-        $this->messages = unserialize($serialized);
     }
 
 }
