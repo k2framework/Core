@@ -243,6 +243,12 @@ class AppContext
         $this->currentAction = $currentAction;
     }
 
+    /**
+     * Devuelve la Url actual, completa, con módulo/controlador/acción
+     * así estos no hayan sido especificados en la URL.
+     * @param boolean $parameters si es true, agrega los parametros de la patición.
+     * @return string 
+     */
     public function getCurrentUrl($parameters = FALSE)
     {
         if ('/' !== $this->currentModuleUrl) {
