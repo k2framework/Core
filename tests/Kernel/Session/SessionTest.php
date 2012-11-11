@@ -6,7 +6,7 @@ use KumbiaPHP\Kernel\Session\Session;
 
 ob_start();
 
-class ResponseTest extends PHPUnit_Framework_TestCase
+class SessionTest extends PHPUnit_Framework_TestCase
 {
 
     public function testBasic()
