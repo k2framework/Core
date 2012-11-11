@@ -15,16 +15,16 @@ class Session implements SessionInterface
 
     protected $namespaceApp;
 
-    public function __construct(Request $request)
+    public function __construct($appPath)
     {
-        $this->namespaceApp = md5($request->getAppContext()->getAppPath());
+        $this->namespaceApp = md5($appPath);
         $this->start();
     }
 
     public function start()
     {
         session_name($this->namespaceApp);
-        session_id($this->namespaceApp); //die("Que gran peo");
+        session_id($this->namespaceApp);
         session_start();
     }
 
