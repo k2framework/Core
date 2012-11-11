@@ -7,4 +7,5 @@ php:
 script: phpunit tests
 
 notifications:
-  irc: "irc.freenode.org#kumbiaphp"
+  email:
+    - programador.manuel@gmail.com
