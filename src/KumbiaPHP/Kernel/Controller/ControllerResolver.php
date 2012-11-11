@@ -31,101 +31,13 @@ class ControllerResolver
     public function __construct(ContainerInterface $con)
     {
         $this->container = $con;
-        $this->parseUrl();
-    }
 
-    public function parseUrl()
-    {
-        $controller = 'Index'; //controlador por defecto si no se especifica.
-        $contSmall = 'index';
-        $action = 'index'; //accion por defecto si no se especifica.
-        $actionSmall = 'index';
-        $moduleUrl = '/';
-        $params = array(); //parametros de la url, de existir.
-        //obtenemos la url actual de la petición.
-        $currentUrl = '/' . trim($this->container->get('app.context')->getRequestUrl(), '/');
+        $app = $con->get('app.context');
 
-        list($moduleUrl, $module) = $this->getModule($currentUrl);
-
-        if (!$moduleUrl || !$module) {
-            throw new NotFoundException(sprintf("La ruta \"%s\" no concuerda con ningún módulo ni controlador en la App", $currentUrl), 404);
-        }
-
-        if ($url = explode('/', trim(substr($currentUrl, strlen($moduleUrl)), '/'))) {
-
-            //ahora obtengo el controlador
-            if (current($url)) {
-                //si no es un controlador lanzo la excepcion
-                $controller = $this->camelcase($contSmall = current($url));
-                next($url);
-            }
-            //luego obtenemos la acción
-            if (current($url)) {
-                $action = $this->camelcase($actionSmall = current($url), TRUE);
-                next($url);
-            }
-            //por ultimo los parametros
-            if (current($url)) {
-                $params = array_slice($url, key($url));
-            }
-        }
-
-        $this->module = $module;
-        $this->contShortName = $controller;
-        $this->action = $action;
-        $this->parameters = $params;
-
-        $app = $this->container->get('app.context');
-
-        $app->setCurrentModule($module);
-        $app->setCurrentModuleUrl($moduleUrl);
-        $app->setCurrentController($contSmall);
-        $app->setCurrentAction($actionSmall);
-    }
-
-    /**
-     * Convierte la cadena con espacios o guión bajo en notacion camelcase
-     *
-     * @param string $s cadena a convertir
-     * @param boolean $firstLower indica si es lower camelcase
-     * @return string
-     * */
-    protected function camelcase($string, $firstLower = FALSE)
-    {
-        $string = str_replace(' ', '', ucwords(preg_replace('@(.+)_(\w)@', '$1 $2', strtolower($string))));
-
-        if ($firstLower) {
-            // Notacion lowerCamelCase
-            $string[0] = strtolower($string[0]);
-            return $string;
-        } else {
-            return $string;
-        }
-    }
-
-    protected function getModule($url)
-    {
-        if ('/logout' === $url) {
-            return array($url, $url);
-        }
-
-        $routes = array_keys($this->container->get('app.context')->getRoutes());
-
-        usort($routes, function($a, $b) {
-                    return strlen($a) > strlen($b) ? -1 : 1;
-                }
-        );
-
-        foreach ($routes as $route) {
-            if (0 === strpos($url, $route)) {
-                if ('/' === $route) {
-                    return array($route, $this->container->get('app.context')->getRoutes('/'));
-                } elseif ('/' === substr($url, strlen($route), 1) || strlen($url) === strlen($route)) {
-                    return array($route, $this->container->get('app.context')->getRoutes($route));
-                }
-            }
-        }
-        return FALSE;
+        $this->module = $app->getCurrentModule();
+        $this->contShortName = $this->camelcase($app->getCurrentController());
+        $this->action = $this->camelcase($app->getCurrentAction(), true);
+        $this->parameters = $app->getCurrentParameters();
     }
 
     public function getController()
@@ -305,6 +217,26 @@ class ControllerResolver
         //lo hago accesible para poderlo leer
         $propertie->setAccessible(true);
         $propertie->setValue($this->controller, $action);
+    }
+
+    /**
+     * Convierte la cadena con espacios o guión bajo en notacion camelcase
+     *
+     * @param string $s cadena a convertir
+     * @param boolean $firstLower indica si es lower camelcase
+     * @return string
+     * */
+    protected function camelcase($string, $firstLower = false)
+    {
+        $string = str_replace(' ', '', ucwords(preg_replace('@(.+)_(\w)@', '$1 $2', strtolower($string))));
+
+        if ($firstLower) {
+            // Notacion lowerCamelCase
+            $string[0] = strtolower($string[0]);
+            return $string;
+        } else {
+            return $string;
+        }
     }
 
 }

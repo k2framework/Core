@@ -148,13 +148,13 @@ abstract class Kernel implements KernelInterface
                 self::$container->get('app.context')->setRequest($request);
 
                 $response = $this->_execute($request);
-                
+
                 //Luego devolvemos el request original al kernel,
                 //al AppContext y al .
                 $this->request = $originalRequest;
                 self::$container->get('app.context')->setRequest($originalRequest);
                 self::$container->set('request', $originalRequest);
-                
+
                 return $response;
             }
         } catch (\Exception $e) {
@@ -165,21 +165,21 @@ abstract class Kernel implements KernelInterface
     private function _execute(Request $request)
     {
         $this->request = $request;
-        
+
         if (!self::$container) { //si no se ha creado el container lo creamos.
             $this->init($request);
-        }        
+        }
         //agregamos el request al container
         self::$container->set('request', $this->request);
-        
-        //creamos el resolver, para que encuentre el modulo, controlador y accion a ejecutar.
-        $resolver = new ControllerResolver(self::$container);
 
         //ejecutamos el evento request
         $this->dispatcher->dispatch(KumbiaEvents::REQUEST, $event = new RequestEvent($request));
 
+
         if (!$event->hasResponse()) {
 
+            //creamos el resolver.
+            $resolver = new ControllerResolver(self::$container);
             //obtenemos la instancia del controlador, el nombre de la accion
             //a ejecutar, y los parametros que recibirá dicha acción
             list($controller, $action, $params) = $resolver->getController($request);

@@ -75,6 +75,12 @@ class AppContext
     protected $currentAction;
 
     /**
+     * Contiene los parametros de la petición.
+     * @var array 
+     */
+    protected $currentParameters;
+
+    /**
      * indica si el proyecto está en producción ó no.
      * @var boolean 
      */
@@ -90,22 +96,25 @@ class AppContext
      */
     public function __construct(Request $request, $inProduction, $appPath, $modules, $routes)
     {
-        $this->baseUrl = $request->getBaseUrl();
         $this->inProduction = $inProduction;
         $this->appPath = $appPath;
-        $this->requestUrl = $request->getRequestUrl();
-        $this->modulesPath = $appPath . 'modules/';
+        $this->modulesPath = rtrim($appPath, '/') . '/modules/';
         $this->modules = $modules;
         $this->routes = $routes;
+        $this->setRequest($request);
     }
 
     /**
      * Establece la nueva url cuando se hace un forward.
      * @param Request $request 
+     * @return AppContext
      */
     public function setRequest(Request $request)
     {
         $this->requestUrl = $request->getRequestUrl();
+        $this->baseUrl = $request->getBaseUrl();
+        $this->parseUrl();
+        return $this;
     }
 
     /**
@@ -136,17 +145,9 @@ class AppContext
     }
 
     /**
-     * Devuelve la ruta hacia la carpeta de los modulos de la app
-     * @return string 
-     */
-    public function getModulesPath()
-    {
-        return $this->modulesPath;
-    }
-
-    /**
-     * Devuelve la ruta hacia la carpeta de los modulos de la app
-     * @return string 
+     * Devuelve la ruta hacia la carpeta del módulo en cuestión.
+     * @param string $module nombre del Módulo
+     * @return null|string 
      */
     public function getPath($module)
     {
@@ -199,12 +200,14 @@ class AppContext
     }
 
     /**
-     * Establece el modulo actual en ejecucion
+     * Establece el módulo actual en ejecucion
      * @param string $currentModule 
+     * @return AppContext
      */
     public function setCurrentModule($currentModule)
     {
         $this->currentModule = $currentModule;
+        return $this;
     }
 
     /**
@@ -217,16 +220,18 @@ class AppContext
     }
 
     /**
-     * Establece el nombre del controlador actual en ejecución
+     * Establece el nombre del controlador (en small_case) actual en ejecución
      * @param string $currentController 
+     * @return AppContext
      */
     public function setCurrentController($currentController)
     {
         $this->currentController = $currentController;
+        return $this;
     }
 
     /**
-     * Devuelve el nombre de la accion actual en ejecución
+     * Devuelve el nombre de la accion actual (en small_case) en ejecución
      * @return string 
      */
     public function getCurrentAction()
@@ -237,10 +242,32 @@ class AppContext
     /**
      * Establece el nombre de la accion actual en ejecución
      * @param string $currentController
+     * @return AppContext
      */
     public function setCurrentAction($currentAction)
     {
         $this->currentAction = $currentAction;
+        return $this;
+    }
+
+    /**
+     * Devuelve los parametros de la petición.
+     * @return array 
+     */
+    public function getCurrentParameters()
+    {
+        return $this->currentParameters;
+    }
+
+    /**
+     * Establece los parametros de la petición, enviados por la url
+     * @param array $currentParameters
+     * @return AppContext 
+     */
+    public function setCurrentParameters(array $currentParameters = array())
+    {
+        $this->currentParameters = $currentParameters;
+        return $this;
     }
 
     /**
@@ -295,10 +322,12 @@ class AppContext
     /**
      * Establece el prefijo de la url que identifica al modulo de la petición.
      * @param string $currentModuleUrl 
+     * @return AppContext
      */
     public function setCurrentModuleUrl($currentModuleUrl)
     {
         $this->currentModuleUrl = $currentModuleUrl;
+        return $this;
     }
 
     /**
@@ -330,6 +359,94 @@ class AppContext
         } else {
             return $this->getBaseUrl() . ltrim($url[0], '/');
         }
+    }
+
+    /**
+     * Lee la Url de la petición actual, extrae el módulo/controlador/acción/parametros
+     * y los almacena en los atributos de la clase.
+     * @throws NotFoundException 
+     */
+    protected function parseUrl()
+    {
+        $controller = 'index'; //controlador por defecto si no se especifica.
+        $action = 'index'; //accion por defecto si no se especifica.
+        $moduleUrl = '/';
+        $params = array(); //parametros de la url, de existir.
+        //obtenemos la url actual de la petición.
+        $currentUrl = '/' . trim($this->getRequestUrl(), '/');
+
+        list($moduleUrl, $module) = $this->getModule($currentUrl);
+
+        if (!$moduleUrl || !$module) {
+            throw new NotFoundException(sprintf("La ruta \"%s\" no concuerda con ningún módulo ni controlador en la App", $currentUrl), 404);
+        }
+
+        if ($url = explode('/', trim(substr($currentUrl, strlen($moduleUrl)), '/'))) {
+
+            //ahora obtengo el controlador
+            if (current($url)) {
+                //si no es un controlador lanzo la excepcion
+                $controller = current($url);
+                next($url);
+            }
+            //luego obtenemos la acción
+            if (current($url)) {
+                $action = current($url);
+                next($url);
+            }
+            //por ultimo los parametros
+            if (current($url)) {
+                $params = array_slice($url, key($url));
+            }
+        }
+
+        $this->setCurrentModule($module)
+                ->setCurrentModuleUrl($moduleUrl)
+                ->setCurrentController($controller)
+                ->setCurrentAction($action)
+                ->setCurrentParameters($params);
+    }
+
+    /**
+     * Convierte la cadena con espacios o guión bajo en notacion camelcase
+     *
+     * @param string $s cadena a convertir
+     * @param boolean $firstLower indica si es lower camelcase
+     * @return string
+     * */
+    private function camelcase($string)
+    {
+        return str_replace(' ', '', ucwords(preg_replace('@(.+)_(\w)@', '$1 $2', strtolower($string))));
+    }
+
+    /**
+     * Devuelve el posible módulo a partir de la Url recibida como parametro.
+     * @param string $url
+     * @return boolean 
+     */
+    protected function getModule($url)
+    {
+        if ('/logout' === $url) {
+            return array($url, $url);
+        }
+
+        $routes = array_keys($this->getRoutes());
+
+        usort($routes, function($a, $b) {
+                    return strlen($a) > strlen($b) ? -1 : 1;
+                }
+        );
+
+        foreach ($routes as $route) {
+            if (0 === strpos($url, $route)) {
+                if ('/' === $route) {
+                    return array($route, $this->getRoutes('/'));
+                } elseif ('/' === substr($url, strlen($route), 1) || strlen($url) === strlen($route)) {
+                    return array($route, $this->getRoutes($route));
+                }
+            }
+        }
+        return FALSE;
     }
 
 }
