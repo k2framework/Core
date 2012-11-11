@@ -201,6 +201,10 @@ class Request
         return $this->content;
     }
 
+    public function __clone()
+    {
+        $this->__construct($this->getBaseUrl());
+    }
     /**
      * Crea la url base de la petición.
      * @return string 

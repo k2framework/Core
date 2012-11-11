@@ -118,7 +118,6 @@ abstract class Kernel implements KernelInterface
      */
     public function init(Request $request)
     {
-        $this->request = $request;
         //creamos la instancia del AppContext
         $context = new AppContext($this->request, $this->production, $this->getAppPath(), $this->modules, $this->routes);
         //leemos la config de la app
@@ -134,15 +133,30 @@ abstract class Kernel implements KernelInterface
         self::$container->set('app.context', $context);
         //le asignamos el servicio AppContext al request
         $this->request->setAppContext($context);
-
-        //agregamos el request al container
-        self::$container->set('request', $this->request);
     }
 
-    public function execute(Request $request)
+    public function execute(Request $request, $type = Kernel::MASTER_REQUEST)
     {
         try {
-            return $this->_execute($request);
+            //verificamos el tipo de petición
+            if (self::MASTER_REQUEST === $type) {
+                return $this->_execute($request);
+            } else {
+                //almacenamos en una variable temporal el request
+                //original. y actualizamos el AppContext.
+                $originalRequest = $this->request;
+                self::$container->get('app.context')->setRequest($request);
+
+                $response = $this->_execute($request);
+                
+                //Luego devolvemos el request original al kernel,
+                //al AppContext y al .
+                $this->request = $originalRequest;
+                self::$container->get('app.context')->setRequest($originalRequest);
+                self::$container->set('request', $originalRequest);
+                
+                return $response;
+            }
         } catch (\Exception $e) {
             return $this->exception($e);
         }
@@ -150,12 +164,14 @@ abstract class Kernel implements KernelInterface
 
     private function _execute(Request $request)
     {
+        $this->request = $request;
+        
         if (!self::$container) { //si no se ha creado el container lo creamos.
             $this->init($request);
-        } else {//si ya se creó el container solo actualizamos el app.context con el nuevo request
-            $this->request = $request;
-            self::$container->get('app.context')->setRequest($this->request);
-        }
+        }        
+        //agregamos el request al container
+        self::$container->set('request', $this->request);
+        
         //creamos el resolver, para que encuentre el modulo, controlador y accion a ejecutar.
         $resolver = new ControllerResolver(self::$container);
 

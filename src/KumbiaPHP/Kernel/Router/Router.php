@@ -68,13 +68,13 @@ class Router implements RouterInterface
         if ($this->forwards++ > 10) {
             throw new \LogicException("Se ha detectado un ciclo de redirección Infinito...!!!");
         }
-        //obtengo el request y le asigno la nueva url.
-        $request = \KumbiaPHP\Kernel\Kernel::get('request');
+        //clono el request y le asigno la nueva url.
+        $request = clone \KumbiaPHP\Kernel\Kernel::get('request');
 
-        $request->query->set('_url', $this->app->createUrl($url));
+        $request->query->set('_url', trim($url, '/'));
 
         //retorno la respuesta del kernel.
-        return $this->kernel->execute($request);
+        return $this->kernel->execute($request, KernelInterface::SUB_REQUEST);
     }
 
     protected function toSmallCase($string)

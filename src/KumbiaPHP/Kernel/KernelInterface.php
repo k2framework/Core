@@ -16,14 +16,18 @@ use KumbiaPHP\Di\Container\ContainerInterface;
  */
 interface KernelInterface
 {
+    
+    const MASTER_REQUEST = 1;
+    const SUB_REQUEST = 2;
 
     /**
      * Metodó que ejecuta todo el proceso de la ejecucion de la petición.
      * @param Request $request objeto que contiene toda la info de la petición 
+     * @param int $type indica si la petición es la original ó es una sub petición. 
      * @return Response objeto respuesta
      * @throws \LogicException excepcion si no se puede devolver una respuesta
      */
-    public function execute(Request $request);
+    public function execute(Request $request, $type = KernelInterface::MASTER_REQUEST);
     
     /**
      * Devuelve el objeto container para casos especiales donde
