@@ -168,6 +168,7 @@ abstract class Kernel implements KernelInterface
 
         if (!self::$container) { //si no se ha creado el container lo creamos.
             $this->init($request);
+            $this->validateModules();
         }
         //agregamos el request al container
         self::$container->set('request', $this->request);
@@ -334,6 +335,15 @@ abstract class Kernel implements KernelInterface
                 foreach ($params['listen'] as $method => $event) {
                     $this->dispatcher->addListener($event, array($service, $method));
                 }
+            }
+        }
+    }
+    
+    private function validateModules()
+    {
+        foreach ($this->modules as $module => $path) {
+            if (false === is_dir($route = rtrim($path, '/') . "/{$module}")) {
+                throw new \InvalidArgumentException("No existe la ruta \"$route\" para el módulo \"$module\"");
             }
         }
     }
