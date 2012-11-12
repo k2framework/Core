@@ -4,7 +4,6 @@ require_once __DIR__ . '/../../autoload.php';
 
 use KumbiaPHP\Kernel\Session\Session;
 
-ob_start();
 
 class SessionTest extends PHPUnit_Framework_TestCase
 {
@@ -43,7 +42,6 @@ class SessionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($data['private'], $session->all('private'));
 
         $session->destroy();
-        ob_end_flush();
     }
 
 }

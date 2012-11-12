@@ -6,8 +6,6 @@ use KumbiaPHP\Flash\Flash;
 use KumbiaPHP\Flash\FlashCollection;
 use KumbiaPHP\Kernel\Session\Session;
 
-ob_start();
-
 class FlashTest extends PHPUnit_Framework_TestCase
 {
 
@@ -51,6 +49,9 @@ class FlashTest extends PHPUnit_Framework_TestCase
     public function testFlash()
     {
         $session = new Session(__DIR__);
+        
+        $session->destroy();
+        $session->start();
 
         $flash = new Flash($session);
 
@@ -61,8 +62,8 @@ class FlashTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals(array('Archivo Creado'), $flash->get('mensaje'));
         $this->assertNull($flash->get('mensaje'));
-
-        ob_end_flush();
+        
+        $session->destroy();
     }
 
 }

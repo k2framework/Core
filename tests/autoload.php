@@ -1,5 +1,7 @@
 <?php
 
+ob_start();
+
 spl_autoload_register(function($className) {
             $className = ltrim($className, '\\');
             $fileName = '';
