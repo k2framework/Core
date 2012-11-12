@@ -43,7 +43,7 @@ class Flash
      * Establece un mensaje flash
      * 
      * @param string $type tipo del mensaje ( success, info , error, advertencia )
-     * @param string $message  el mensaje a guardar.
+     * @param string|array $message  el mensaje a guardar.
      */
     public function set($type, $message)
     {
@@ -87,7 +87,7 @@ class Flash
 
     /**
      * Establece un mensaje de tipo success
-     * @param string $message 
+     * @param string|array $message 
      */
     public function success($message)
     {
@@ -96,7 +96,7 @@ class Flash
 
     /**
      * Establece un mensaje de tipo info
-     * @param type $message 
+     * @param string|array $message 
      */
     public function info($message)
     {
@@ -105,7 +105,7 @@ class Flash
 
     /**
      * Establece un mensaje de tipo warning
-     * @param string $message 
+     * @param string|array $message 
      */
     public function warning($message)
     {
@@ -114,7 +114,7 @@ class Flash
 
     /**
      * Establece un mensaje de tipo error
-     * @param string $message 
+     * @param string|array $message 
      */
     public function error($message)
     {

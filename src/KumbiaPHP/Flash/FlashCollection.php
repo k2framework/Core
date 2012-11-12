@@ -16,12 +16,15 @@ class FlashCollection
      * Agrega un mensaje flash
      * 
      * @param string $type tipo del mensaje ( success, info , error, advertencia )
-     * @param string $message  el mensaje a guardar.
+     * @param string|array $message  el mensaje a guardar.
      */
     public function add($type, $message)
     {
         $type = trim($type);
-        $this->flashes[$type][] = $message;
+        if (!isset($this->flashes[$type])) {
+            $this->flashes[$type] = array();
+        }
+        $this->flashes[$type] = array_merge($this->flashes[$type],(array) $message);
     }
 
     /**
