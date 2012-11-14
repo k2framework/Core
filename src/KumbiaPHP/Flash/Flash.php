@@ -120,17 +120,4 @@ class Flash
     {
         $this->set('error', $message);
     }
-
-    public function __toString()
-    {
-        $code = '<div class="messages-flash">' . PHP_EOL;
-        foreach ((array) $this->getAll() as $type => $messages) {
-            foreach ((array) $messages as $message) {
-                $code.= "<div class=\"flash $type\">$message</div>" . PHP_EOL;
-            }
-        }
-        $code .= '</div>' . PHP_EOL;
-        return $code;
-    }
-
 }
