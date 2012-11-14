@@ -61,7 +61,7 @@ class Flash
     }
 
     /**
-     * Devuelve los mensajes que han sido previamente guardados, si existen.
+     * Devuelve los mensajes que han sido previamente guardados para un tipo especifico, si existen.
      * 
      * antes de devolverlos, son borrados de la sesión.
      * 
