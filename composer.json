@@ -4,7 +4,6 @@
 	"replace":{
         "kumbiaphp/loader": "dev-master",
         "kumbiaphp/kernel": "dev-master",
-        "kumbiaphp/activerecord": "dev-php5.3",
         "kumbiaphp/event-dispatcher": "dev-master",
         "kumbiaphp/dependency-injection": "dev-master",
         "kumbiaphp/security": "dev-master",
@@ -21,5 +20,6 @@
         "psr-0":{ 
             "KumbiaPHP\\": "src/"
         }
-    }
+    },
+	"minimum-stability": "dev"
 }
