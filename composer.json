@@ -5,19 +5,19 @@
 		"kumbiaphp/activerecord": ">=1.0-dev"
 	},
     "replace":{
-        "kumbiaphp/loader": "dev-master",
-        "kumbiaphp/kernel": "dev-master",
-        "kumbiaphp/event-dispatcher": "dev-master",
-        "kumbiaphp/dependency-injection": "dev-master",
-        "kumbiaphp/security": "dev-master",
-        "kumbiaphp/form": "dev-master",
-        "kumbiaphp/validation": "dev-master",
-        "kumbiaphp/upload": "dev-master",
-        "kumbiaphp/view": "dev-master",
-        "kumbiaphp/flash": "dev-master",
-        "kumbiaphp/cache": "dev-master",
-        "kumbiaphp/k2_ar": "dev-master",
-        "kumbiaphp/compiler": "dev-master"
+        "kumbiaphp/loader": "self.version",
+        "kumbiaphp/kernel": "self.version",
+        "kumbiaphp/event-dispatcher": "self.version",
+        "kumbiaphp/dependency-injection": "self.version",
+        "kumbiaphp/security": "self.version",
+        "kumbiaphp/form": "self.version",
+        "kumbiaphp/validation": "self.version",
+        "kumbiaphp/upload": "self.version",
+        "kumbiaphp/view": "self.version",
+        "kumbiaphp/flash": "self.version",
+        "kumbiaphp/cache": "self.version",
+        "kumbiaphp/k2_ar": "self.version",
+        "kumbiaphp/compiler": "self.version"
     },
     "autoload": {
         "psr-0":{ 
