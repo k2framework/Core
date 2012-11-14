@@ -1,9 +1,25 @@
 {
-    "name": "kumbiaphp/kumbiaphp",
+    "name": "kumbiaphp/core",
     "type": "library",
+	"replace":{
+        "kumbiaphp/loader": "dev-master",
+        "kumbiaphp/kernel": "dev-master",
+        "kumbiaphp/activerecord": "dev-php5.3",
+        "kumbiaphp/event-dispatcher": "dev-master",
+        "kumbiaphp/dependency-injection": "dev-master",
+        "kumbiaphp/security": "dev-master",
+        "kumbiaphp/form": "dev-master",
+        "kumbiaphp/validation": "dev-master",
+        "kumbiaphp/upload": "dev-master",
+        "kumbiaphp/view": "dev-master",
+        "kumbiaphp/flash": "dev-master",
+        "kumbiaphp/cache": "dev-master",
+        "kumbiaphp/k2_ar": "dev-master",
+        "kumbiaphp/compiler": "dev-master"
+    },
     "autoload": {
         "psr-0":{ 
-            "KumbiaPHP": "src/"
+            "KumbiaPHP\\": "src/"
         }
     }
 }
