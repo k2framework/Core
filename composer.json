@@ -1,10 +1,7 @@
 {
     "name": "kumbiaphp/core",
     "type": "library",
-	"require":{
-		"kumbiaphp/activerecord": ">=1.0-dev"
-	},
-    "replace":{
+    "require":{
         "kumbiaphp/loader": "self.version",
         "kumbiaphp/kernel": "self.version",
         "kumbiaphp/event-dispatcher": "self.version",
