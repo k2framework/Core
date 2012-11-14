@@ -90,7 +90,17 @@ class View
         echo self::$content;
         self::$content = '';
         if ($showFlash) {
-            echo self::flash();
+            try {
+
+                if (self::$container->hasParameter('view.flash')) {
+                    self::partial(self::$container->getParameter('view.flash'));
+                } else {
+                    self::partial('flash/messages');
+                }
+            } catch (\LogicException $e) {
+                $message = " Para los mensjaes Flash";
+                throw new \LogicException($e->getMessage() . $message);
+            }
         }
     }
 
