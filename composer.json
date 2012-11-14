@@ -2,7 +2,7 @@
     "name": "kumbiaphp/core",
     "type": "library",
 	"require":{
-		"kumbiaphp/activerecord": "dev-master"
+		"kumbiaphp/activerecord": ">=1.0-dev"
 	},
     "replace":{
         "kumbiaphp/loader": "dev-master",
