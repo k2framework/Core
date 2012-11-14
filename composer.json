@@ -1,7 +1,7 @@
 {
     "name": "kumbiaphp/core",
     "type": "library",
-    "require":{
+    "replace":{
         "kumbiaphp/loader": "self.version",
         "kumbiaphp/kernel": "self.version",
         "kumbiaphp/event-dispatcher": "self.version",
