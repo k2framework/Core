@@ -2,19 +2,8 @@
     "name": "kumbiaphp/core",
     "type": "library",
     "replace":{
-        "kumbiaphp/loader": "self.version",
-        "kumbiaphp/kernel": "self.version",
         "kumbiaphp/event-dispatcher": "self.version",
-        "kumbiaphp/dependency-injection": "self.version",
-        "kumbiaphp/security": "self.version",
-        "kumbiaphp/form": "self.version",
-        "kumbiaphp/validation": "self.version",
-        "kumbiaphp/upload": "self.version",
-        "kumbiaphp/view": "self.version",
-        "kumbiaphp/flash": "self.version",
-        "kumbiaphp/cache": "self.version",
-        "kumbiaphp/k2_ar": "self.version",
-        "kumbiaphp/compiler": "self.version"
+        "kumbiaphp/dependency-injection": "self.version"
     },
     "autoload": {
         "psr-0":{ 
