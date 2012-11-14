@@ -1,6 +1,9 @@
 {
     "name": "kumbiaphp/core",
     "type": "library",
+	"require":{
+		"kumbiaphp/activerecord": "dev-master"
+	}
 	"replace":{
         "kumbiaphp/loader": "dev-master",
         "kumbiaphp/kernel": "dev-master",
