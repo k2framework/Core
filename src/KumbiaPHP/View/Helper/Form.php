@@ -263,7 +263,7 @@ class Form extends AbstractHelper
         if ($action) {
             $action = self::$app->getBaseUrl() . $action;
         } else {
-            $action = self::$app->getBaseUrl() . substr(self::$app->getCurrentUrl(true), 1);
+            $action = self::$app->getBaseUrl() . ltrim(self::$app->getCurrentUrl(true), '/');
         }
         return "<form action=\"$action\" method=\"post\" enctype=\"multipart/form-data\" $attrs>";
     }
