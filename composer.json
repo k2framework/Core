@@ -2,7 +2,7 @@
     "name": "kumbiaphp/core",
     "type": "library",
 	"require":{
-		"kumbiaphp/activerecord": ">=1.0-dev"
+		"kumbiaphp/activerecord": ">=1.0.x-dev"
 	},
     "replace":{
         "kumbiaphp/loader": "dev-master",
@@ -24,5 +24,5 @@
             "KumbiaPHP\\": "src/"
         }
     },
-    "minimum-stability": "alpha"
+    "minimum-stability": "dev"
 }
