@@ -3,6 +3,7 @@
     "type": "library",
     "replace":{
         "kumbiaphp/event-dispatcher": "self.version",
+        "kumbiaphp/validation": "self.version",
         "kumbiaphp/dependency-injection": "self.version"
     },
     "autoload": {
