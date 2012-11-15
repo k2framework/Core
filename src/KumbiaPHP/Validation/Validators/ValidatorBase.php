@@ -52,14 +52,16 @@ abstract class ValidatorBase
     protected static function getValue(Validatable $object, $column)
     {
         if ($object instanceof \KumbiaPHP\Form\Form) {
-            if (isset($object[$column])) {
-                return $object[$column]->getValue();
-            } else {
-                return NULL;
+            if (!$object->getData() instanceof \KumbiaPHP\ActiveRecord\ActiveRecord) {
+                if (isset($object[$column])) {
+                    return $object[$column]->getValue();
+                } else {
+                    return NULL;
+                }
             }
-        } else {
-            return isset($object->$column) ? : NULL;
+            $object = $object->getData();
         }
+        return isset($object->$column) ? $object->$column : NULL;
     }
 
     protected static function createErrorMessage(Validatable $object, $column, $params)

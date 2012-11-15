@@ -43,7 +43,7 @@ class Validator
         $valid = TRUE;
         foreach ($validations as $classValidation => $fields) {
             foreach ($fields as $field => $params) {
-                if (FALSE === call_user_func_array(array($classValidation, 'validate'), array(
+                if (false === call_user_func_array(array($classValidation, 'validate'), array(
                             $object, $field, $params, $update))) {
                     //agregamos el error al objeto.
                     $object->addError($field, Validators\ValidatorBase::getLastError());
