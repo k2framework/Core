@@ -100,7 +100,7 @@ class Form implements ArrayAccess, Validatable
                 $this->initFromModel($model);
             } else {
                 $this->init();
-                $this->initValidationsFromModel($model);
+                $this->initExtrasFromModel($model);
             }
         } else {
             $this->validationBuilder = new ValidationBuilder();
@@ -538,10 +538,10 @@ class Form implements ArrayAccess, Validatable
                 $field->setValue($model->{$fieldName});
             }
         }
-        $this->initValidationsFromModel($model);
+        $this->initExtrasFromModel($model);
     }
 
-    private function initValidationsFromModel(ActiveRecord $model)
+    private function initExtrasFromModel(ActiveRecord $model)
     {
         /* @var $attribute \ActiveRecord\Metadata\Attribute */
         foreach ($model->metadata()->getAttributes() as $fieldName => $attribute) {
@@ -558,6 +558,9 @@ class Form implements ArrayAccess, Validatable
                     $this->validationBuilder->add(ValidationAR::UNIQUE, $fieldName, array(
                         'message' => "El Valor especificado para el Campo {$field->getLabel()} ya existe en el Sistema"
                     ));
+                }
+                if (null !== $attribute->default && null === $field->getValue()) {
+                    $field->setValue($attribute->default);
                 }
             }
         }
