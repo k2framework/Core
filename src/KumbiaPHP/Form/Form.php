@@ -550,7 +550,9 @@ class Form implements ArrayAccess, Validatable
                     $field->required();
                 }
                 if (null !== $attribute->length && is_numeric($attribute->length)) {
-                    $field->maxLength($attribute->length);
+                    if (method_exists($field, 'maxLength')) {//se debe verificar si el objeto Field permite esta validación.
+                        $field->maxLength($attribute->length);
+                    }
                 }
                 if (true === $attribute->unique) {
                     $this->validationBuilder->add(ValidationAR::UNIQUE, $fieldName, array(
