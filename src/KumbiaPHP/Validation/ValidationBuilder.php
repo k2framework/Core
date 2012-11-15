@@ -24,7 +24,9 @@ class ValidationBuilder
 
     public function add($type, $field, array $params = array())
     {
-        $this->valitations[$type][$field] = $params;
+        if (!$this->has($type, $field)) {
+            $this->valitations[$type][$field] = $params;
+        }
         return $this;
     }
 
