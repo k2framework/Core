@@ -2,8 +2,8 @@
 
 namespace KumbiaPHP\ActiveRecord\Validation\Validators;
 
-use KumbiaPHP\Validation\Validators\ValidatorBase;
 use KumbiaPHP\Validation\Validatable;
+use KumbiaPHP\Validation\Validators\ValidatorBase;
 
 /**
  * KumbiaPHP web & app Framework
@@ -44,7 +44,7 @@ class Unique extends ValidatorBase
             throw new \LogicException(sprintf("El metodo \"validate\" de la clase \"%s\" espera un objeto ActiveRecord", __CLASS__));
         }
         // Condiciones
-        $q = $object->get();
+        $q = $object->createQuery();
 
         $values = array();
 
@@ -79,34 +79,38 @@ class Unique extends ValidatorBase
             }
         }
 
-        if (is_array($column)) {
-            // Establece condiciones con with
-            foreach ($column as $k) {
-                // En un indice UNIQUE si uno de los campos es NULL, entonces el indice
-                // no esta completo y no se considera la restriccion
-                if (!isset($object->$k) || $object->$k === '') {
-                    return TRUE;
-                }
+//        if (is_array($column)) {
+//            // Establece condiciones con with
+//            foreach ($column as $k) {
+//                // En un indice UNIQUE si uno de los campos es NULL, entonces el indice
+//                // no esta completo y no se considera la restriccion
+//                if (!isset($object->$k) || $object->$k === '') {
+//                    return TRUE;
+//                }
+//
+//                $values[$k] = $object->$k;
+//                $q->where("$k = :$k");
+//            }
+//
+//            $q->bind($values);
+//
+//            // Verifica si existe
+//            if ($object->existsOne()) {
+//                return FALSE;
+//            }
+//        } else {
+        $values[$column] = $object->$column;
 
-                $values[$k] = $object->$k;
-                $q->where("$k = :$k");
-            }
-
-            $q->bind($values);
-
-            // Verifica si existe
-            if ($object->existsOne()) {
-                return FALSE;
-            }
-        } else {
-            $values[$column] = $object->$column;
-
-            $q->where("$column = :$column")->bind($values);
-            // Verifica si existe
-            if ($object->existsOne()) {
-                return FALSE;
-            }
+        $q->where("$column = :$column")->bind($values);
+        
+        
+        var_dump($q);die;
+        // Verifica si existe
+        if ($object->existsOne()) {
+            self::createErrorMessage($object, $column, $params);
+            return FALSE;
         }
+//        }
 
         return TRUE;
     }
