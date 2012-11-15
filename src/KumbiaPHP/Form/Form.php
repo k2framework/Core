@@ -366,8 +366,10 @@ class Form implements ArrayAccess, Validatable
      */
     public function isValid()
     {
-        if ($this->model instanceof ActiveRecord) {
-            return self::$validator->validate($this->model);
+        if ($this->model instanceof ActiveRecord
+                && isset($this->model->{$this->model->metadata()->getPK()})
+                && $this->model->exists()) {
+            return self::$validator->validateOnUpdate($this);
         } else {
             return self::$validator->validate($this);
         }
@@ -552,7 +554,7 @@ class Form implements ArrayAccess, Validatable
                 }
                 if (true === $attribute->unique) {
                     $this->validationBuilder->add(ValidationAR::UNIQUE, $fieldName, array(
-                        'message' => "El Campo  {$field->getLabel()} ya existe en el Sistema"
+                        'message' => "El Valor especificado para el Campo {$field->getLabel()} ya existe en el Sistema"
                     ));
                 }
             }
