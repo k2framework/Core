@@ -40,6 +40,9 @@ class Unique extends ValidatorBase
      */
     public static function validate(Validatable $object, $column, $params = NULL, $update = FALSE)
     {
+        if ($object instanceof \KumbiaPHP\Form\Form) {
+            $object = $object->getData();
+        }
         if (!$object instanceof \KumbiaPHP\ActiveRecord\ActiveRecord) {
             throw new \LogicException(sprintf("El metodo \"validate\" de la clase \"%s\" espera un objeto ActiveRecord", __CLASS__));
         }
@@ -78,39 +81,15 @@ class Unique extends ValidatorBase
                 $q->bindValue("pk_$pk", $object->$pk);
             }
         }
-
-//        if (is_array($column)) {
-//            // Establece condiciones con with
-//            foreach ($column as $k) {
-//                // En un indice UNIQUE si uno de los campos es NULL, entonces el indice
-//                // no esta completo y no se considera la restriccion
-//                if (!isset($object->$k) || $object->$k === '') {
-//                    return TRUE;
-//                }
-//
-//                $values[$k] = $object->$k;
-//                $q->where("$k = :$k");
-//            }
-//
-//            $q->bind($values);
-//
-//            // Verifica si existe
-//            if ($object->existsOne()) {
-//                return FALSE;
-//            }
-//        } else {
         $values[$column] = $object->$column;
 
         $q->where("$column = :$column")->bind($values);
-        
-        
-        var_dump($q);die;
+
         // Verifica si existe
         if ($object->existsOne()) {
             self::createErrorMessage($object, $column, $params);
             return FALSE;
         }
-//        }
 
         return TRUE;
     }
