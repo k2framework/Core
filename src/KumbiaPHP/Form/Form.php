@@ -10,6 +10,7 @@ use KumbiaPHP\Form\Exception\FormException;
 use KumbiaPHP\Validation\ValidationBuilder;
 use KumbiaPHP\Di\Container\ContainerInterface;
 use KumbiaPHP\Form\Field\AbstractField as Field;
+use KumbiaPHP\ActiveRecord\Validation\ValidationBuilder as ValidationAR;
 
 /**
  * 
@@ -89,16 +90,20 @@ class Form implements ArrayAccess, Validatable
      */
     final public function __construct($model = NULL, $createFields = FALSE)
     {
-        $this->validationBuilder = new ValidationBuilder();
         if ($model instanceof ActiveRecord) {
+            if (!($this->validationBuilder = $model->getValidations()) instanceof ValidationBuilder) {
+                throw new \LogicException(sprintf("El método\"validations\" de la clase \"%s\" debe devolver un objeto ValidationBuilder", get_class($model)));
+            }
             $this->name = strtolower(basename(get_class($model)));
             $this->model = $model;
             if ($createFields) {
                 $this->initFromModel($model);
             } else {
                 $this->init();
+                $this->initValidationsFromModel($model);
             }
         } else {
+            $this->validationBuilder = new ValidationBuilder();
             $this->name = $model;
             $this->init();
         }
@@ -361,17 +366,11 @@ class Form implements ArrayAccess, Validatable
      */
     public function isValid()
     {
-        return self::$validator->validate($this);
-        /* @var $field Field */
-        $valid = TRUE;
-
-        foreach ($this->fields as $index => $field) {
-            if (!self::$validator->validate($field)) {
-                $valid = FALSE;
-                $this->errors[$index] = $field->getError();
-            }
+        if ($this->model instanceof ActiveRecord) {
+            return self::$validator->validate($this->model);
+        } else {
+            return self::$validator->validate($this);
         }
-        return $valid;
     }
 
     /**
@@ -527,22 +526,34 @@ class Form implements ArrayAccess, Validatable
     {
         /* @var $attribute \ActiveRecord\Metadata\Attribute */
         foreach ($model->metadata()->getAttributes() as $fieldName => $attribute) {
-            if ($attribute->PK) {
+            if ($attribute->PK && $attribute->autoIncrement) {
                 $field = $this->add($fieldName, 'hidden');
-                if (isset($model->{$fieldName})) {
-                    $field->setValue($model->{$fieldName});
-                }
             } else {
                 $field = $this->add($fieldName)
                         ->setLabel($attribute->alias);
-                if (isset($model->{$fieldName})) {
-                    $field->setValue($model->{$fieldName});
-                }
-                if ($attribute->notNull) {
+            }
+            if (isset($model->{$fieldName})) {
+                $field->setValue($model->{$fieldName});
+            }
+        }
+        $this->initValidationsFromModel($model);
+    }
+
+    private function initValidationsFromModel(ActiveRecord $model)
+    {
+        /* @var $attribute \ActiveRecord\Metadata\Attribute */
+        foreach ($model->metadata()->getAttributes() as $fieldName => $attribute) {
+            if (($field = $this->getField($fieldName)) instanceof Field) {//si se creó el elemento
+                if (true === $attribute->notNull) {
                     $field->required();
                 }
-                if (NULL !== $attribute->length && is_numeric($attribute->length)) {
+                if (null !== $attribute->length && is_numeric($attribute->length)) {
                     $field->maxLength($attribute->length);
+                }
+                if (true === $attribute->unique) {
+                    $this->validationBuilder->add(ValidationAR::UNIQUE, $fieldName, array(
+                        'message' => "El Campo  {$field->getLabel()} ya existe en el Sistema"
+                    ));
                 }
             }
         }
