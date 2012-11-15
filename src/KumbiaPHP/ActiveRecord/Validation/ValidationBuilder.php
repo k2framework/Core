@@ -18,20 +18,17 @@ class ValidationBuilder extends BaseBuilder
     //acá irán las validaciones del AR
     public function defaultField($field, array $params = NULL)
     {
-        $this->_valitations[self::DEFAULT_FIELD][$field] = $params;
-        return $this;
+        return $this->add(self::DEFAULT_FIELD, $field, $params);
     }
 
     public function unique($field, array $params = NULL)
     {
-        $this->_valitations[self::UNIQUE][$field] = $params;
-        return $this;
+        return $this->add(self::UNIQUE, $field, $params);
     }
 
     public function primary($field, array $params = NULL)
     {
-        $this->_valitations[self::PRIMARY][$field] = $params;
-        return $this;
+        return $this->add(self::PRIMARY, $field, $params);
     }
 
 }
