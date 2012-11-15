@@ -337,8 +337,10 @@ abstract class Kernel implements KernelInterface
                 }
             }
         }
+
+        self::$container->set('dispatcher', $this->dispatcher);
     }
-    
+
     private function validateModules()
     {
         foreach ($this->modules as $module => $path) {
