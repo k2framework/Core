@@ -45,7 +45,8 @@ class Firewall
             if ($url === Reader::get('security.login_url') && !$event->getRequest()->isMethod('post')) {
                 //si no existe el token y la url es la del logueo, nos vamos.
                 return;
-            } elseif (($this->isSecure($url) && $event->getRequest()->isMethod('post')) ||
+            } elseif ((($this->isSecure($url) || $url === '/_autenticate')
+                    && $event->getRequest()->isMethod('post')) ||
                     ('http' === Reader::get('security.type') &&
                     $event->getRequest()->server->get('PHP_AUTH_USER') &&
                     $event->getRequest()->server->get('PHP_AUTH_PW'))
