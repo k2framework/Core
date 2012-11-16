@@ -77,6 +77,22 @@ class Tag extends AbstractHelper
     }
 
     /**
+     * Incluye un archivo javascript
+     *
+     * @param string $src archivo javascript
+     * @param boolean $cache indica si se usa cache de navegador
+     */
+    public static function printJs($src, $priority = 100, $cache = TRUE)
+    {
+        $src = "js/$src";
+        if (!$cache) {
+            $src .= '?nocache=' . uniqid();
+        }
+
+        echo '<script type="text/javascript" src="' . self::$app->getBaseUrl() . $src . '.js"></script>' . PHP_EOL;
+    }
+
+    /**
      * Incluye un archivo de css
      *
      * @param string $src archivo css
