@@ -56,7 +56,7 @@ class Firewall
                 $event->setResponse($this->loginCheck());
                 return;
             }
-        } elseif ($url === Reader::get('security.login_url')) {
+        } elseif ($url === Reader::get('security.login_url') || $url === '/_autenticate') {
             //si ya existe el token y estamos en la url del form de logueo, mandamos al target_login
             $event->stopPropagation();
             $event->setResponse($this->container->get('router')
