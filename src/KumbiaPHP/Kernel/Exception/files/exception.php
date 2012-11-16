@@ -25,8 +25,7 @@ return $result;
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Ha Ocurrido una Excepción</title>
 <link href="<?php echo $app->getBaseUrl() ?>css/exception.css" rel="stylesheet" type="text/css" media="screen" />
-<link href="<?php echo $app->getBaseUrl() ?>css/bienvenida.css" rel="stylesheet" type="text/css" media="screen" />
-<link href="<?php echo $app->getBaseUrl() ?>css/style.css" rel="stylesheet" type="text/css" media="screen" />
+<link href="<?php echo $app->getBaseUrl() ?>css/structure.css" rel="stylesheet" type="text/css" media="screen" />
 </head>
 <body>
 <div class="exception">
