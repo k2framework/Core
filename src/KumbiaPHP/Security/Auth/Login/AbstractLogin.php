@@ -28,11 +28,4 @@ abstract class AbstractLogin
      * @return Response 
      */
     abstract public function showLogin();
-
-    public function logout($targetLogout)
-    {
-        $this->container->get('session')->destroy();
-        return $this->container->get('router')->redirect($targetLogout);
-    }
-
 }
