@@ -2,10 +2,12 @@
 
 namespace KumbiaPHP\Security\Listener;
 
+use KumbiaPHP\Security\Event\Events;
 use KumbiaPHP\Security\Config\Reader;
 use KumbiaPHP\Security\Acl\AclManager;
 use KumbiaPHP\Kernel\Event\RequestEvent;
 use KumbiaPHP\Security\Auth\AuthManager;
+use KumbiaPHP\Security\Event\SecurityEvent;
 use KumbiaPHP\Di\Container\ContainerInterface;
 use KumbiaPHP\Security\Exception\AuthException;
 use KumbiaPHP\Security\Exception\UserNotFoundException;
@@ -147,6 +149,18 @@ class Firewall
             $auth->autenticate($token); //si falla el logueo, tira una excepcion.
 
             $this->container->get('session')->set('token', $token, 'security');
+
+            $event = new SecurityEvent($this->container->get('request')
+                            , $this->container->get('security'));
+
+            $this->container->get('dispatcher')->dispatch(Events::LOGIN, $event);
+
+            if ($event->hasResponse()) {//si se estableció una respuesta
+                //eliminamos la sesión por si se creó
+                $this->container->get('session')->delete('target_login', 'security');
+                return $event->getResponse();
+            }
+
             if ($url = $this->container->get('session')->get('target_login', 'security')) {
                 $this->container->get('session')->delete('target_login', 'security');
                 return $this->container->get('router')->redirect($url);
@@ -187,8 +201,20 @@ class Firewall
             die("No existe el Tipo del Logueo $typeLoginClassName");
         }
 
-        $login = new $typeLoginClassName($this->container);
-        return $login->logout(Reader::get('security.target_logout'));
+        $event = new SecurityEvent($this->container->get('request')
+                        , $this->container->get('security'));
+
+        $this->container->get('dispatcher')->dispatch(Events::LOGOUT, $event);
+
+        //eliminamos la sesión
+        $this->container->get('session')->delete(null, 'security');
+
+        if ($event->hasResponse()) {//si se estableció una respuesta
+            return $event->getResponse();
+        }
+
+        return $this->container->get('router')
+                        ->redirect(Reader::get('security.target_logout'));
     }
 
 }
