@@ -55,4 +55,4 @@ class PDOStatement extends Base
 
 }
 
-PDOStatement::setDispatcher(Kernel::get('app.kernel')->getDispatcher());
+PDOStatement::setDispatcher(Kernel::get('dispatcher'));
