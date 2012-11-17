@@ -55,7 +55,7 @@ abstract class AbstractToken implements TokenInterface
     public function unserialize($serialized)
     {
         list($this->user, $this->valid) = unserialize($serialized);
-        if (is_object($this->user) && method_exists($this->user, '__construct')) {
+        if (($this->user instanceof UserInterface) && method_exists($this->user, '__construct')) {
             $this->user->__construct();
         }
     }
@@ -67,7 +67,7 @@ abstract class AbstractToken implements TokenInterface
 
     public function getRoles()
     {
-        return (array) $this->user->getRoles();
+        return ($this->user instanceof UserInterface) ? (array) $this->user->getRoles() : array();
     }
 
     public function getAttributes($attr = NULL)
@@ -75,7 +75,7 @@ abstract class AbstractToken implements TokenInterface
         if (NULL === $attr) {
             return $this->attributes;
         } else {
-            if (is_object($this->user) && isset($this->user->{$attr})) {
+            if (($this->user instanceof UserInterface) && isset($this->user->{$attr})) {
                 return $this->user->{$attr};
             } else {
                 return isset($this->attributes[$attr]) ? $this->attributes[$attr] : NULL;
