@@ -53,7 +53,9 @@ class View
         $response = new Response($this->getContent());
         $response->setCharset(APP_CHARSET);
         $response->cache($cacheTime);
-
+        
+        $this->clearFlashes();
+        
         return $response;
     }
 
@@ -235,6 +237,15 @@ class View
     private function camelcase($string)
     {
         return str_replace(' ', '', ucwords(preg_replace('@(.+)_(\w)@', '$1 $2', strtolower($string))));
+    }
+    
+    /**
+     * Elimina los mensajes flash que no se mostraron en la página 
+     */
+    private function clearFlashes()
+    {
+        self::$container->get('session')
+                ->delete(null, 'flash');
     }
 
 }
