@@ -371,20 +371,22 @@ class AppContext
      * ya que el prefijo lo podemos cambiar a nuestro antojo.
      * 
      * @param string $url
+     * @param boolean $baseUrl indica si se devuelve con el baseUrl delante ó no
      * @return string
      * @throws NotFoundException si no existe el módulo
      */
-    public function createUrl($url)
+    public function createUrl($url, $baseUrl = true)
     {
         $url = explode(':', $url);
         if (count($url) > 1) {
             if (!$route = array_search($url[0], $this->routes)) {
                 throw new NotFoundException("No Existe el módulo {$url[0]}, no se pudo crear la url");
             }
-            return $this->getBaseUrl() . trim($route, '/') . '/' . $url[1];
+            $url = trim($route, '/') . '/' . $url[1];
         } else {
-            return $this->getBaseUrl() . ltrim($url[0], '/');
+            $url = ltrim($url[0], '/');
         }
+        return $baseUrl ? $this->getBaseUrl() . $url : $url;
     }
 
     /**
