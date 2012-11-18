@@ -71,7 +71,7 @@ class Router implements RouterInterface
         //clono el request y le asigno la nueva url.
         $request = clone \KumbiaPHP\Kernel\Kernel::get('request');
 
-        $request->query->set('_url', trim($url, '/'));
+        $request->query->set('_url', '/' . ltrim($this->app->createUrl($url, false), '/'));
 
         //retorno la respuesta del kernel.
         return $this->kernel->execute($request, KernelInterface::SUB_REQUEST);
