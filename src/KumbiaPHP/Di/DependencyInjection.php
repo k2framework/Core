@@ -85,7 +85,7 @@ class DependencyInjection implements DependencyInjectionInterface
             $instance = $reflection->newInstanceArgs($arguments);
         }
         //agregamos la instancia del objeto al contenedor.
-        $this->container->set($id, $instance);
+        $this->container->setInstance($id, $instance);
 
         $this->injectObjectIntoServicesQueue();
 

@@ -42,7 +42,7 @@ class Container implements ContainerInterface
         $di->setContainer($this);
 
         //agregamos al container como servicio.
-        $this->set('container', $this);
+        $this->setInstance('container', $this);
     }
 
     public function get($id)
@@ -69,7 +69,7 @@ class Container implements ContainerInterface
         return isset($this->services[$id]);
     }
 
-    public function set($id, $object)
+    public function setInstance($id, $object)
     {
         $this->services[$id] = $object;
         //y lo agregamos a las definiciones. (solo será a gregado si no existe)

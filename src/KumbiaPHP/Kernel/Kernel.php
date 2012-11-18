@@ -125,12 +125,12 @@ abstract class Kernel implements KernelInterface
         //iniciamos el container con esa config
         $this->initContainer($config->getConfig());
         //asignamos el kernel al container como un servicio
-        self::$container->set('app.kernel', $this);
+        self::$container->setInstance('app.kernel', $this);
         //iniciamos el dispatcher con esa config
         $this->initDispatcher($config->getConfig());
 
         //seteamos el contexto de la aplicación como servicio
-        self::$container->set('app.context', $context);
+        self::$container->setInstance('app.context', $context);
         //le asignamos el servicio AppContext al request
         $this->request->setAppContext($context);
     }
@@ -157,7 +157,7 @@ abstract class Kernel implements KernelInterface
                 //Luego devolvemos el request original al kernel,
                 //al AppContext, y el tipo de request
                 $this->request = $originalRequest;
-                self::$container->set('request', $originalRequest);
+                self::$container->setInstance('request', $originalRequest);
                 self::$container->get('app.context')
                         ->setRequest($originalRequest)
                         ->setRequestType($originalRequestType);
@@ -179,7 +179,7 @@ abstract class Kernel implements KernelInterface
             $this->validateModules();
         }
         //agregamos el request al container
-        self::$container->set('request', $this->request);
+        self::$container->setInstance('request', $this->request);
 
         //ejecutamos el evento request
         $this->dispatcher->dispatch(KumbiaEvents::REQUEST, $event = new RequestEvent($request));
@@ -346,7 +346,7 @@ abstract class Kernel implements KernelInterface
             }
         }
 
-        self::$container->set('dispatcher', $this->dispatcher);
+        self::$container->setInstance('dispatcher', $this->dispatcher);
     }
 
     private function validateModules()
