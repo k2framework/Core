@@ -112,22 +112,25 @@ class Container implements ContainerInterface
     public function setParameter($id, $value)
     {
         $this->definitions['parameters'][$id] = $value;
+        return $this;
     }
 
     /**
      * Crea ó Actualiza la configuración para la creación de un servicio.
      * 
-     * @example $container->set("session", array(
-     *              'class' => "Lib\\Session\Session",
+     * @example $container->set("session", "Lib\\Session\Session", array(
      *              'construct' => '@request'
      * ));
      * 
      * @param string $id identificador del servicio
+     * @param string $className Nombre de la Clase a Instanciar
      * @param array $config configuración para el servicio.
      */
-    public function set($id, array $config)
+    public function set($id, $className, array $config = array())
     {
+        $config['class'] = $className;
         $this->definitions['services'][$id] = $config;
+        return $this;
     }
 
 }

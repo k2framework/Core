@@ -42,6 +42,7 @@ interface ContainerInterface
      * Establece un valor para un parametro
      * @param string $id nombre del parametro
      * @param mixed $value valor del parametro
+     * @return ContainerInterface
      */
     public function setParameter($id, $value);
 }
