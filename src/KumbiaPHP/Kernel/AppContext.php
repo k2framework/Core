@@ -87,6 +87,12 @@ class AppContext
     protected $inProduction;
 
     /**
+     * Mantiene el tipo de request establecido en el Kernel (MASTER, SUB)
+     * @var string 
+     */
+    protected $requestType;
+
+    /**
      * Constructor de la clase
      * @param Request $request
      * @param type $inProduction
@@ -115,6 +121,26 @@ class AppContext
         $this->baseUrl = $request->getBaseUrl();
         $this->parseUrl();
         return $this;
+    }
+
+    /**
+     * Establece el tipo de request del kernel, (MASTER, SUB)
+     * @param string $type
+     * @return \KumbiaPHP\Kernel\AppContext 
+     */
+    public function setRequestType($type)
+    {
+        $this->requestType = $type;
+        return $this;
+    }
+
+    /**
+     * Devuelve el tipo de request (MASTER, SUB)
+     * @return string 
+     */
+    public function getRequestType()
+    {
+        return $this->requestType;
     }
 
     /**
