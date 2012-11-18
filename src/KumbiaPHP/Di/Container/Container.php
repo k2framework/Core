@@ -69,6 +69,11 @@ class Container implements ContainerInterface
         return isset($this->services[$id]);
     }
 
+    /**
+     * Establece una instancia de un objeto en el indice especificado
+     * @param string $id indice
+     * @param object $object objeto a almacenar
+     */
     public function setInstance($id, $object)
     {
         $this->services[$id] = $object;
@@ -95,6 +100,10 @@ class Container implements ContainerInterface
         return array_key_exists($id, $this->definitions['parameters']);
     }
 
+    /**
+     * Devuelve las definiciones de los servicios
+     * @return array 
+     */
     public function getDefinitions()
     {
         return $this->definitions;
@@ -103,6 +112,22 @@ class Container implements ContainerInterface
     public function setParameter($id, $value)
     {
         $this->definitions['parameters'][$id] = $value;
+    }
+
+    /**
+     * Crea ó Actualiza la configuración para la creación de un servicio.
+     * 
+     * @example $container->set("session", array(
+     *              'class' => "Lib\\Session\Session",
+     *              'construct' => '@request'
+     * ));
+     * 
+     * @param string $id identificador del servicio
+     * @param array $config configuración para el servicio.
+     */
+    public function set($id, array $config)
+    {
+        $this->definitions['services'][$id] = $config;
     }
 
 }
