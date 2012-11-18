@@ -140,20 +140,27 @@ abstract class Kernel implements KernelInterface
         try {
             //verificamos el tipo de petición
             if (self::MASTER_REQUEST === $type) {
-                return $this->_execute($request);
+                return $this->_execute($request, $type);
             } else {
                 //almacenamos en una variable temporal el request
                 //original. y actualizamos el AppContext.
+                //tambien el tipo de request
                 $originalRequest = $this->request;
-                self::$container->get('app.context')->setRequest($request);
+                $originalRequestType = self::$container->get('app.context')
+                        ->getRequestType();
+                self::$container->get('app.context')
+                        ->setRequest($request)
+                        ->setRequestType($type);
 
-                $response = $this->_execute($request);
+                $response = $this->_execute($request, $type);
 
                 //Luego devolvemos el request original al kernel,
-                //al AppContext y al .
+                //al AppContext, y el tipo de request
                 $this->request = $originalRequest;
-                self::$container->get('app.context')->setRequest($originalRequest);
                 self::$container->set('request', $originalRequest);
+                self::$container->get('app.context')
+                        ->setRequest($originalRequest)
+                        ->setRequestType($originalRequestType);
 
                 return $response;
             }
@@ -162,12 +169,13 @@ abstract class Kernel implements KernelInterface
         }
     }
 
-    private function _execute(Request $request)
+    private function _execute(Request $request, $type = Kernel::MASTER_REQUEST)
     {
         $this->request = $request;
 
         if (!self::$container) { //si no se ha creado el container lo creamos.
             $this->init($request);
+            self::$container->get('app.context')->setRequestType($type);
             $this->validateModules();
         }
         //agregamos el request al container
