@@ -45,7 +45,6 @@ class ControllerResolver
         if ('/logout' === $this->module) {
             throw new NotFoundException(sprintf("La ruta \"%s\" no concuerda con ningún módulo ni controlador en la App", $this->module), 404);
         }
-        $modulePath = $this->container->get('app.context')->getPath($this->module);
         //creo el nombre del controlador con el sufijo Controller
         $controllerName = $this->contShortName . 'Controller';
         //uno el namespace y el nombre del controlador.
@@ -54,6 +53,7 @@ class ControllerResolver
         try {
             $reflectionClass = new ReflectionClass($controllerClass);
         } catch (\Exception $e) {
+            $modulePath = $this->container->get('app.context')->getPath($this->module);
             throw new NotFoundException(sprintf("No existe el controlador \"%s\" en la ruta \"%sController/%s.php\"", $controllerName, $modulePath, $controllerName), 404);
         }
 
