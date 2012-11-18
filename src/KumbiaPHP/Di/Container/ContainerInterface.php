@@ -37,4 +37,11 @@ interface ContainerInterface
      * @return boolean 
      */
     public function hasParameter($id);
+
+    /**
+     * Establece un valor para un parametro
+     * @param string $id nombre del parametro
+     * @param mixed $value valor del parametro
+     */
+    public function setParameter($id, $value);
 }

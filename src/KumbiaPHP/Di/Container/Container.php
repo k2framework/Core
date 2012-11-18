@@ -100,4 +100,9 @@ class Container implements ContainerInterface
         return $this->definitions;
     }
 
+    public function setParameter($id, $value)
+    {
+        $this->definitions['parameters'][$id] = $value;
+    }
+
 }
