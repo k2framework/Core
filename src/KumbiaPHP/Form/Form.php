@@ -585,4 +585,4 @@ class Form implements ArrayAccess, Validatable
 /*
  * Le pasamos los servicios que necesita.
  */
-Form::injectServices(\KumbiaPHP\Kernel\Kernel::getContainer());
+Form::injectServices(\KumbiaPHP\Kernel\Kernel::get('container'));
