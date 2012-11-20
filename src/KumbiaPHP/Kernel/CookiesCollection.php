@@ -2,7 +2,9 @@
 
 namespace KumbiaPHP\Kernel;
 
-class CookiesCollection
+use KumbiaPHP\Kernel\Collection;
+
+class CookiesCollection extends Collection
 {
 
     /**
@@ -74,66 +76,6 @@ class CookiesCollection
         foreach ($this->keys() as $cookie) {
             $this->delete($cookie);
         }
-    }
-
-    /**
-     * Devuelve un arreglo con todos los indices de los parametros que 
-     * contiene la clase
-     * @return array 
-     */
-    public function keys()
-    {
-        return array_keys($this->all());
-    }
-
-    /**
-     * Devuelve un parametro convertido a entero, ó el valor por defecto
-     * si no existe
-     * @param string $key
-     * @param int $default
-     * @return int 
-     */
-    public function getInt($key, $default = 0)
-    {
-        return (int) $this->get($key, $default);
-    }
-
-    /**
-     * Devuelve los digitos contenidos en un parametro, ó los digitos deel 
-     * valor por defecto si no existe
-     * @param string $key
-     * @param mixed $default
-     * @return int 
-     */
-    public function getDigits($key, $default = '')
-    {
-        return preg_replace('/[^[:digit:]]/', '', $this->get($key, $default));
-    }
-
-    /**
-     * @todo pendiente con getAlnum, no funciona bien por el momento.
-     * Devuelve los caracteres alfanumericos de un parametro, ó
-     * los caracteres alfanumericos del valor por defecto si no existe el param.
-     * @param string $key
-     * @param string $default
-     * @return string 
-     * 
-     */
-    public function getAlnum($key, $default = '')
-    {
-        return preg_replace('/[^[:alnum:]]/', '', $this->get($key, $default));
-    }
-
-    /**
-     * Devuelve los caracteres que solo sean letras de un parametro si existe,
-     * sino devuelve los caracteres que solo sean letras del valor por defecto.
-     * @param string $key
-     * @param string $default
-     * @return string 
-     */
-    public function getAlpha($key, $default = '')
-    {
-        return preg_replace('/[^[:alpha:]]/', '', $this->get($key, $default));
     }
 
 }
