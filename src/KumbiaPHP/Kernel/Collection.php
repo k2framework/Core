@@ -120,7 +120,7 @@ class Collection implements \Serializable
      */
     public function keys()
     {
-        return array_keys($this->params);
+        return array_keys($this->all());
     }
 
     /**
