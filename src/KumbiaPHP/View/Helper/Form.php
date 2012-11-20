@@ -242,7 +242,7 @@ class Form extends AbstractHelper
         if ($action) {
             $action = self::$app->createUrl($action);
         } else {
-            $action = self::$app->getBaseUrl() . ltrim(self::$app->getCurrentUrl(true), '/');
+            $action = self::$app->getCurrentUrl(true);
         }
         return "<form action=\"$action\" method=\"$method\" $attrs>";
     }
@@ -261,9 +261,9 @@ class Form extends AbstractHelper
             $attrs = self::getAttrs($attrs);
         }
         if ($action) {
-            $action = self::$app->getBaseUrl() . $action;
+            $action = self::$app->createUrl($action);
         } else {
-            $action = self::$app->getBaseUrl() . ltrim(self::$app->getCurrentUrl(true), '/');
+            $action = self::$app->getCurrentUrl(true);
         }
         return "<form action=\"$action\" method=\"post\" enctype=\"multipart/form-data\" $attrs>";
     }

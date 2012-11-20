@@ -23,6 +23,7 @@ namespace KumbiaPHP\Upload;
 use KumbiaPHP\Kernel\Request;
 use KumbiaPHP\Upload\Adapter\File;
 use KumbiaPHP\Upload\Adapter\Image;
+use KumbiaPHP\Kernel\File as UploadedFile;
 use KumbiaPHP\Upload\Exception\UploadException;
 
 /**
@@ -49,7 +50,7 @@ abstract class Upload
     /**
      * Nombre de archivo subido por método POST
      * 
-     * @var string
+     * @var UploadedFile
      */
     protected $file;
 
@@ -58,42 +59,49 @@ abstract class Upload
      *
      * @var boolean
      */
-    protected $allowScripts = FALSE;
+    protected $allowScripts = null;
 
     /**
      * Tamaño mínimo del archivo
      * 
      * @var string
      */
-    protected $minSize = NULL;
+    protected $minSize = null;
 
     /**
      * Tamaño máximo del archivo
      *
      * @var string
      */
-    protected $maxSize = NULL;
+    protected $maxSize = null;
 
     /**
      * Tipos de archivo permitidos utilizando mime
      * 
      * @var array
      */
-    protected $types = NULL;
+    protected $types = null;
 
     /**
      * Extensión de archivo permitida
      *
      * @var array
      */
-    protected $extensions = NULL;
+    protected $extensions = null;
 
     /**
      * Permitir sobrescribir ficheros
      * 
      * @var bool Por defecto FALSE
      */
-    protected $overwrite = FALSE;
+    protected $overwrite = false;
+
+    /**
+     * Ruta donde se guardara el archivo
+     *
+     * @var string
+     */
+    protected $path;
 
     /**
      * Constructor
@@ -104,7 +112,7 @@ abstract class Upload
     {
         $this->request = $request;
         if (!$this->file = $request->files->get($name)) {
-            throw new UploadException("No existe el indice \"$name\" en los archivos subidos");
+            throw new UploadException("No existe el archivo \"$name\" en los archivos subidos");
         }
     }
 
@@ -126,9 +134,18 @@ abstract class Upload
         return new $class($request, $name);
     }
 
+    /**
+     * 
+     * @return UploadedFile 
+     */
+    public function getFile()
+    {
+        return $this->file;
+    }
+
     public function getErrors()
     {
-        return $this->errors;
+        return array_merge($this->errors, (array) $this->file->getError());
     }
 
     /**
@@ -219,25 +236,45 @@ abstract class Upload
     }
 
     /**
+     * Asigna la ruta al directorio de destino para el archivo
+     * 
+     * @param string $path ruta al directorio de destino (Ej: /home/usuario/data)
+     */
+    public function setPath($path)
+    {
+        $this->path = $path;
+    }
+
+    /**
+     * Guardar el archivo en el servidor
+     * 
+     * @param string $name nombre con el que se guardará el archivo
+     * @return boolean
+     */
+    protected function saveFile($name)
+    {
+        return $this->file->move($this->path, $name);
+    }
+
+    /**
      * Guarda el archivo subido
      *
      * @param string $name nombre con el que se guardara el archivo
-     * @return boolean
+     * @return UploadedFile
      */
-    public function save($name = NULL)
+    public function save($name = null)
     {
-        if (!$this->isUploaded()) {
-            return FALSE;
+        if ($this->file->hasError()) {
+            return false;
         }
-        if (!$name) {
-            $name = $this->file['name'];
-        } else {
-            $name = $name . $this->getExtension();
+        if (null === $name) {
+            $name = $this->file->getName();
         }
         // Guarda el archivo
-        if ($this->beforeSave($name) !== FALSE && $this->overwrite($name) && $this->validates() && $this->saveFile($name)) {
+        if (false !== $this->beforeSave($name) && $this->overwrite($name) && $this->validates() && $this->saveFile($name)) {
             $this->afterSave($name);
-            return TRUE;
+            $this->file->setName($name);
+            return $this->file;
         }
     }
 
@@ -252,37 +289,7 @@ abstract class Upload
         $name = md5(time());
 
         // Guarda el archivo
-        if ($this->save($name)) {
-            return $name . $this->getExtension();
-        }
-
-        return FALSE;
-    }
-
-    /**
-     * Verifica si el archivo esta subido en el servidor y listo para guardarse
-     * 
-     * @return boolean
-     */
-    public function isUploaded()
-    {
-        // Verifica si ha ocurrido un error al subir
-        if ($this->file['error'] > 0) {
-            //if ($_FILES[$this->name]['error'] > 0) {
-            $error = array(
-                UPLOAD_ERR_INI_SIZE => 'el archivo excede el tamaño máximo (' . ini_get('upload_max_filesize') . 'b) permitido por el servidor',
-                UPLOAD_ERR_FORM_SIZE => 'el archivo excede el tamaño máximo permitido',
-                UPLOAD_ERR_PARTIAL => 'se ha subido el archivo parcialmente',
-                UPLOAD_ERR_NO_FILE => 'no se ha subido ningún archivo',
-                UPLOAD_ERR_NO_TMP_DIR => 'no se encuentra el directorio de archivos temporales',
-                UPLOAD_ERR_CANT_WRITE => 'falló al escribir el archivo en disco',
-                UPLOAD_ERR_EXTENSION => 'una extensión de php ha detenido la subida del archivo'
-            );
-
-            $this->errors[] = 'Error: ' . $error[$this->file['error']];
-            return FALSE;
-        }
-        return TRUE;
+        return $this->save($name);
     }
 
     /**
@@ -292,37 +299,42 @@ abstract class Upload
      */
     protected function validates()
     {
+        // Verifica que se pueda escribir en el directorio
+        if (!is_writable($this->path)) {
+            $this->errors[] = 'Error: no se puede escribir en el directorio';
+            return false;
+        }
         // Denegar subir archivos de scripts ejecutables
-        if (!$this->allowScripts && preg_match('/\.(php|phtml|php3|php4|js|shtml|pl|py|rb|rhtml)$/i', $this->file['name'])) {
+        if (!$this->allowScripts && preg_match('/\.(php|phtml|php3|php4|js|shtml|pl|py|rb|rhtml)$/i', $this->file->getName())) {
             $this->errors[] = 'Error: no esta permitido subir scripts ejecutables';
-            return FALSE;
+            return false;
         }
 
         // Valida el tipo de archivo
         if ($this->types !== NULL && !$this->validatesTypes()) {
             $this->errors[] = 'Error: el tipo de archivo no es válido';
-            return FALSE;
+            return false;
         }
 
         // Valida extensión del archivo
-        if ($this->extensions !== NULL && !preg_match('/\.(' . implode('|', $this->extensions) . ')$/i', $this->file['name'])) {
+        if ($this->extensions !== NULL && !preg_match('/\.(' . implode('|', $this->extensions) . ')$/i', $this->file->getName())) {
             $this->errors[] = 'Error: la extensión del archivo no es válida';
-            return FALSE;
+            return false;
         }
 
         // Verifica si es superior al tamaño indicado
         if ($this->maxSize !== NULL && $this->file['size'] > $this->toBytes($this->maxSize)) {
             $this->errors[] = "Error: no se admiten archivos superiores a $this->maxSize" . 'b';
-            return FALSE;
+            return false;
         }
 
         // Verifica si es inferior al tamaño indicado
         if ($this->minSize !== NULL && $this->file['size'] < $this->toBytes($this->minSize)) {
             $this->errors[] = "Error: no se admiten archivos inferiores a $this->minSize" . 'b';
-            return FALSE;
+            return false;
         }
 
-        return TRUE;
+        return true;
     }
 
     /**
@@ -332,23 +344,7 @@ abstract class Upload
      */
     protected function validatesTypes()
     {
-        return in_array($this->file['type'], $this->types);
-    }
-
-    /**
-     * Devuelve la extensión
-     *
-     * @return string
-     */
-    protected function getExtension()
-    {
-        if ($ext = explode('.', $this->file['name'])) {
-            $ext = '.' . end($ext);
-        } else {
-            $ext = NULL;
-        }
-
-        return $ext;
+        return in_array($this->file->getType(), $this->types);
     }
 
     /**
@@ -359,13 +355,13 @@ abstract class Upload
     protected function overwrite($name)
     {
         if ($this->overwrite) {
-            return TRUE;
+            return true;
         }
         if (file_exists("$this->path/$name")) {
             $this->errors[] = 'Error: ya existe este fichero. Y no se permite reescribirlo';
-            return FALSE;
+            return false;
         }
-        return TRUE;
+        return true;
     }
 
     /**
@@ -401,11 +397,4 @@ abstract class Upload
         return $size;
     }
 
-    /**
-     * Guardar el archivo en el servidor
-     * 
-     * @param string $name nombre con el que se guardará el archivo
-     * @return boolean
-     */
-    protected abstract function saveFile($name);
 }

@@ -67,7 +67,7 @@ class Ajax extends AbstractHelper
         if (is_array($attrs)) {
             $attrs = self::getAttrs($attrs);
         }
-        return '<a href="' . self::$app->getControllerUrl() . "/$action\" class=\"js-remote $class\" rel=\"#{$update}\" $attrs>$text</a>";
+        return '<a href="' . self::$app->getControllerUrl($action) . "\" class=\"js-remote $class\" rel=\"#{$update}\" $attrs>$text</a>";
     }
 
     /**
@@ -110,7 +110,7 @@ class Ajax extends AbstractHelper
         if (is_array($attrs)) {
             $attrs = self::getAttrs($attrs);
         }
-        return '<a href="' . self::$app->getControllerUrl() . "/$action\" class=\"js-remote-confirm $class\" rel=\"#{$update}\" title=\"$confirm\" $attrs>$text</a>";
+        return '<a href="' . self::$app->getControllerUrl($action) . "\" class=\"js-remote-confirm $class\" rel=\"#{$update}\" title=\"$confirm\" $attrs>$text</a>";
     }
 
     /**
@@ -177,7 +177,7 @@ class Ajax extends AbstractHelper
         if ($action) {
             $action = self::$app->createUrl($action);
         } else {
-            $action = self::$app->getBaseUrl() . ltrim(self::$app->getCurrentUrl(), '/');
+            $action = self::$app->getCurrentUrl(true);
         }
         return "<form action=\"$action\" method=\"$method\" class=\"js-remote $class\" data-div=\"$update\" $attrs>";
     }

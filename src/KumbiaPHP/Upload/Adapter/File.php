@@ -33,13 +33,6 @@ class File extends Upload
 {
 
     /**
-     * Ruta donde se guardara el archivo
-     *
-     * @var string
-     */
-    protected $path;
-
-    /**
      * Constructor
      *
      * @param Request $request
@@ -50,44 +43,7 @@ class File extends Upload
     {
         parent::__construct($request, $name);
         // Ruta donde se guardara el archivo
-        $this->path = dirname($request->getAppContext()->getAppPath()) . '/public/files/upload';
-    }
-
-    /**
-     * Asigna la ruta al directorio de destino para el archivo
-     * 
-     * @param string $path ruta al directorio de destino (Ej: /home/usuario/data)
-     */
-    public function setPath($path)
-    {
-        $this->path = $path;
-    }
-
-    /**
-     * Guardar el archivo en el servidor
-     * 
-     * @param string $name nombre con el que se guardará el archivo
-     * @return boolean
-     */
-    protected function saveFile($name)
-    {
-        return move_uploaded_file($this->file['tmp_name'], "$this->path/$name");
-    }
-
-    /**
-     * Valida el archivo antes de guardar
-     * 
-     * @return boolean
-     */
-    protected function validates()
-    {
-        // Verifica que se pueda escribir en el directorio
-        if (!is_writable($this->path)) {
-            $this->errors[] = 'Error: no se puede escribir en el directorio';
-            return FALSE;
-        }
-
-        return parent::validates();
+        $this->path = dirname($request->getAppContext()->getAppPath()) . '/public/files/upload/';
     }
 
 }

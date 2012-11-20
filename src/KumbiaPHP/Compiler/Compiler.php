@@ -18,18 +18,15 @@ class Compiler implements CompilerInterface
      */
     private $directories = array();
 
-    function __construct($filename, $autoload = FALSE)
+    function __construct($filename)
     {
         if (!is_dir($dir = dirname($filename))) {
             throw new CompilerException("El directorio \"$dir\" No existe");
         }
         $this->filename = $filename;
 
-        if (TRUE === $autoload) {
-            spl_autoload_register(array($this, 'autoload'), TRUE, TRUE);
-        }
-
         $this->config = parse_ini_file('compiler.ini', TRUE);
+        $this->code = "<?php\n";
         var_dump($this->config);
         var_dump('Clases Compiladas:');
     }
@@ -51,15 +48,12 @@ class Compiler implements CompilerInterface
             throw new CompilerException("No se puede escribir en el Archvio \"$filename\"");
         }
 
-        $code = file_get_contents($filename);
-        $this->code = $code . PHP_EOL . PHP_EOL . $this->code;
+        $this->code .= PHP_EOL . file_get_contents($filename);
     }
 
-    public function autoload($className)
+    protected function getContent($className)
     {
-        if (!$this->isValid($className)) {
-            return;
-        }
+        $original = $className;
         $className = ltrim($className, '\\');
         $fileName = '';
         $namespace = '';
@@ -72,6 +66,7 @@ class Compiler implements CompilerInterface
 
         foreach ($this->directories as $folder) {
             if (file_exists($file = $folder . DIRECTORY_SEPARATOR . $fileName)) {
+                var_dump($original);
                 $this->add($file);
                 return;
             }
@@ -80,6 +75,10 @@ class Compiler implements CompilerInterface
 
     public function compile()
     {
+        foreach ($this->includedClasess() as $class) {
+            $this->getContent($class);
+        }
+
         $compiled = str_replace("\n<?php", '', $this->code);
 
         $compiled = preg_replace('@/\*(.*)\*/@Us', '', $compiled);
@@ -87,30 +86,9 @@ class Compiler implements CompilerInterface
         file_put_contents($this->filename, $compiled);
     }
 
-    protected function excludedNamespaces()
+    protected function includedClasess()
     {
-        return $this->config['exclude']['namespace'];
-    }
-
-    protected function includedNamespaces()
-    {
-        return $this->config['include']['namespace'];
-    }
-
-    protected function isValid($className)
-    {
-        foreach ($this->excludedNamespaces() as $namespace) {
-            if (false !== strpos($className, $namespace)) {
-                return FALSE;
-            }
-        }
-        foreach ($this->includedNamespaces() as $namespace) {
-            if (false !== strpos($className, $namespace)) {
-                var_dump($className);
-                return TRUE;
-            }
-        }
-        return false;
+        return $this->config['include']['class'];
     }
 
 }

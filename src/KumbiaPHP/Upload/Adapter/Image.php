@@ -33,13 +33,6 @@ class Image extends Upload
 {
 
     /**
-     * Ruta donde se guardara el archivo
-     *
-     * @var string
-     */
-    protected $path;
-
-    /**
      * Ancho mínimo de la imagen
      * 
      * @var int
@@ -78,17 +71,7 @@ class Image extends Upload
     {
         parent::__construct($request, $name);
         // Ruta donde se guardara el archivo
-        $this->path = dirname($request->getAppContext()->getAppPath()) . '/public/img/upload';
-    }
-
-    /**
-     * Asigna la ruta al directorio de destino para la imagen
-     * 
-     * @param string $path ruta al directorio de destino (Ej: /home/usuario/data)
-     */
-    public function setPath($path)
-    {
-        $this->path = $path;
+        $this->path = dirname($request->getAppContext()->getAppPath()) . '/public/img/upload/';
     }
 
     /**
@@ -145,7 +128,7 @@ class Image extends Upload
         }
 
         // Verifica que sea un archivo de imagen
-        if (!preg_match('/^image\//i', $this->file['type'])) {
+        if (!preg_match('/^image\//i', $this->file->getType())) {
             $this->errors[] = 'Error: el archivo debe ser una imagen';
             return FALSE;
         }
@@ -153,7 +136,7 @@ class Image extends Upload
         // Verifica ancho minimo de la imagen
         if ($this->minWidth !== NULL) {
             // Obtiene datos de la imagen
-            $imageSize = getimagesize($this->file['tmp_name']);
+            $imageSize = getimagesize($this->file->getTmpName());
 
             if ($imageSize[0] < $this->minWidth) {
                 $this->errors[] = "Error: el ancho de la imagen debe ser superior o igual a {$this->minWidth}px";
@@ -165,7 +148,7 @@ class Image extends Upload
         if ($this->maxWidth !== NULL) {
             if (!isset($imageSize)) {
                 // Obtiene datos de la imagen
-                $imageSize = getimagesize($this->file['tmp_name']);
+                $imageSize = getimagesize($this->file->getTmpName());
             }
 
             if ($imageSize[0] > $this->maxWidth) {
@@ -177,7 +160,7 @@ class Image extends Upload
         // Verifica alto minimo de la imagen
         if ($this->minHeight !== NULL) {
             // Obtiene datos de la imagen
-            $imageSize = getimagesize($this->file['tmp_name']);
+            $imageSize = getimagesize($this->file->getTmpName());
 
             if ($imageSize[1] < $this->minHeight) {
                 $this->errors[] = "Error: el alto de la imagen debe ser superior o igual a {$this->minHeight}px";
@@ -189,7 +172,7 @@ class Image extends Upload
         if ($this->maxHeight !== NULL) {
             if (!isset($imageSize)) {
                 // Obtiene datos de la imagen
-                $imageSize = getimagesize($this->file['tmp_name']);
+                $imageSize = getimagesize($this->file->getTmpName());
             }
 
             if ($imageSize[1] > $this->maxHeight) {
@@ -210,23 +193,12 @@ class Image extends Upload
     protected function validatesTypes()
     {
         foreach ($this->_types as $type) {
-            if ($this->file['type'] == "image/$type") {
+            if ($this->file->getType() == "image/$type") {
                 return TRUE;
             }
         }
 
         return FALSE;
-    }
-
-    /**
-     * Guardar el archivo en el servidor
-     * 
-     * @param string $name nombre con el que se guardará el archivo
-     * @return boolean
-     */
-    protected function saveFile($name)
-    {
-        return move_uploaded_file($this->file['tmp_name'], "$this->path/$name");
     }
 
 }

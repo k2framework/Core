@@ -70,21 +70,6 @@ class Html extends AbstractHelper
     }
 
     /**
-     * Devuelve una URL usando la constante self::$app->getBaseUrl(), para que siempre funcione
-     * 
-     * @example Html::url
-     * echo Html::url('controller/action')
-     * Devuelve una URL a ese controller y acción
-     *
-     * @param string $action Ruta a la acción
-     * @return string
-     */
-    public static function url($action)
-    {
-        return self::$app->createUrl($action);
-    }
-
-    /**
      * Crea un enlace a una acción del mismo controller que estemos
      *
      * @example Html::linkAction
@@ -101,7 +86,7 @@ class Html extends AbstractHelper
             $attrs = self::getAttrs($attrs);
         }
 
-        return '<a href="' . self::$app->getControllerUrl() . "/$action\" $attrs >$text</a>";
+        return '<a href="' . self::$app->getControllerUrl($action) . "\" $attrs >$text</a>";
     }
 
     /**

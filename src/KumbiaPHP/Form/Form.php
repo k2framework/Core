@@ -230,9 +230,9 @@ class Form implements ArrayAccess, Validatable
     public function getAction()
     {
         if ($this->action) {
-            return self::$app->getBaseUrl() . $this->action;
+            return self::$app->createUrl($this->action);
         } else {
-            return self::$app->getBaseUrl() . ltrim(self::$app->getCurrentUrl(true), '/');
+            return self::$app->getCurrentUrl(true);
         }
     }
 
@@ -585,4 +585,4 @@ class Form implements ArrayAccess, Validatable
 /*
  * Le pasamos los servicios que necesita.
  */
-Form::injectServices(\KumbiaPHP\Kernel\Kernel::getContainer());
+Form::injectServices(\KumbiaPHP\Kernel\Kernel::get('container'));

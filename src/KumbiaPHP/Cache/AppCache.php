@@ -77,7 +77,12 @@ class AppCache implements KernelInterface
         return in_array($request->getMethod(), array('GET', 'HEAD'));
     }
 
-    public static function getContainer()
+    public static function get($service)
+    {
+        
+    }
+
+    public static function getParam($param)
     {
         
     }

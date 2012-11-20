@@ -30,13 +30,18 @@ interface KernelInterface
     public function execute(Request $request, $type = KernelInterface::MASTER_REQUEST);
     
     /**
-     * Devuelve el objeto container para casos especiales donde
+     * Devuelve un servicio del container, se usa en casos especiales donde
      * no sea posible pasarlo a travez del inyector de dependencias,
      * por ejemplo en el active record.
      * 
      * Por favor evitar en los posible su uso
      * 
-     * @return ContainerInterface
+     * @return object
      */
-    public static function getContainer();
+    public static function get($service);
+    
+    /**
+     * Devuelve un parametro del contenedor 
+     */
+    public static function getParam($param);
 }
