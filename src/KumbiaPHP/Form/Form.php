@@ -230,9 +230,9 @@ class Form implements ArrayAccess, Validatable
     public function getAction()
     {
         if ($this->action) {
-            return self::$app->getBaseUrl() . $this->action;
+            return self::$app->createUrl($this->action);
         } else {
-            return self::$app->getBaseUrl() . ltrim(self::$app->getCurrentUrl(true), '/');
+            return self::$app->getCurrentUrl(true);
         }
     }
 
