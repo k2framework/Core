@@ -37,7 +37,7 @@ class Container implements ContainerInterface
     {
         $this->services = array();
         $this->di = $di;
-        $this->definitions = $definitions;
+        $this->definitions = $definitions + array('parameters', 'services');
 
         $di->setContainer($this);
 
@@ -48,16 +48,15 @@ class Container implements ContainerInterface
     public function get($id)
     {
 
-        if ($this->has($id)) {
-            //si existe el servicio lo devolvemos
-            return $this->services[$id];
-        }
-        //si no existe debemos crearlo
-        //buscamos el servicio en el contenedor de servicios
-        if (!isset($this->definitions['services'][$id])) {
+        //si no existe lanzamos la excepcion
+        if (!$this->has($id)) {
             throw new IndexNotDefinedException(sprintf('No existe el servicio "%s"', $id));
         }
-
+        //si existe el servicio y está creado lo devolvemos
+        if ($this->hasInstance($id)) {
+            return $this->services[$id];            
+        }
+        //si existe pero no se ha creado, creamos la instancia
         $config = $this->definitions['services'][$id];
 
         //retorna la instancia recien creada
@@ -65,6 +64,11 @@ class Container implements ContainerInterface
     }
 
     public function has($id)
+    {
+        return isset($this->definitions['services'][$id]);
+    }
+
+    public function hasInstance($id)
     {
         return isset($this->services[$id]);
     }

@@ -25,6 +25,13 @@ interface ContainerInterface
     public function has($id);
 
     /**
+     * Verifica si un servicio ya ha sido creado por el contenedor.
+     * @param string $id nombre del servicio
+     * @return boolean 
+     */
+    public function hasInstance($id);
+
+    /**
      * Devuelve el valor de un parametro si existe
      * @param string $id nombre del parametro
      * @return mixed|NULL 

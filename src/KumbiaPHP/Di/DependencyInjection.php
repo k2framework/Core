@@ -78,7 +78,7 @@ class DependencyInjection implements DependencyInjectionInterface
 
             //verificamos si ya se creó una instancia en una retrollamada del
             //metodo injectObjectIntoServicesQueue
-            if ($this->container->has($id)) {
+            if (is_object($this->container->hasInstance($id))) {
                 return $this->container->get($id);
             }
 
