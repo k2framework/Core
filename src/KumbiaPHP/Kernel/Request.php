@@ -2,9 +2,12 @@
 
 namespace KumbiaPHP\Kernel;
 
-use KumbiaPHP\Kernel\Session\SessionInterface;
-use KumbiaPHP\Kernel\AppContext;
 use KumbiaPHP\Kernel\Collection;
+use KumbiaPHP\Kernel\AppContext;
+use KumbiaPHP\Kernel\FilesCollection;
+use KumbiaPHP\Kernel\CookiesCollection;
+use KumbiaPHP\Kernel\Session\SessionInterface;
+
 
 /**
  * Esta clase representa una petición HTTP.
@@ -76,8 +79,8 @@ class Request
         $this->server = new Collection($_SERVER);
         $this->request = new Collection($_POST);
         $this->query = new Collection($_GET);
-        $this->cookies = new Collection($_COOKIE);
-        $this->files = new Collection($_FILES);
+        $this->cookies = new CookiesCollection($_COOKIE);
+        $this->files = new FilesCollection($_FILES);
 
         //este fix es para permitir tener en el request los valores para peticiones
         //PUT y DELETE, ya que php no ofrece una forma facil de obtenerlos
