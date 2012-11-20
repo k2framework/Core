@@ -3,6 +3,7 @@
 namespace KumbiaPHP\Validation\Validators;
 
 use KumbiaPHP\Validation\Validatable;
+use KumbiaPHP\Di\Container\ContainerInterface;
 
 /**
  * KumbiaPHP web & app Framework
@@ -31,6 +32,12 @@ abstract class ValidatorBase
     protected static $lastError;
 
     /**
+     *
+     * @var ContainerInterface 
+     */
+    protected static $container;
+
+    /**
      * Metodo para validar
      *
      * @param ActiveRecord $object objeto ActiveRecord
@@ -42,6 +49,11 @@ abstract class ValidatorBase
     public static function validate(Validatable $object, $column, $params = NULL, $update = FALSE)
     {
         return TRUE;
+    }
+
+    public static function setContainer(ContainerInterface $container)
+    {
+        self::$container = $container;
     }
 
     public static function getLastError()
@@ -69,6 +81,9 @@ abstract class ValidatorBase
         if (isset($params['message'])) {
 
             if (preg_match_all("/{(?'item'.+?)}/", $params['message'], $matches)) {
+                if (self::$container->has('translator')) {//solo si existe el servicio en el contenedor.
+                    $params['message'] = self::$container->get('translator')->trans($params['message']);
+                }
                 foreach ($matches['item'] as $item) {
                     if ('label' === $item && $object instanceof \KumbiaPHP\Form\Form) {
                         $value = $object[$column]['label'];
