@@ -23,6 +23,7 @@ class Session implements SessionInterface
 
     public function start()
     {
+        session_name($this->namespaceApp);
         session_start();
     }
 
