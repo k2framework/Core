@@ -304,18 +304,11 @@ class AppContext
      */
     public function getCurrentUrl($parameters = FALSE)
     {
-        if ('/' !== $this->currentModuleUrl) {
-            $url = $this->currentModuleUrl . '/' . $this->currentController .
-                    '/' . $this->currentAction;
-        } else {
-            $url = $this->currentController . '/' . $this->currentAction;
+        $url = $this->createUrl("{$this->currentModule}:{$this->currentController}/{$this->currentAction}");
+        if ($parameters && count($this->currentParameters)) {
+            $url .= '/' . join('/', $this->currentParameters);
         }
-
-        if ($parameters) {
-            $url .= substr($this->requestUrl, strlen($url));
-        }
-
-        return trim($url, '/') . '/';
+        return $url;
     }
 
     /**
@@ -329,11 +322,12 @@ class AppContext
 
     /**
      * Devuelve la ruta hasta el controlador actual ejecutandose.
+     * @param string $action si se especifica se añade al final de la URL
      * @return string 
      */
-    public function getControllerUrl()
+    public function getControllerUrl($action = null)
     {
-        return $this->getBaseUrl() . trim($this->currentModuleUrl, '/') . '/' . $this->currentController;
+        return rtrim($this->createUrl("{$this->currentModule}:{$this->currentController}/{$action}"), '/');
     }
 
     /**

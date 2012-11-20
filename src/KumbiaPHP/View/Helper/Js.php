@@ -69,7 +69,7 @@ class Js extends AbstractHelper
         if (is_array($attrs)) {
             $attrs = self::getAttrs($attrs);
         }
-        return '<a href="' . self::$app->getControllerUrl() . "/$action\" title=\"$confirm\" class=\"js-confirm $class\" $attrs>$text</a>";
+        return '<a href="' . self::$app->getControllerUrl($action) . "\" title=\"$confirm\" class=\"js-confirm $class\" $attrs>$text</a>";
     }
 
     /**

@@ -52,7 +52,7 @@ class Router implements RouterInterface
      */
     public function toAction($action = NULL, $status = 302)
     {
-        $url = $this->app->getControllerUrl() . '/' . $action;
+        $url = $this->app->getControllerUrl($action);
         return new RedirectResponse($url, $status);
     }
 
@@ -75,13 +75,6 @@ class Router implements RouterInterface
 
         //retorno la respuesta del kernel.
         return $this->kernel->execute($request, KernelInterface::SUB_REQUEST);
-    }
-
-    protected function toSmallCase($string)
-    {
-        $string[0] = strtolower($string[0]);
-
-        return strtolower(preg_replace('/([A-Z])/', "_$1", $string));
     }
 
 }
