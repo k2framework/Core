@@ -94,20 +94,18 @@ class AppContext
 
     /**
      * Constructor de la clase
-     * @param Request $request
      * @param type $inProduction
      * @param type $appPath
      * @param type $modules
      * @param type $namespaces 
      */
-    public function __construct(Request $request, $inProduction, $appPath, $modules, $routes)
+    public function __construct($inProduction, $appPath, $modules, $routes)
     {
         $this->inProduction = $inProduction;
         $this->appPath = $appPath;
         $this->modulesPath = rtrim($appPath, '/') . '/modules/';
         $this->modules = $modules;
         $this->routes = $routes;
-        $this->setRequest($request);
     }
 
     /**
@@ -117,6 +115,7 @@ class AppContext
      */
     public function setRequest(Request $request)
     {
+        $request->setAppContext($this);
         $this->requestUrl = $request->getRequestUrl();
         $this->baseUrl = $request->getBaseUrl();
         $this->parseUrl();

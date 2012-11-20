@@ -100,8 +100,8 @@ abstract class Kernel implements KernelInterface
         ExceptionHandler::handle($this);
 
         if ($production) {
-            error_reporting(0);
-            ini_set('display_errors', 'Off');
+//            error_reporting(0);
+//            ini_set('display_errors', 'Off');
         } else {
             error_reporting(-1);
             ini_set('display_errors', 'On');
@@ -116,10 +116,10 @@ abstract class Kernel implements KernelInterface
      * AppContext, Container, Inyector de dependencias, Dispatcher, etc.
      *  
      */
-    public function init(Request $request)
+    public function init()
     {
         //creamos la instancia del AppContext
-        $context = new AppContext($this->request, $this->production, $this->getAppPath(), $this->modules, $this->routes);
+        $context = new AppContext($this->production, $this->getAppPath(), $this->modules, $this->routes);
         //leemos la config de la app
         $config = new ConfigReader($context);
         //iniciamos el container con esa config
@@ -128,11 +128,10 @@ abstract class Kernel implements KernelInterface
         self::$container->setInstance('app.kernel', $this);
         //iniciamos el dispatcher con esa config
         $this->initDispatcher($config->getConfig());
-
         //seteamos el contexto de la aplicación como servicio
         self::$container->setInstance('app.context', $context);
-        //le asignamos el servicio AppContext al request
-        $this->request->setAppContext($context);
+        //establecemos el Request en el AppContext
+        $context->setRequest($this->request);
     }
 
     public function execute(Request $request, $type = Kernel::MASTER_REQUEST)
@@ -174,7 +173,7 @@ abstract class Kernel implements KernelInterface
         $this->request = $request;
 
         if (!self::$container) { //si no se ha creado el container lo creamos.
-            $this->init($request);
+            $this->init();
             self::$container->get('app.context')->setRequestType($type);
             $this->validateModules();
         }

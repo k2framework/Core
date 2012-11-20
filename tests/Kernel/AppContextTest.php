@@ -49,8 +49,10 @@ class AppContextTest extends PHPUnit_Framework_TestCase
     {
         $request = $this->createRequest();
 
-        $app = new AppContext($request, $this->prod, __DIR__
+        $app = new AppContext($this->prod, __DIR__
                         , $this->modules, $this->routes);
+        
+        $app->setRequest($request);
 
         $this->assertEquals($this->prod, $app->InProduction());
         $this->assertEquals(__DIR__, $app->getAppPath());
@@ -65,8 +67,10 @@ class AppContextTest extends PHPUnit_Framework_TestCase
     {
         $request = $this->createRequest();
 
-        $app = new AppContext($request, $this->prod, __DIR__
+        $app = new AppContext($this->prod, __DIR__
                         , $this->modules, $this->routes);
+        
+        $app->setRequest($request);
 
         $this->assertEquals('K2/Backend', $app->getRoutes('/admin'));
 
