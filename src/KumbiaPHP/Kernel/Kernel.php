@@ -175,7 +175,7 @@ abstract class Kernel implements KernelInterface
         if (!self::$container) { //si no se ha creado el container lo creamos.
             $this->init();
             self::$container->get('app.context')->setRequestType($type);
-            $this->validateModules();
+            $this->production || $this->validateModules();
         }
         //agregamos el request al container
         self::$container->setInstance('request', $this->request);
