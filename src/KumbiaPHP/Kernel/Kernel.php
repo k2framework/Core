@@ -100,8 +100,8 @@ abstract class Kernel implements KernelInterface
         ExceptionHandler::handle($this);
 
         if ($production) {
-//            error_reporting(0);
-//            ini_set('display_errors', 'Off');
+            error_reporting(0);
+            ini_set('display_errors', 'Off');
         } else {
             error_reporting(-1);
             ini_set('display_errors', 'On');
