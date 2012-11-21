@@ -33,7 +33,7 @@ class AppCache implements KernelInterface
         $this->kernel = $kernel;
     }
 
-    public function execute(Request $request)
+    public function execute(Request $request, $type = KernelInterface::MASTER_REQUEST)
     {
 
 //        if (!$this->kernel->isProduction()) {
@@ -48,7 +48,6 @@ class AppCache implements KernelInterface
 
         if ($this->isMethodCacheable($request) &&
                 (($response = $this->cache->get($id)) instanceof Response)) {
-            $response->setNotModified();
             if ('text/html' === $response->headers->get('Content-Type', 'text/html')) {
                 echo '<!-- Tiempo: ' . round(microtime(1) - START_TIME, 4) . ' seg. -->';
             }

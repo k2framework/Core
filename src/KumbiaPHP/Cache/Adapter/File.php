@@ -131,7 +131,9 @@ class File extends Cache
 
     public function remove($id, $group = 'default')
     {
-        return unlink($this->getFilename($id, $group));
+        if (is_file($file = $this->getFilename($id, $group))) {
+            return unlink($file);
+        }
     }
 
 }
