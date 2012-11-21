@@ -116,7 +116,7 @@ abstract class Kernel implements KernelInterface
      * AppContext, Container, Inyector de dependencias, Dispatcher, etc.
      *  
      */
-    public function init()
+    public function init(Request $request)
     {
         //creamos la instancia del AppContext
         $context = new AppContext($this->production, $this->getAppPath(), $this->modules, $this->routes);
@@ -131,7 +131,7 @@ abstract class Kernel implements KernelInterface
         //seteamos el contexto de la aplicación como servicio
         self::$container->setInstance('app.context', $context);
         //establecemos el Request en el AppContext
-        $context->setRequest($this->request);
+        $context->setRequest($request);
     }
 
     public function execute(Request $request, $type = Kernel::MASTER_REQUEST)
@@ -173,7 +173,7 @@ abstract class Kernel implements KernelInterface
         $this->request = $request;
 
         if (!self::$container) { //si no se ha creado el container lo creamos.
-            $this->init();
+            $this->init($request);
             self::$container->get('app.context')->setRequestType($type);
             $this->production || $this->validateModules();
         }
