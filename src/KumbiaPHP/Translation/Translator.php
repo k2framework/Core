@@ -40,7 +40,7 @@ class Translator implements TranslatorInterface
             return $text;
         }
 
-        return $translation;
+        return vsprintf($translation, $params);
     }
 
 }
