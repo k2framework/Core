@@ -17,17 +17,17 @@ class Translator implements TranslatorInterface
 
     public function __construct()
     {
-        $prodiverClassName = "KumbiaPHP\\Translation\\Provider\\" .
-                ucfirst(Kernel::getParam('translator.provider'));
+        $provider = Kernel::getParam('translator.provider');
 
-        if (class_exists($prodiverClassName)) {
-            $this->messages = new $prodiverClassName();
-        } else {
-            $prodiverClassName = Kernel::getParam('translator.provider');
-            $this->messages = new $prodiverClassName();
+        if ('@' === $provider[0]) {
+            $this->messages = Kernel::get(substr($provider, 1));
             if (!$this->messages instanceof ProviderInterface) {
-                throw new \LogicException("La clase $prodiverClassName debe implementar la Interfaz KumbiaPHP\\Translation\\Provider\\ProviderInterface");
+                $class = get_class($this->messages);
+                throw new \LogicException("La clase {$class} debe implementar la Interfaz KumbiaPHP\\Translation\\Provider\\ProviderInterface");
             }
+        } else {
+            $providerClassName = 'KumbiaPHP\\Translation\\Provider\\' . ucfirst($provider);
+            $this->messages = new $providerClassName();
         }
     }
 
