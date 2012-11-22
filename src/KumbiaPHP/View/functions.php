@@ -36,5 +36,5 @@ function eh($s, $charset = APP_CHARSET)
 function trans($text, array $params = array(), $locale = null)
 {
     return KumbiaPHP\Kernel\Kernel::get('translator')
-                    ->trans($text, $params, $lang);
+                    ->trans($text, $params, $locale);
 }
