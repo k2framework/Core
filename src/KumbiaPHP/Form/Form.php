@@ -342,8 +342,15 @@ class Form implements ArrayAccess, Validatable
                 $string .= $field . "</label></li>" . PHP_EOL;
             }
         }
-        $string .= "<li>" . $this->add('Enviar', 'submit')->setValue('Enviar') . " " . PHP_EOL;
-        $string .= $this->add('Resetear', 'reset')->setValue('Resetear') . "</li>" . PHP_EOL;
+        if (Kernel::get('container')->has('translator')) {
+            $string .= "<li>" . $this->add('submitSend', 'submit')
+                            ->setValue(Kernel::get('translator')->trans($label)) . " " . PHP_EOL;
+            $string .= $this->add('buttonReset', 'reset')
+                            ->setValue(Kernel::get('translator')->trans($label)) . "</li>" . PHP_EOL;
+        } else {
+            $string .= "<li>" . $this->add('submitSend', 'submit')->setValue('Enviar') . " " . PHP_EOL;
+            $string .= $this->add('buttonReset', 'reset')->setValue('Resetear') . "</li>" . PHP_EOL;
+        }
         return $string . "</ul>" . PHP_EOL . $this->close() . PHP_EOL;
     }
 
