@@ -344,9 +344,9 @@ class Form implements ArrayAccess, Validatable
         }
         if (Kernel::get('container')->has('translator')) {
             $string .= "<li>" . $this->add('submitSend', 'submit')
-                            ->setValue(Kernel::get('translator')->trans($label)) . " " . PHP_EOL;
+                            ->setValue(Kernel::get('translator')->trans('Enviar')) . " " . PHP_EOL;
             $string .= $this->add('buttonReset', 'reset')
-                            ->setValue(Kernel::get('translator')->trans($label)) . "</li>" . PHP_EOL;
+                            ->setValue(Kernel::get('translator')->trans('Resetear')) . "</li>" . PHP_EOL;
         } else {
             $string .= "<li>" . $this->add('submitSend', 'submit')->setValue('Enviar') . " " . PHP_EOL;
             $string .= $this->add('buttonReset', 'reset')->setValue('Resetear') . "</li>" . PHP_EOL;
