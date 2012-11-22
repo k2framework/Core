@@ -131,6 +131,7 @@ abstract class Kernel implements KernelInterface
         //seteamos el contexto de la aplicación como servicio
         self::$container->setInstance('app.context', $context);
         //establecemos el Request en el AppContext
+        $context->setLocales(self::$container->getParameter('config.locales'));
         $context->setRequest($request);
     }
 
