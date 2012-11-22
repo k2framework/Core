@@ -64,6 +64,8 @@ class Request
      * @var string 
      */
     protected $content = FALSE;
+    
+    protected $locale;
 
     /**
      * Constructor de la clase. 
@@ -208,7 +210,26 @@ class Request
     {
         $this->__construct($this->getBaseUrl());
     }
+    
+    /**
+     * Obtiene el Locale del Petición.
+     * @return type 
+     */
+    public function getLocale()
+    {
+        return $this->locale;
+    }
 
+    /**
+     * Establece el Locale de la Petición.
+     * @param string $locale 
+     */
+    public function setLocale($locale)
+    {
+        $this->locale = $locale;
+    }
+
+    
     /**
      * Crea la url base de la petición.
      * @return string 
