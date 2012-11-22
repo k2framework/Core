@@ -15,12 +15,6 @@ class AppContext
 {
 
     /**
-     * Url base del proyecto
-     * @var string 
-     */
-    protected $baseUrl;
-
-    /**
      * Ruta hacia el directorio app del proyecto
      * @var string 
      */
@@ -31,12 +25,6 @@ class AppContext
      * @var string 
      */
     protected $modulesPath;
-
-    /**
-     * Contiene la url actual de la petición
-     * @var string 
-     */
-    protected $requestUrl;
 
     /**
      * Areglo con las nombres y directorios de los modulos del proyecto
@@ -93,6 +81,18 @@ class AppContext
     protected $requestType;
 
     /**
+     * Contiene los locales permitidos en la App
+     * @var array 
+     */
+    protected $locales;
+
+    /**
+     *
+     * @var Request 
+     */
+    protected $request;
+
+    /**
      * Constructor de la clase
      * @param type $inProduction
      * @param type $appPath
@@ -106,6 +106,7 @@ class AppContext
         $this->modulesPath = rtrim($appPath, '/') . '/modules/';
         $this->modules = $modules;
         $this->routes = $routes;
+        $this->useLocale = false;
     }
 
     /**
@@ -116,9 +117,14 @@ class AppContext
     public function setRequest(Request $request)
     {
         $request->setAppContext($this);
-        $this->requestUrl = $request->getRequestUrl();
-        $this->baseUrl = $request->getBaseUrl();
+        $this->request = $request;
         $this->parseUrl();
+        return $this;
+    }
+
+    public function setLocales($locales = null)
+    {
+        $this->locales = explode(',', $locales);
         return $this;
     }
 
@@ -148,7 +154,7 @@ class AppContext
      */
     public function getBaseUrl()
     {
-        return $this->baseUrl;
+        return $this->request->getBaseUrl();
     }
 
     /**
@@ -166,7 +172,7 @@ class AppContext
      */
     public function getRequestUrl()
     {
-        return $this->requestUrl;
+        return $this->request->getRequestUrl();
     }
 
     /**
@@ -379,7 +385,7 @@ class AppContext
         } else {
             $url = ltrim($url[0], '/');
         }
-        return $baseUrl ? $this->getBaseUrl() . $url : $url;
+        return $baseUrl ? $this->request->getBaseUrl() . $url : $url;
     }
 
     /**
@@ -394,9 +400,9 @@ class AppContext
         $moduleUrl = '/';
         $params = array(); //parametros de la url, de existir.
         //obtenemos la url actual de la petición.
-        $currentUrl = '/' . trim($this->getRequestUrl(), '/');
+        $currentUrl = '/' . trim($this->request->getRequestUrl(), '/');
 
-        list($moduleUrl, $module) = $this->getModule($currentUrl);
+        list($moduleUrl, $module, $currentUrl) = $this->getModule($currentUrl);
 
         if (!$moduleUrl || !$module) {
             throw new NotFoundException(sprintf("La ruta \"%s\" no concuerda con ningún módulo ni controlador en la App", $currentUrl), 404);
@@ -443,12 +449,24 @@ class AppContext
     /**
      * Devuelve el posible módulo a partir de la Url recibida como parametro.
      * @param string $url
-     * @return boolean 
+     * @param boolean $recursive
+     * @return array 
      */
-    protected function getModule($url)
+    protected function getModule($url, $recursive = true)
     {
+        if (count($this->locales) && $recursive) {
+            $_url = explode('/', trim($url, '/'));
+            $locale = array_shift($_url);
+            if (in_array($locale, $this->locales)) {
+                $this->request->setLocale($locale);
+                return $this->getModule('/' . join('/', $_url), false);
+            } else {
+                $this->request->setLocale($this->locales[0]);
+            }
+        }
+
         if ('/logout' === $url) {
-            return array($url, $url);
+            return array($url, $url, $url);
         }
 
         $routes = array_keys($this->getRoutes());
@@ -461,13 +479,13 @@ class AppContext
         foreach ($routes as $route) {
             if (0 === strpos($url, $route)) {
                 if ('/' === $route) {
-                    return array($route, $this->getRoutes('/'));
+                    return array($route, $this->getRoutes('/'), $url);
                 } elseif ('/' === substr($url, strlen($route), 1) || strlen($url) === strlen($route)) {
-                    return array($route, $this->getRoutes($route));
+                    return array($route, $this->getRoutes($route), $url);
                 }
             }
         }
-        return FALSE;
+        return false;
     }
 
 }
