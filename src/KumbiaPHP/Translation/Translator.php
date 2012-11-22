@@ -37,7 +37,7 @@ class Translator implements TranslatorInterface
         $locale || $locale = Kernel::get('request')->getLocale();
 
         if (false === $translation = $this->messages->get($text, $locale)) {
-            return $text;
+            $translation = $text;
         }
 
         return vsprintf($translation, $params);
