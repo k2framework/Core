@@ -3,12 +3,12 @@
 namespace KumbiaPHP\Form;
 
 use \ArrayAccess;
+use KumbiaPHP\Kernel\Kernel;
 use KumbiaPHP\Kernel\Request;
 use KumbiaPHP\Validation\Validatable;
 use KumbiaPHP\ActiveRecord\ActiveRecord;
 use KumbiaPHP\Form\Exception\FormException;
 use KumbiaPHP\Validation\ValidationBuilder;
-use KumbiaPHP\Di\Container\ContainerInterface;
 use KumbiaPHP\Form\Field\AbstractField as Field;
 use KumbiaPHP\ActiveRecord\Validation\ValidationBuilder as ValidationAR;
 
@@ -63,11 +63,6 @@ class Form implements ArrayAccess, Validatable
     protected $errors = array();
 
     /**
-     * @var \KumbiaPHP\Kernel\AppContext
-     */
-    protected static $app;
-
-    /**
      * @var \KumbiaPHP\Validation\Validator
      * @var type 
      */
@@ -107,12 +102,6 @@ class Form implements ArrayAccess, Validatable
             $this->name = $model;
             $this->init();
         }
-    }
-
-    public static function injectServices(ContainerInterface $container)
-    {
-        self::$app = $container->get('app.context');
-        self::$validator = $container->get('validator');
     }
 
     /**
@@ -230,9 +219,9 @@ class Form implements ArrayAccess, Validatable
     public function getAction()
     {
         if ($this->action) {
-            return self::$app->createUrl($this->action);
+            return Kernel::get('app.context')->createUrl($this->action);
         } else {
-            return self::$app->getCurrentUrl(true);
+            return Kernel::get('app.context')->getCurrentUrl(true);
         }
     }
 
@@ -369,9 +358,9 @@ class Form implements ArrayAccess, Validatable
         if ($this->model instanceof ActiveRecord
                 && isset($this->model->{$this->model->metadata()->getPK()})
                 && $this->model->exists()) {
-            return self::$validator->validateOnUpdate($this);
+            return Kernel::get('validator')->validateOnUpdate($this);
         } else {
-            return self::$validator->validate($this);
+            return Kernel::get('validator')->validate($this);
         }
     }
 
@@ -581,8 +570,3 @@ class Form implements ArrayAccess, Validatable
     }
 
 }
-
-/*
- * Le pasamos los servicios que necesita.
- */
-Form::injectServices(\KumbiaPHP\Kernel\Kernel::get('container'));
