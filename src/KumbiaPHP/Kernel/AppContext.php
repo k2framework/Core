@@ -106,7 +106,6 @@ class AppContext
         $this->modulesPath = rtrim($appPath, '/') . '/modules/';
         $this->modules = $modules;
         $this->routes = $routes;
-        $this->useLocale = false;
     }
 
     /**
@@ -385,6 +384,8 @@ class AppContext
         } else {
             $url = ltrim($url[0], '/');
         }
+        //si se usa locale, lo añadimos a la url.
+        $this->request->getLocale() && $url = $this->request->getLocale() . '/' . $url;
         return $baseUrl ? $this->request->getBaseUrl() . $url : $url;
     }
 
