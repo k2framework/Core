@@ -157,7 +157,6 @@ class Form implements ArrayAccess, Validatable
      */
     protected function _add(Field $field)
     {
-        //$index = preg_replace('/\[.*\]/i', '', $formField->getFieldName());
         $index = $field->setFormName($this->getName())
                 ->setValidationBuilder($this->validationBuilder)
                 ->getFieldName();
@@ -200,7 +199,7 @@ class Form implements ArrayAccess, Validatable
     }
 
     /**
-     * Establece la Acci�n para el formulario.
+     * Establece la Acción para el formulario.
      * 
      * @param string $action
      * @return FormBuilder 
@@ -226,7 +225,7 @@ class Form implements ArrayAccess, Validatable
     }
 
     /**
-     * Establece el m�todo de la petici�n
+     * Establece el método de la petición
      *
      * @param string $method
      * @return FormBuilder 
@@ -336,10 +335,10 @@ class Form implements ArrayAccess, Validatable
                 continue;
             } elseif ($field instanceof \KumbiaPHP\Form\Field\Check ||
                     $field instanceof \KumbiaPHP\Form\Field\Radio) {
-                $string .= "<li>" . $field->getLabel() . PHP_EOL;
+                $string .= "<li>" . $field['label'] . PHP_EOL;
                 $string .= $field . "</li>" . PHP_EOL;
             } else {
-                $string .= "<li><label>" . $field->getLabel() . PHP_EOL;
+                $string .= "<li><label>" . $field['label'] . PHP_EOL;
                 $string .= $field . "</label></li>" . PHP_EOL;
             }
         }
