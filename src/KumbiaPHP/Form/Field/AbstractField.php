@@ -3,6 +3,7 @@
 namespace KumbiaPHP\Form\Field;
 
 use \ArrayAccess;
+use KumbiaPHP\Kernel\Kernel;
 use KumbiaPHP\Validation\ValidationBuilder;
 
 /**
@@ -113,7 +114,11 @@ abstract class AbstractField implements ArrayAccess
      */
     public function setLabel($label)
     {
-        $this->label = $label;
+        if (Kernel::get('container')->has('translator')) {
+            $this->label = Kernel::get('translator')->trans($label);
+        } else {
+            $this->label = $label;
+        }
         return $this;
     }
 
