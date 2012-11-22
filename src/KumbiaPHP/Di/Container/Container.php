@@ -37,7 +37,7 @@ class Container implements ContainerInterface
     {
         $this->services = array();
         $this->di = $di;
-        $this->definitions = $definitions + array('parameters', 'services');
+        $this->definitions = $definitions + array('parameters' => array(), 'services' => array());
 
         $di->setContainer($this);
 
@@ -54,7 +54,7 @@ class Container implements ContainerInterface
         }
         //si existe el servicio y está creado lo devolvemos
         if ($this->hasInstance($id)) {
-            return $this->services[$id];            
+            return $this->services[$id];
         }
         //si existe pero no se ha creado, creamos la instancia
         $config = $this->definitions['services'][$id];
