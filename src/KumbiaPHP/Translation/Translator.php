@@ -9,7 +9,7 @@ class Translator implements TranslatorInterface
     
     protected $appContext;
 
-    public function trans($text, array $params = array(), $lang = null)
+    public function trans($text, array $params = array(), $locale = null)
     {
         return $text;
     }

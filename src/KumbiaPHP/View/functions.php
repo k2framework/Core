@@ -31,9 +31,9 @@ function eh($s, $charset = APP_CHARSET)
  * Realiza la traducción de un texto
  * @param string $text
  * @param array $params
- * @param string $lang 
+ * @param string $locale 
  */
-function trans($text, array $params = array(), $lang = null)
+function trans($text, array $params = array(), $locale = null)
 {
     return KumbiaPHP\Kernel\Kernel::get('translator')
                     ->trans($text, $params, $lang);
