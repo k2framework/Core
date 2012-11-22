@@ -307,8 +307,6 @@ abstract class Kernel implements KernelInterface
      */
     protected function initContainer(array $config = array())
     {
-
-        //$definitions = new DefinitionManager();
         $definitions = array(
             'services' => $config['services'],
             'parameters' => $config['parameters'],
@@ -319,6 +317,13 @@ abstract class Kernel implements KernelInterface
         $this->di = new DependencyInjection();
 
         self::$container = new Container($this->di, $definitions);
+
+        //si se estan usando locales y ningun módulo a establecido una definición para
+        //el servicio translator, lo hacemos por acá.
+        if (isset($definitions['parameters']['config.locales'])
+                && !self::$container->has('translator')) {
+            self::$container->set('translator', 'KumbiaPHP\\Translation\\Translator');
+        }
     }
 
     /**
