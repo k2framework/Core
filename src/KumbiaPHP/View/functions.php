@@ -26,3 +26,15 @@ function eh($s, $charset = APP_CHARSET)
 {
     echo htmlspecialchars($s, ENT_QUOTES, $charset);
 }
+
+/**
+ * Realiza la traducción de un texto
+ * @param string $text
+ * @param array $params
+ * @param string $lang 
+ */
+function trans($text, array $params = array(), $lang = null)
+{
+    return KumbiaPHP\Kernel\Kernel::get('translator')
+                    ->trans($text, $params, $lang);
+}
