@@ -451,7 +451,7 @@ class AppContext
      * Devuelve el posible módulo a partir de la Url recibida como parametro.
      * @param string $url
      * @param boolean $recursive
-     * @return array 
+     * @return array ($moduleUrl, $moduleName, $currentUrl)
      */
     protected function getModule($url, $recursive = true)
     {
