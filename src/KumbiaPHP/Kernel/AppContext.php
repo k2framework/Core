@@ -380,7 +380,7 @@ class AppContext
             if (!$route = array_search($url[0], $this->routes)) {
                 throw new NotFoundException("No Existe el módulo {$url[0]}, no se pudo crear la url");
             }
-            $url = trim($route, '/') . '/' . $url[1];
+            $url = ltrim(trim($route, '/') . '/' . $url[1], '/');
         } else {
             $url = ltrim($url[0], '/');
         }
