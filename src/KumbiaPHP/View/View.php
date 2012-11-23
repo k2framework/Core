@@ -123,7 +123,7 @@ class View
 
     /**
      *
-     * @param type $service
+     * @param string $service
      * @return object
      */
     public static function get($service)
