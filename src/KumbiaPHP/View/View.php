@@ -124,7 +124,7 @@ class View
     /**
      *
      * @param type $service
-     * @return \KumbiaPHP\Kernel\Session\SessionInterface|\KumbiaPHP\Kernel\AppContext|\KumbiaPHP\Flash\Flash
+     * @return object
      */
     public static function get($service)
     {
