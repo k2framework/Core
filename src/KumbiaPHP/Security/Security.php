@@ -34,6 +34,7 @@ class Security
     {
         if (NULL === $rol) {
             return $this->session->has('token', 'security') &&
+                    $this->session->get('token', 'security') instanceof TokenInterface &&
                     $this->getToken()->isValid();
         } else {
             if ($this->session->has('token', 'security')) {
