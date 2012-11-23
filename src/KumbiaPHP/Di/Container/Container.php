@@ -137,4 +137,41 @@ class Container implements ContainerInterface
         return $this;
     }
 
+    /**
+     * Verifica la existencia de un serivicio ó un parametro en el contenedor.
+     * @param string $offset
+     * @return boolean 
+     */
+    public function offsetExists($offset)
+    {
+        return $this->has($offset) || $this->hasParameter($offset);
+    }
+
+    /**
+     * Devuelve la instancia de una clase si está definida, sino devuelve un parametro,
+     * si tampoco existe, devuelve null.
+     * @param string $offset
+     * @return mixed 
+     */
+    public function offsetGet($offset)
+    {
+        if ($this->has($offset)) {
+            return $this->get($offset);
+        } elseif ($this->hasParameter($offset)) {
+            return $this->getParameter($offset);
+        } else {
+            return null;
+        }
+    }
+
+    public function offsetSet($offset, $value)
+    {
+        //nada por ahora
+    }
+
+    public function offsetUnset($offset)
+    {
+        //nada por ahora
+    }
+
 }

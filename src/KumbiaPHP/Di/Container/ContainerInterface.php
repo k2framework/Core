@@ -7,7 +7,7 @@ namespace KumbiaPHP\Di\Container;
  *
  * @author manuel
  */
-interface ContainerInterface
+interface ContainerInterface extends \ArrayAccess
 {
 
     /**
