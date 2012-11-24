@@ -30,14 +30,34 @@ class ActiveRecord extends Model implements Validatable
      */
     protected $errors;
 
-    public static function setValidator(Validator $validator)
-    {
-        self::$validator = $validator;
-    }
-
     public function getValidations()
     {
-        return $this->validations(new ValidationBuilder());
+        if (!$this->validation) {
+            $this->validation = new ValidationBuilder();
+            /* @var $attribute \ActiveRecord\Metadata\Attribute */
+            foreach ($this->metadata()->getAttributes() as $field => $attribute) {
+                if (true === $attribute->notNull && !$attribute->PK) {
+                    $this->validation->notNull($field, array(
+                        'message' => "El Campo {field} no puede ser Nulo",
+                        'field' => $attribute->alias,
+                    ));
+                }
+                if (null !== $attribute->length && is_numeric($attribute->length)) {
+                    $this->validation->maxLength($field, array(
+                        'message' => "El Campo {field} no puede ser mayor a {max} caracteres",
+                        'max' => $attribute->length,
+                        'field' => $attribute->alias,
+                    ));
+                }
+                if (true === $attribute->unique) {
+                    $this->validation->unique($field, array(
+                        'message' => "El Valor especificado para el Campo {field} ya existe en el Sistema",
+                        'field' => $attribute->alias,
+                    ));
+                }
+            }
+        }
+        return $this->validations($this->validation);
     }
 
     protected function validate($update = FALSE)
