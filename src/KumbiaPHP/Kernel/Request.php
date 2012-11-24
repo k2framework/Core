@@ -239,7 +239,7 @@ class Request
         $uri = $this->server->get('REQUEST_URI');
         if ($qString = $this->server->get('QUERY_STRING')) {
             parse_str($qString, $get);
-            $get = array_merge($get, array_keys($get), array('?', '='));
+            $get = array_merge($get, array_keys($get), array('?', '=', '&'));
             return rtrim(str_replace($get, '', urldecode($uri)), '/') . '/';
         } else {
             return $uri;
