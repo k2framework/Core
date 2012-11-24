@@ -8,7 +8,6 @@ use KumbiaPHP\Kernel\FilesCollection;
 use KumbiaPHP\Kernel\CookiesCollection;
 use KumbiaPHP\Kernel\Session\SessionInterface;
 
-
 /**
  * Esta clase representa una petición HTTP.
  *
@@ -64,7 +63,6 @@ class Request
      * @var string 
      */
     protected $content = FALSE;
-    
     protected $locale;
 
     /**
@@ -210,7 +208,7 @@ class Request
     {
         $this->__construct($this->getBaseUrl());
     }
-    
+
     /**
      * Obtiene el Locale del Petición.
      * @return type 
@@ -229,7 +227,6 @@ class Request
         $this->locale = $locale;
     }
 
-    
     /**
      * Crea la url base de la petición.
      * @return string 
@@ -238,9 +235,10 @@ class Request
     {
         $uri = $this->server->get('REQUEST_URI');
         if ($qString = $this->server->get('QUERY_STRING')) {
-            parse_str($qString, $get);
-            $get = array_merge($get, array_keys($get), array('?', '=', '&'));
-            return rtrim(str_replace($get, '', urldecode($uri)), '/') . '/';
+            if (false !== $pos = strpos($uri, '?')) {
+                $uri = substr($uri, 0, $pos);
+            }
+            return str_replace($this->query->get('_url'), '/', urldecode($uri));
         } else {
             return $uri;
         }
