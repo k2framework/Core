@@ -183,6 +183,7 @@ class Form implements ArrayAccess, Validatable
         foreach ($this->fields as $field) {
             if ($field->getType() === 'hidden') {
                 $html .= $field->render() . PHP_EOL;
+                $this->removeField($field->getFieldName());//eliminadmos el campo del form, porque ya no se necesitará
             }
         }
         return $html;
@@ -298,6 +299,15 @@ class Form implements ArrayAccess, Validatable
         } else {
             return NULL;
         }
+    }
+    
+    /**
+     * Devuelve los elementos actuales del formulario
+     * @return array 
+     */
+    public function getFields()
+    {
+        return $this->fields;
     }
 
     /**
