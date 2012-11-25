@@ -61,7 +61,7 @@ class ControllerResolver
 
         $this->module = $app->getCurrentModule();
         $this->controllerUrl = $app->getCurrentController();
-        $this->action = $app->getCurrentAction() . 'Action';
+        $this->action = $app->getCurrentAction() . '_action';
         $this->parameters = $app->getCurrentParameters();
     }
 
