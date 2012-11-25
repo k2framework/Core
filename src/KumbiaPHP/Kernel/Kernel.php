@@ -184,16 +184,14 @@ abstract class Kernel implements KernelInterface
         //ejecutamos el evento request
         $this->dispatcher->dispatch(KumbiaEvents::REQUEST, $event = new RequestEvent($request));
 
-
         if (!$event->hasResponse()) {
 
             //creamos el resolver.
             $resolver = new ControllerResolver(self::$container);
             //obtenemos la instancia del controlador, el nombre de la accion
-            //a ejecutar, y los parametros que recibirá dicha acción
-            list($controller, $action, $params) = $resolver->getController($request);
-
-            $event = new ControllerEvent($request, array($controller, $action, $params));
+            //a ejecutar, y los parametros que recibirá dicha acción a traves del método
+            //getController del $resolver y lo pasamos al ControllerEvent
+            $event = new ControllerEvent($request, $resolver->getController($request));
             //ejecutamos el evento controller.
             $this->dispatcher->dispatch(KumbiaEvents::CONTROLLER, $event);
 
