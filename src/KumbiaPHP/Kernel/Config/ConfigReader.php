@@ -23,7 +23,7 @@ class ConfigReader
     {
         $configFile = $app->getAppPath() . '/config/config.php';
         if ($app->inProduction()) {
-            if (file_exists($configFile)) {
+            if (is_file($configFile)) {
                 $this->config = require_once $configFile;
                 return;
             } else {

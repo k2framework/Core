@@ -357,7 +357,7 @@ abstract class Upload
         if ($this->overwrite) {
             return true;
         }
-        if (file_exists("$this->path/$name")) {
+        if (is_file("$this->path/$name")) {
             $this->errors[] = 'Error: ya existe este fichero. Y no se permite reescribirlo';
             return false;
         }

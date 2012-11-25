@@ -52,7 +52,7 @@ class File extends Cache
     public function get($id, $group = 'default')
     {
         $filename = $this->getFilename($id, $group);
-        if (file_exists($filename)) {
+        if (is_file($filename)) {
             $fh = fopen($filename, 'r');
 
             $lifetime = trim(fgets($fh));
@@ -72,7 +72,7 @@ class File extends Cache
     public function getContent($id, $group = 'default')
     {
         $filename = $this->getFilename($id, $group);
-        if (file_exists($filename)) {
+        if (is_file($filename)) {
             $fh = fopen($filename, 'r');
 
             $lifetime = trim(fgets($fh));

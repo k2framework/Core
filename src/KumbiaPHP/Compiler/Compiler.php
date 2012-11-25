@@ -65,7 +65,7 @@ class Compiler implements CompilerInterface
         $fileName .= str_replace('_', DIRECTORY_SEPARATOR, $className) . '.php';
 
         foreach ($this->directories as $folder) {
-            if (file_exists($file = $folder . DIRECTORY_SEPARATOR . $fileName)) {
+            if (is_file($file = $folder . DIRECTORY_SEPARATOR . $fileName)) {
                 var_dump($original);
                 $this->add($file);
                 return;

@@ -155,7 +155,7 @@ class View
 
         extract($params, EXTR_OVERWRITE);
 
-        if (!file_exists($file)) {
+        if (!is_file($file)) {
             throw new \LogicException(sprintf("No existe El Partial \"%s\" en \"%s\"", basename($file), $file));
         }
 
@@ -184,7 +184,7 @@ class View
         } else {
             $file = rtrim($app->getAppPath(), '/') . '/view/templates/' . $template[0] . '.phtml';
         }
-        if (!file_exists($file)) {
+        if (!is_file($file)) {
             throw new \LogicException(sprintf("No existe El Template \"%s\" en \"%s\"", basename($file), $file));
         }
         return $file;
@@ -212,11 +212,11 @@ class View
         }
 
         $file = rtrim($app->getPath($module), '/') . '/View/' . $controller . '/' . $view . '.phtml';
-        if (!file_exists($file)) {
+        if (!is_file($file)) {
             if (is_string($scaffold)) {
                 $view = '/view/scaffolds/' . $scaffold . '/' . $view . '.phtml';
                 $file = rtrim($app->getAppPath(), '/') . $view;
-                if (file_exists($file)) {
+                if (is_file($file)) {
                     return $file;
                 }
             }

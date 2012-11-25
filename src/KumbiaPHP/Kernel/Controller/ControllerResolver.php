@@ -85,7 +85,7 @@ class ControllerResolver
 
             $controllerFile = "{$app->getModules($this->module)}{$controllerClass}.php";
 
-            if (!file_exists($controllerFile)) {
+            if (!is_file($controllerFile)) {
                 throw new NotFoundException();
             }
 

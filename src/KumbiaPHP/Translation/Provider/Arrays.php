@@ -21,7 +21,7 @@ class Arrays implements ProviderInterface
     public function getMessages($locale)
     {
         if (!array_key_exists($locale, $this->messages)) {
-            if (file_exists($file = Kernel::getParam('app_dir') . "config/messages/$locale.php")) {
+            if (is_file($file = Kernel::getParam('app_dir') . "config/messages/$locale.php")) {
                 $messages = require_once $file;
                 $this->messages[$locale] = $messages;
             } else {

@@ -55,7 +55,7 @@ class ExceptionHandler
             } else {
                 header('HTTP/1.1 500 Internal Server Error');
                 $code = 500;
-                if (file_exists($app->getAppPath() . 'view/errors/500.phtml')) {
+                if (is_file($app->getAppPath() . 'view/errors/500.phtml')) {
                     include $app->getAppPath() . 'view/errors/500.phtml';
                 } else {
                     include $app->getAppPath() . 'view/errors/404.phtml';
