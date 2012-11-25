@@ -207,7 +207,7 @@ class View
             $view = $view[2];
         } else {
             $module = $app->getCurrentModule();
-            $controller = $this->camelcase($app->getCurrentController());
+            $controller = $app->getCurrentController();
             $view = $view[0];
         }
 
@@ -224,18 +224,6 @@ class View
         }
 
         return $file;
-    }
-
-    /**
-     * Convierte la cadena con espacios o guión bajo en notacion camelcase
-     *
-     * @param string $s cadena a convertir
-     * @param boolean $firstLower indica si es lower camelcase
-     * @return string
-     * */
-    private function camelcase($string)
-    {
-        return str_replace(' ', '', ucwords(preg_replace('@(.+)_(\w)@', '$1 $2', strtolower($string))));
     }
 
 }
