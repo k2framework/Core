@@ -1,8 +1,8 @@
 <?php
-
 require_once __DIR__ . '/../autoload.php';
 
 use KumbiaPHP\Kernel\Response;
+use KumbiaPHP\Kernel\JsonResponse;
 
 class ResponseTest extends PHPUnit_Framework_TestCase
 {
@@ -44,6 +44,29 @@ class ResponseTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($response->headers->has('Content-Type'));
         $this->assertEquals('text/html', $response->headers->get('Content-Type'));
         $this->assertEquals('text/html', $response->headers->get('Content-Type', 'application/json'));
+    }
+
+    public function testJsonResponse()
+    {
+        $data = array(
+            'nombre' => "Manuel José",
+            'edad' => 23,
+            'pais' => 'Venezuela',
+            'lenguajes' => array('php', 'javascript', 'c++', 'java')
+        );
+
+        $response = new JsonResponse($data);
+
+        $this->assertInstanceOf(get_class(new Response()), $response);
+        $this->assertEquals(json_encode($data), $response->getContent());
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertTrue($response->headers->has('Content-Type'));
+        $this->assertEquals('application/json', $response->headers->get('Content-Type'));
+        
+        unset($data['edad']);
+        
+        $response->setContent($data);
+        $this->assertEquals(json_encode($data), $response->getContent());
     }
 
 }
