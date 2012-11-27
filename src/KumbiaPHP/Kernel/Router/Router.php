@@ -30,7 +30,7 @@ class Router implements RouterInterface
      */
     public function redirect($url = NULL, $status = 302)
     {
-        return new RedirectResponse(Kernel::get('app')->createUrl($url), $status);
+        return new RedirectResponse(Kernel::get('app.context')->createUrl($url), $status);
     }
 
     /**
@@ -40,7 +40,7 @@ class Router implements RouterInterface
      */
     public function toAction($action = NULL, $status = 302)
     {
-        $url = Kernel::get('app')->getControllerUrl($action);
+        $url = Kernel::get('app.context')->getControllerUrl($action);
         return new RedirectResponse($url, $status);
     }
 
@@ -59,17 +59,17 @@ class Router implements RouterInterface
         //clono el request y le asigno la nueva url.
         $request = clone Kernel::get('request');
 
-        $request->query->set('_url', '/' . ltrim(Kernel::get('app')->createUrl($url, false), '/'));
+        $request->query->set('_url', '/' . ltrim(Kernel::get('app.context')->createUrl($url, false), '/'));
 
         //retorno la respuesta del kernel.
-        return Kernel::get('kernel')->execute($request, Kernel::SUB_REQUEST);
+        return Kernel::get('app.kernel')->execute($request, Kernel::SUB_REQUEST);
     }
 
     public function rewrite(RequestEvent $event)
     {
         Reader::read('routes');
 
-        $url = $event->getRequest()->getRequestUrl();
+        $newUrl = $url = $event->getRequest()->getRequestUrl();
         $routes = Reader::get('routes.routes');
 
         if (isset($routes[$url])) {
@@ -91,7 +91,7 @@ class Router implements RouterInterface
         //si la url fué reescrita
         if ($newUrl !== $url) {
             //actualizamos la url en el Request y llamamos al parseUrl del AppContext
-            $event->getRequest()->query->set('_url', '/' . ltrim($url, '/'));
+            $event->getRequest()->query->set('_url', '/' . ltrim($newUrl, '/'));
             $event->getRequest()->getAppContext()->parseUrl();
         }
     }
