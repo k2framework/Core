@@ -59,10 +59,11 @@ class View
     public function render(array $params)
     {
         self::$content = null;
-        isset($params['template']) && $this->template = $params['template'];
-        isset($params['view']) && $this->view = $params['view'];
-        isset($params['response']) && $this->response = $params['response'];
-        isset($params['params']) && self::$variables = array_merge((array) $params['params'], self::$variables);
+        $this->template = isset($params['template']) ? $params['template'] : null;
+        $this->template = isset($params['template']) ? $params['template'] : null;
+        $this->view = isset($params['view']) ? $params['view'] : null;
+        $this->response = isset($params['response']) ? $params['response'] : null;
+        self::$variables = isset($params['params']) ? (array) $params['params'] : array();
 
         Autoload::registerDirectories(array(__DIR__ . '/Helper/'));
 
