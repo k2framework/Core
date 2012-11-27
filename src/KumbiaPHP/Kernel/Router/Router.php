@@ -79,11 +79,14 @@ class Router implements RouterInterface
             // Si existe una ruta con el comodin * crea la nueva ruta
             foreach ($routes as $key => $val) {
                 if ($key == '/*') {
-                    $newUrl = rtrim($val, '*') . $url;
+                    $newUrl = rtrim($val, '/*') . $url;
+                    break;
                 } elseif (strripos($key, '*', -1)) {
-                    $key = rtrim($key, '*');
-                    if (strncmp($url, $key, strlen($key)) == 0)
-                        $newUrl = str_replace($key, rtrim($val, '*'), $url);
+                    $key = rtrim($key, '/*');
+                    if (strncmp($url, $key, strlen($key)) == 0) {
+                        $newUrl = str_replace($key, rtrim($val, '/*'), $url);
+                        break;
+                    }
                 }
             }
         }
