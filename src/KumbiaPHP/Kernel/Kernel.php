@@ -300,7 +300,7 @@ abstract class Kernel implements KernelInterface
 
     /**
      * Esta función inicializa el contenedor de servicios.
-     * @param Collection $reader toda la configuracion de los archivos de config
+     * @param array $config toda la configuracion de los archivos de config
      * de cada lib y modulo compilados en uno solo.
      */
     protected function initContainer(array $config = array())
@@ -315,18 +315,11 @@ abstract class Kernel implements KernelInterface
         $this->di = new DependencyInjection();
 
         self::$container = new Container($this->di, $definitions);
-
-        //si se estan usando locales y ningun módulo a establecido una definición para
-        //el servicio translator, lo hacemos por acá.
-        if (isset($definitions['parameters']['config.locales'])
-                && !self::$container->has('translator')) {
-            self::$container->set('translator', 'KumbiaPHP\\Translation\\Translator');
-        }
     }
 
     /**
      * Inicializa el despachador de eventos
-     * @param Collection $reader config de todo el proyecto.
+     * @param array $config config de todo el proyecto.
      */
     protected function initDispatcher(array $config = array())
     {
