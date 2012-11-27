@@ -70,27 +70,30 @@ class Router implements RouterInterface
         Reader::read('routes');
 
         $url = $event->getRequest()->getRequestUrl();
-        $routes = Reader::get('routes');
+        $routes = Reader::get('routes.routes');
 
         if (isset($routes[$url])) {
             //si existe la ruta exacta usamos esa
-            $url = $routes[$url];
+            $newUrl = $routes[$url];
         } else {
             // Si existe una ruta con el comodin * crea la nueva ruta
             foreach ($routes as $key => $val) {
                 if ($key == '/*') {
-                    return rtrim($val, '*') . $url;
-                }
-
-                if (strripos($key, '*', -1)) {
+                    $newUrl = rtrim($val, '*') . $url;
+                } elseif (strripos($key, '*', -1)) {
                     $key = rtrim($key, '*');
                     if (strncmp($url, $key, strlen($key)) == 0)
-                        return str_replace($key, rtrim($val, '*'), $url);
+                        $newUrl = str_replace($key, rtrim($val, '*'), $url);
                 }
             }
         }
 
-        $event->getRequest()->query->set('_url', $url);
+        //si la url fué reescrita
+        if ($newUrl !== $url) {
+            //actualizamos la url en el Request y llamamos al parseUrl del AppContext
+            $event->getRequest()->query->set('_url', '/' . ltrim($url, '/'));
+            $event->getRequest()->getAppContext()->parseUrl();
+        }
     }
 
 }
