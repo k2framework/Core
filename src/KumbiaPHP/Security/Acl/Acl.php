@@ -31,7 +31,7 @@ abstract class Acl implements AclInterface
 
     public function check(UserInterface $user, $resource)
     {
-        $roles = $user->getRoles();
+        $roles = array_merge(array('default'), (array) $user->getRoles());
 
         foreach ((array) $roles as $role) {
             if ($this->isAllowed($role, $resource)) {
