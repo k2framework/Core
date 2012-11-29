@@ -35,7 +35,7 @@ class Form implements ArrayAccess, Validatable
     protected $model;
 
     /**
-     * Url a la que apuntar� el Form
+     * Url a la que apuntará el Form
      *
      * @var string 
      */
@@ -83,7 +83,7 @@ class Form implements ArrayAccess, Validatable
      * @param ActiveRecord|string $model modelo AR ó nombre del form
      * @param boolean $createFields indica si se crearan los campos a partir del modelo.
      */
-    final public function __construct($model = null, $createFields = false)
+    final public function __construct($model, $createFields = false)
     {
         if ($model instanceof ActiveRecord) {
             if (!($this->validationBuilder = $model->getValidations()) instanceof ValidationBuilder) {
