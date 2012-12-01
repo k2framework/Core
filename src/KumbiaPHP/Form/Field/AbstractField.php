@@ -255,7 +255,7 @@ abstract class AbstractField implements ArrayAccess
             'name' => $this->formName . '[' . $this->getFieldName() . ']',
             'type' => $this->getType(),
         ));
-        if (!is_array($this->getValue())) {
+        if (!is_array($this->getValue()) && !\is_object($this->getValue())) {
             $this->attrs(array(
                 'value' => htmlspecialchars($this->getValue(), ENT_COMPAT),
             ));
