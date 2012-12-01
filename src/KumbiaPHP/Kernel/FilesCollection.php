@@ -27,7 +27,7 @@ class FilesCollection
                         )), $name);
                 }
             } else {
-                $this->set($key, new File($file));
+                $this->set($name, new File($file));
             }
         }
     }
