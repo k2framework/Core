@@ -15,8 +15,8 @@ class FilesCollection
 
     public function __construct()
     {
-        foreach ((array)$_FILES as $name => $file) {
-            if (is_array($file['name'])) {
+        foreach ((array) $_FILES as $name => $file) {
+            if (isset($file['name']) && is_array($file['name'])) {
                 foreach (array_keys($file['name']) as $key) {
                     $this->set($key, new File(array(
                             'name' => $file['name'][$key],
@@ -125,4 +125,5 @@ class FilesCollection
     {
         return array_keys($this->all());
     }
+
 }
