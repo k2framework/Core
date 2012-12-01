@@ -90,7 +90,7 @@ class Form implements ArrayAccess, Validatable
             if (!($this->validationBuilder = $model->getValidations()) instanceof ValidationBuilder) {
                 throw new \LogicException(sprintf("El método\"validations\" de la clase \"%s\" debe devolver un objeto ValidationBuilder", get_class($model)));
             }
-            $this->name = strtolower(basename(get_class($model)));
+            $this->name = $model->getTable();
             $this->model = $model;
             if ($createFields) {
                 $this->initFromModel($model);
