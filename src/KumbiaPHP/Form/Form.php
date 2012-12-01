@@ -5,6 +5,7 @@ namespace KumbiaPHP\Form;
 use \ArrayAccess;
 use KumbiaPHP\Kernel\Kernel;
 use KumbiaPHP\Kernel\Request;
+use KumbiaPHP\Form\Field\File;
 use KumbiaPHP\Validation\Validatable;
 use KumbiaPHP\ActiveRecord\ActiveRecord;
 use KumbiaPHP\Form\Exception\FormException;
@@ -164,7 +165,7 @@ class Form implements ArrayAccess, Validatable
                 ->getFieldName();
         $field->init(); //inicializaciones especiales.
         $this->fields[$index] = $field;
-        if ($field instanceof Field\File) {
+        if ($field instanceof File) {
             $this->attrs(array('enctype' => 'multipart/form-data'));
         }
         if (($this->model instanceof ActiveRecord ) && isset($this->model->{$index})) {
