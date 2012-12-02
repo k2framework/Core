@@ -25,7 +25,7 @@ class ConfigReader
         $configFile = $app->getAppPath() . '/config/config.php';
         if ($app->inProduction()) {
             if (is_file($configFile)) {
-                $this->config = require_once $configFile;
+                $this->config = require $configFile;
                 return;
             } else {
                 $this->config = $this->compile($app);
