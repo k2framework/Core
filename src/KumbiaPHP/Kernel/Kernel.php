@@ -130,8 +130,11 @@ abstract class Kernel implements KernelInterface
         $this->initDispatcher($config->getConfig());
         //seteamos el contexto de la aplicación como servicio
         self::$container->setInstance('app.context', $context);
+        //si se usan locales los añadimos.
+        if (isset(self::$container['config']['locales'])) {
+            $context->setLocales(self::$container['config']['locales']);
+        }
         //establecemos el Request en el AppContext
-        $context->setLocales(self::$container->getParameter('config.locales'));
         $context->setRequest($request);
     }
 
@@ -306,16 +309,11 @@ abstract class Kernel implements KernelInterface
      */
     protected function initContainer(array $config = array())
     {
-        $definitions = array(
-            'services' => $config['services'],
-            'parameters' => $config['parameters'],
-        );
-
-        $definitions['parameters']['app_dir'] = $this->getAppPath();
+        $config['parameters']['app_dir'] = $this->getAppPath();
 
         $this->di = new DependencyInjection();
 
-        self::$container = new Container($this->di, $definitions);
+        self::$container = new Container($this->di, $config);
     }
 
     /**
