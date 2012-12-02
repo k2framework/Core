@@ -17,7 +17,8 @@ class ConfigReader
      * @var Collection
      */
     protected $config;
-    private $sectionsValid = array('config', 'parameters');
+
+//    private $sectionsValid = array('config', 'parameters');
 
     public function __construct(AppContext $app)
     {
@@ -47,9 +48,8 @@ class ConfigReader
      */
     protected function compile(AppContext $app)
     {
-        $section['config'] = array();
-        $section['services'] = array();
-        $section['parameters'] = array();
+        $parameters = array();
+        $services = array();
 
         $dirs = array_merge($app->getModules(), array('app' => dirname($app->getAppPath())));
 
@@ -58,27 +58,27 @@ class ConfigReader
             $servicesFile = rtrim($dir, '/') . '/' . $namespace . '/config/services.ini';
 
             if (is_file($configFile)) {
-                foreach (parse_ini_file($configFile, TRUE) as $sectionType => $values) {
+                foreach (parse_ini_file($configFile, true) as $sectionType => $values) {
 
-                    if (in_array($sectionType, $this->sectionsValid)) {
-                        foreach ($values as $index => $v) {
-                            $section[$sectionType][$index] = $v;
-                        }
+                    foreach ($values as $index => $v) {
+                        $parameters[$sectionType][$index] = $v;
                     }
                 }
             }
             if (is_file($servicesFile)) {
                 foreach (parse_ini_file($servicesFile, TRUE) as $serviceName => $config) {
-                    $section['services'][$serviceName] = $config;
+                    $services[$serviceName] = $config;
                 }
             }
         }
-
-        $section = $this->explodeIndexes($section);
-
-        unset($section['config']); //esta seccion esta disponible en parameters con el prefio config.*
-
-        return $this->prepareAditionalConfig($section);
+//           var_dump($this->prepareAditionalConfig(array(
+//            'parameters' => $parameters,
+//            'services' => $services,
+//        )));die;
+        return $this->prepareAditionalConfig(array(
+            'parameters' => $parameters,
+            'services' => $services,
+        ));
     }
 
     public function getConfig()
@@ -107,24 +107,24 @@ class ConfigReader
      * @param Collection $services
      * @param Collection $params 
      */
-    protected function explodeIndexes(array $section)
-    {
-        foreach ($section['config'] as $key => $value) {
-            $explode = explode('.', $key);
-            //si hay un punto y el valor delante del punto
-            //es el nombre de un servicio existente
-            if (count($explode) > 1 && isset($section['services'][$explode[0]])) {
-                //le asignamos el nuevo valor al parametro
-                //que usará ese servicio
-                if (isset($section['parameters'][$explode[1]])) {
-                    $section['parameters'][$explode[1]] = $value;
-                }
-            } else {
-                $section['parameters']['config.' . $key] = $value;
-            }
-        }
-        return $section;
-    }
+//    protected function explodeIndexes(array $section)
+//    {
+//        foreach ($section['config'] as $key => $value) {
+//            $explode = explode('.', $key);
+//            //si hay un punto y el valor delante del punto
+//            //es el nombre de un servicio existente
+//            if (count($explode) > 1 && isset($section['services'][$explode[0]])) {
+//                //le asignamos el nuevo valor al parametro
+//                //que usará ese servicio
+//                if (isset($section['parameters'][$explode[1]])) {
+//                    $section['parameters'][$explode[1]] = $value;
+//                }
+//            } else {
+//                $section['parameters']['config.' . $key] = $value;
+//            }
+//        }
+//        return $section;
+//    }
 
     /**
      * Añade configuraciones adicionales al arreglo de los servicios y patametros,
@@ -136,15 +136,15 @@ class ConfigReader
     protected function prepareAditionalConfig($configs)
     {
         //si se usa el routes lo añadimos al container
-        if (isset($configs['parameters']['config.routes'])) {
-            $router = substr($configs['parameters']['config.routes'], 1);
+        if (isset($configs['parameters']['config']['routes'])) {
+            $router = substr($configs['parameters']['config']['routes'], 1);
 
             //si es el router por defecto quien reescribirá las url
             if ('router' === $router) {
                 //solo le añadimos un listener.
                 $configs['services']['router']
                         ['listen']['rewrite'] = 'kumbia.request';
-            } else/*if (isset($configs['services'][$router]))*/ {
+            } else/* if (isset($configs['services'][$router])) */ {
                 //si es un servicio distinto al router. y existe,
                 //lo añadimos al principio de todos los servicios.
                 $def = $configs['services'][$router]; //guardamos la definición del servicio en una variable temporal.
@@ -164,7 +164,7 @@ class ConfigReader
 
         //si se estan usando locales y ningun módulo a establecido una definición para
         //el servicio translator, lo hacemos por acá.
-        if (isset($configs['parameters']['config.locales'])
+        if (isset($configs['parameters']['config']['locales'])
                 && !isset($configs['services']['translator'])) {
             $configs['services']['translator'] = array(
                 'class' => 'KumbiaPHP\\Translation\\Translator',
