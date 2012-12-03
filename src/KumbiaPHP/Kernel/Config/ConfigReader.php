@@ -76,9 +76,9 @@ class ConfigReader
 //            'services' => $services,
 //        )));die;
         return $this->prepareAditionalConfig(array(
-            'parameters' => $parameters,
-            'services' => $services,
-        ));
+                    'parameters' => $parameters,
+                    'services' => $services,
+                ));
     }
 
     public function getConfig()
@@ -101,24 +101,9 @@ class ConfigReader
 
             //si es el router por defecto quien reescribirá las url
             if ('router' === $router) {
-                //solo le añadimos un listener.
+                //le añadimos un listener.
                 $configs['services']['router']
-                        ['listen']['rewrite'] = 'kumbia.request';
-            } else/* if (isset($configs['services'][$router])) */ {
-                //si es un servicio distinto al router. y existe,
-                //lo añadimos al principio de todos los servicios.
-                $def = $configs['services'][$router]; //guardamos la definición del servicio en una variable temporal.
-                unset($configs['services'][$router]); //eliminamos la definición del arreglo $config
-                //volteamos el arreglo de servicios, para insertar de nuevo la definición.
-                $configs['services'] = array_reverse($configs['services'], true);
-                //insertamos la definición, quedando esta al final del array.
-                $configs['services'][$router] = $def;
-                //volvemos a voltear los servicios, con lo que la definición insertada
-                //queda de primera.
-                $configs['services'] = array_reverse($configs['services'], true);
-                //esto es importante debido a que queremos que el primer escucha que siempre
-                //se ejecute sea el que hace las reescrituras de url, para que cuando se
-                //llamen a los siguientes escuchas ya la url esté reescrita.
+                        ['listen']['rewrite'] = 'kumbia.request:1000';//con priotidad 1000 para que sea el primero en ejecutarse.
             }
         }
 
