@@ -326,12 +326,17 @@ abstract class Kernel implements KernelInterface
         foreach ($config['services'] as $service => $params) {
             if (isset($params['listen'])) {
                 foreach ($params['listen'] as $method => $event) {
-                    $this->dispatcher->addListener($event, array($service, $method));
+                    //hacemos un explode para ver si se ha pasado la prioridad en el evento
+                    //la prioridad es un numero entero que va seguido del nombre del evento
+                    //y dos puntos, ejemplos kumbia.request:100
+                    $event = explode(':', $event);
+                    $this->dispatcher->addListener($event[0], array($service, $method)
+                            , isset($event[1]) ? (int) $event[1] : 0);
                 }
             }
         }
 
-        self::$container->setInstance('dispatcher', $this->dispatcher);
+        self::$container->setInstance('event.dispatcher', $this->dispatcher);
     }
 
 }
