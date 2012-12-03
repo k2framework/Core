@@ -87,46 +87,6 @@ class ConfigReader
     }
 
     /**
-     * Busca en el config.ini de la aplicación
-     * los indices que representen servicios definidos, y que tengan
-     * un punto que separe al nombre del servicio de un parametro del mismo
-     * ( el parametro tambien debe estár definido )
-     * 
-     * @example
-     * 
-     * tenemos un servicio llamada    mi_servico
-     * tiene un parametro definido    nombre_app  con valor = 'Mi App'
-     *  
-     * Si queremos cambiar ese valor, debemos hacerlo en el config.ini de 
-     * la App.
-     * 
-     * y colocar los siguiente en la seccion [config]:
-     * 
-     * mi_servico.nombre_app = 'Nuevo nombre asignado'
-     * 
-     * @param Collection $services
-     * @param Collection $params 
-     */
-//    protected function explodeIndexes(array $section)
-//    {
-//        foreach ($section['config'] as $key => $value) {
-//            $explode = explode('.', $key);
-//            //si hay un punto y el valor delante del punto
-//            //es el nombre de un servicio existente
-//            if (count($explode) > 1 && isset($section['services'][$explode[0]])) {
-//                //le asignamos el nuevo valor al parametro
-//                //que usará ese servicio
-//                if (isset($section['parameters'][$explode[1]])) {
-//                    $section['parameters'][$explode[1]] = $value;
-//                }
-//            } else {
-//                $section['parameters']['config.' . $key] = $value;
-//            }
-//        }
-//        return $section;
-//    }
-
-    /**
      * Añade configuraciones adicionales al arreglo de los servicios y patametros,
      * como por ejemplo configurar el servicio que reescribe las url, para que sea
      * el primero en ejecutarse, configurar el servicio de traducciones, etc.
