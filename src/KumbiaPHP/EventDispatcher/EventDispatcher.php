@@ -39,47 +39,62 @@ class EventDispatcher implements EventDispatcherInterface
 
     public function dispatch($eventName, Event $event)
     {
-        if (!array_key_exists($eventName, $this->listeners)) {
+        if (!$this->hasListeners($eventName)) {
             return;
         }
-        if (is_array($this->listeners[$eventName]) && count($this->listeners[$eventName])) {
-            foreach ($this->listeners[$eventName] as $listener) {
-                $service = $this->container->get($listener[0]);
-                $service->{$listener[1]}($event);
-                if ($event->isPropagationStopped()) {
+        foreach ($this->getListeners($eventName) as $listener) {
+            $service = $this->container->get($listener[0]);
+            $service->{$listener[1]}($event);
+            if ($event->isPropagationStopped()) {
+                return;
+            }
+        }
+    }
+
+    public function addListener($eventName, $listener, $priority = 0)
+    {
+        $this->listeners[$eventName][$priority][] = $listener;
+    }
+
+    public function hasListeners($eventName)
+    {
+        return isset($this->listeners[$eventName]);
+    }
+
+    public function getListeners($eventName)
+    {
+        $this->sortListeners($eventName);
+        //unimos todos los listener que estan en prioridades diferentes.
+        return call_user_func_array('array_merge', $this->listeners[$eventName]);
+    }
+
+    public function removeListener($eventName, $listener)
+    {
+        if ($this->hasListeners($eventName)) {
+            foreach ($this->listeners[$eventName] as $priority => $listeners) {
+                if (false !== ($key = array_search($listener, $listeners))) {
+                    unset($this->listeners[$eventName][$priority][$key]);
                     return;
                 }
             }
         }
     }
 
-    public function addListener($eventName, $listener)
-    {
-        if (!$this->hasListener($eventName, $listener)) {
-            $this->listeners[$eventName][] = $listener;
-        }
-    }
-
-    public function hasListener($eventName, $listener)
+    protected function sortListeners($eventName)
     {
         if (isset($this->listeners[$eventName])) {
-            return in_array($listener, $this->listeners[$eventName]);
-        } else {
-            return FALSE;
+            krsort($this->listeners[$eventName]);
         }
     }
 
-    public function removeListener($eventName, $listener)
+    public function addSubscriber(EventSubscriberInterface $subscriber)
     {
-        if ($this->hasListener($eventName, $listener)) {
-            do {
-                if ($listener === current($this->listeners[$eventName])) {
-                    $key = key(current($this->listeners[$eventName]));
-                    break;
-                }
-            } while (next($this->listeners[$eventName]));
+        foreach ($subscriber->getSubscribedEvents() as $method => $params) {
+            if (is_array($params)) {//si es arreglo es porque pasamos la prioridad
+            } else {
+                $this->addListener($eventName, $listener);
+            }
         }
-        unset($this->listeners[$eventName][$key]);
     }
 
 }
