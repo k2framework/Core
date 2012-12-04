@@ -38,9 +38,20 @@ class EventDispatcher implements EventDispatcherInterface
      * Constructor de la clase.
      * @param ContainerInterface $container 
      */
-    public function __construct(ContainerInterface $container)
+    public function __construct(ContainerInterface $container = null)
     {
         $this->container = $container;
+        $definitions = $container->getDefinitions();
+        foreach ($definitions['services'] as $id => $config) {
+            if (isset($config['listen'])) {//si está escuchando eventos
+                foreach ($config['listen'] as $method => $params) {
+                    isset($params[1]) || $params[1] = 0; //si no existe la prioridad la seteamos a 0
+                    $this->addListener($params[0], array($id, $method), $params[1]);
+                }
+            } elseif (isset($config['subscriber'])) {
+                $this->addSubscriber($container->get($id));
+            }
+        }
     }
 
     public function dispatch($eventName, Event $event)
