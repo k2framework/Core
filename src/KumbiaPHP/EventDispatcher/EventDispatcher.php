@@ -66,11 +66,16 @@ class EventDispatcher implements EventDispatcherInterface
         }
     }
 
-    public function dispatch($eventName, Event $event)
+    public function dispatch($eventName, Event $event = null)
     {
         if (!$this->hasListeners($eventName)) {
             return;
         }
+
+        if (!$event) {
+            $event = new Event();
+        }
+
         foreach ($this->getListeners($eventName) as $listener) {
             call_user_func($listener, $event);
             if ($event->isPropagationStopped()) {
