@@ -267,7 +267,7 @@ abstract class Upload
      */
     protected function saveFile($name)
     {
-        return $this->file->move($this->path, $name);
+        return $this->file->move($this->path, $name, false);
     }
 
     /**
