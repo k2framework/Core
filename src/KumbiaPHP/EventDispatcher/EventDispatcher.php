@@ -40,6 +40,18 @@ class EventDispatcher implements EventDispatcherInterface
      */
     public function __construct(ContainerInterface $container = null)
     {
+        if ($container) {
+            $this->setContainer($container);
+        }
+    }
+
+    /**
+     * Establece el contenedor en el dispatcher, y de una vez recorre las definiciones
+     * del mismo para obtener los escuchas y subscriptores de eventos.
+     * @param ContainerInterface $container 
+     */
+    public function setContainer(ContainerInterface $container)
+    {
         $this->container = $container;
         $definitions = $container->getDefinitions();
         foreach ($definitions['services'] as $id => $config) {
