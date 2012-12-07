@@ -5,6 +5,7 @@ namespace KumbiaPHP\ActiveRecord;
 use ActiveRecord\Model;
 use KumbiaPHP\Kernel\Kernel;
 use ActiveRecord\Config\Config;
+use ActiveRecord\Adapter\Adapter;
 use KumbiaPHP\Validation\Validator;
 use KumbiaPHP\Validation\Validatable;
 use KumbiaPHP\ActiveRecord\Config\Reader;
@@ -110,4 +111,6 @@ if (!Config::initialized()) {
     //si no está inicializada la configuración que usa el Active Record,
     //lo inicializamos.
     Reader::readDatabases();
+    //le pasamos la instancia del EventDispatcher al Adapter del ActiveRecord
+    Adapter::setEventDispatcher(Kernel::get('event.dispatcher'));
 }
