@@ -94,8 +94,8 @@ class Form implements ArrayAccess, Validatable
                 $this->initFromModel($model);
             } else {
                 $this->init();
-                $this->initExtrasFromModel($model);
             }
+            $this->initExtrasFromModel($model);
         } elseif (is_string($model)) {
             $this->name = $model;
             $this->init();
@@ -543,7 +543,6 @@ class Form implements ArrayAccess, Validatable
                 $field->setValue($model->{$fieldName});
             }
         }
-        $this->initExtrasFromModel($model);
     }
 
     private function initExtrasFromModel(ActiveRecord $model)
