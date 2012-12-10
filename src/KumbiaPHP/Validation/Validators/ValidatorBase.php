@@ -66,7 +66,7 @@ abstract class ValidatorBase
         if ($object instanceof \KumbiaPHP\Form\Form) {//para trabajar la Lib Form de K2
             if (isset($object[$column])) {
                 return $object[$column]->getValue();
-            } elseif (!is_object($object = $object->getData())) {
+            } else {
                 return null;
             }
         }
