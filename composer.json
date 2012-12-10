@@ -1,6 +1,15 @@
 {
     "name": "kumbiaphp/core",
     "type": "library",
+    "description": "Core de KumbiaPHP versión K2 framework, trabaja con php 5.3 ó superior.",
+    "license": "BSD",
+    "keywords": ["framework"],
+    "authors": [
+        {
+            "name": "Manuel Aguirre",
+            "email": "programador.manuel@gmail.com"
+        }
+    ],
     "replace":{
         "kumbiaphp/event-dispatcher": "self.version",
         "kumbiaphp/validation": "self.version",
