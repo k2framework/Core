@@ -3,7 +3,7 @@ CORE KumbiaPHP 2
 
 ..  image:: https://secure.travis-ci.org/manuelj555/Core.png?branch=master
 
-Esta es una base del core para una nueva versión de KumbiaPHP framework, trabaja con php 5.3 ó superior.
+Core de KumbiaPHP versión K2 framework, trabaja con php 5.3 ó superior.
 
 Librerias Disponibles
 ---------------------
