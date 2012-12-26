@@ -10,14 +10,14 @@
             "email": "programador.manuel@gmail.com"
         }
     ],
-    "replace":{
+    "replace": {
         "kumbiaphp/event-dispatcher": "self.version",
         "kumbiaphp/validation": "self.version",
         "kumbiaphp/dependency-injection": "self.version"
     },
     "autoload": {
-        "psr-0":{ 
-            "KumbiaPHP\\": "src/"
+        "psr-0": {
+            "K2\\": "src/"
         }
     },
     "minimum-stability": "dev"

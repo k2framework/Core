@@ -2,8 +2,7 @@
 
 require_once __DIR__ . '/../../autoload.php';
 
-use KumbiaPHP\Kernel\Session\Session;
-
+use K2\Kernel\Session\Session;
 
 class SessionTest extends PHPUnit_Framework_TestCase
 {
@@ -11,7 +10,7 @@ class SessionTest extends PHPUnit_Framework_TestCase
     public function testBasic()
     {
         $session = new Session(__DIR__);
-        
+
         $session->destroy();
         $session->start();
 
@@ -36,7 +35,7 @@ class SessionTest extends PHPUnit_Framework_TestCase
                 'user_id' => 100
             ),
         );
-        
+
         $this->assertEquals($data, $session->all());
         $this->assertEquals($data['default'], $session->all('default'));
         $this->assertEquals($data['private'], $session->all('private'));

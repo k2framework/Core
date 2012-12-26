@@ -1,8 +1,9 @@
 <?php
+
 require_once __DIR__ . '/../autoload.php';
 
-use KumbiaPHP\Kernel\Request;
-use KumbiaPHP\Kernel\AppContext;
+use K2\Kernel\Request;
+use K2\Kernel\AppContext;
 
 class AppContextTest extends PHPUnit_Framework_TestCase
 {
@@ -51,7 +52,7 @@ class AppContextTest extends PHPUnit_Framework_TestCase
 
         $app = new AppContext($this->prod, __DIR__
                         , $this->modules, $this->routes);
-        
+
         $app->setRequest($request);
 
         $this->assertEquals($this->prod, $app->InProduction());
@@ -69,7 +70,7 @@ class AppContextTest extends PHPUnit_Framework_TestCase
 
         $app = new AppContext($this->prod, __DIR__
                         , $this->modules, $this->routes);
-        
+
         $app->setRequest($request);
 
         $this->assertEquals('K2/Backend', $app->getRoutes('/admin'));

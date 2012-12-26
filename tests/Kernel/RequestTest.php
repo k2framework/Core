@@ -2,7 +2,7 @@
 
 require_once __DIR__ . '/../autoload.php';
 
-use KumbiaPHP\Kernel\Request;
+use K2\Kernel\Request;
 
 class RequestTest extends PHPUnit_Framework_TestCase
 {

@@ -1,10 +1,11 @@
 <?php
+
 require_once __DIR__ . '/../autoload.php';
 
-use KumbiaPHP\Kernel\File;
-use KumbiaPHP\Kernel\Collection;
-use KumbiaPHP\Kernel\FilesCollection;
-use KumbiaPHP\Kernel\CookiesCollection;
+use K2\Kernel\File;
+use K2\Kernel\Collection;
+use K2\Kernel\FilesCollection;
+use K2\Kernel\CookiesCollection;
 
 class CollectionTest extends PHPUnit_Framework_TestCase
 {
