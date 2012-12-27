@@ -81,12 +81,6 @@ class AppContext
     protected $requestType;
 
     /**
-     * Contiene los locales permitidos en la App
-     * @var array 
-     */
-    protected $locales;
-
-    /**
      *
      * @var Request 
      */
@@ -117,7 +111,6 @@ class AppContext
     {
         $request->setAppContext($this);
         $this->request = $request;
-        $this->parseUrl();
         return $this;
     }
 
@@ -388,106 +381,5 @@ class AppContext
         $this->request->getLocale() && $url = $this->request->getLocale() . '/' . $url;
         return $baseUrl ? $this->request->getBaseUrl() . $url : $url;
     }
-
-    /**
-     * Lee la Url de la petición actual, extrae el módulo/controlador/acción/parametros
-     * y los almacena en los atributos de la clase.
-     * @throws NotFoundException 
-     */
-    public function parseUrl()
-    {
-        $controller = 'index'; //controlador por defecto si no se especifica.
-        $action = 'index'; //accion por defecto si no se especifica.
-        $moduleUrl = '/';
-        $params = array(); //parametros de la url, de existir.
-        //obtenemos la url actual de la petición.
-        $currentUrl = '/' . trim($this->request->getRequestUrl(), '/');
-
-        list($moduleUrl, $module, $currentUrl) = $this->getModule($currentUrl);
-
-        if (!$moduleUrl || !$module) {
-            throw new NotFoundException(sprintf("La ruta \"%s\" no concuerda con ningún módulo ni controlador en la App", $currentUrl), 404);
-        }
-
-        if ($url = explode('/', trim(substr($currentUrl, strlen($moduleUrl)), '/'))) {
-
-            //ahora obtengo el controlador
-            if (current($url)) {
-                //si no es un controlador lanzo la excepcion
-                $controller = current($url);
-                next($url);
-            }
-            //luego obtenemos la acción
-            if (current($url)) {
-                $action = current($url);
-                next($url);
-            }
-            //por ultimo los parametros
-            if (current($url)) {
-                $params = array_slice($url, key($url));
-            }
-        }
-
-        $this->setCurrentModule($module)
-                ->setCurrentModuleUrl($moduleUrl)
-                ->setCurrentController($controller)
-                ->setCurrentAction($action)
-                ->setCurrentParameters($params);
-    }
-
-    /**
-     * Convierte la cadena con espacios o guión bajo en notacion camelcase
-     *
-     * @param string $s cadena a convertir
-     * @param boolean $firstLower indica si es lower camelcase
-     * @return string
-     * */
-    private function camelcase($string)
-    {
-        return str_replace(' ', '', ucwords(preg_replace('@(.+)_(\w)@', '$1 $2', strtolower($string))));
-    }
-
-    /**
-     * Devuelve el posible módulo a partir de la Url recibida como parametro.
-     * @param string $url
-     * @param boolean $recursive
-     * @return array ($moduleUrl, $moduleName, $currentUrl)
-     */
-    protected function getModule($url, $recursive = true)
-    {
-        if (count($this->locales) && $recursive) {
-            $_url = explode('/', trim($url, '/'));
-            $locale = array_shift($_url);
-            if (in_array($locale, $this->locales)) {
-                $this->request->setLocale($locale);
-                return $this->getModule('/' . join('/', $_url), false);
-            } else {
-                $this->request->setLocale($this->locales[0]);
-            }
-        }
-
-        if ('/logout' === $url) {
-            return array($url, $url, $url);
-        }
-
-        $routes = array_keys($this->getRoutes());
-
-        usort($routes, function($a, $b) {
-                    return strlen($a) > strlen($b) ? -1 : 1;
-                }
-        );
-
-        foreach ($routes as $route) {
-            if (0 === strpos($url, $route)) {
-                if ('/' === $route) {
-                    return array($route, $this->getRoutes('/'), $url);
-                } elseif ('/' === substr($url, strlen($route), 1) || strlen($url) === strlen($route)) {
-                    return array($route, $this->getRoutes($route), $url);
-                }
-            }
-        }
-        return false;
-    }
-
 }
 

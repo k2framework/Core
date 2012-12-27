@@ -96,7 +96,7 @@ class Router implements RouterInterface
         if ($newUrl !== $url) {
             //actualizamos la url en el Request y llamamos al parseUrl del AppContext
             $event->getRequest()->query->set('_url', '/' . ltrim($newUrl, '/'));
-            $event->getRequest()->getAppContext()->parseUrl();
+            App::get('app.kernel')->parseUrl();
         }
     }
 

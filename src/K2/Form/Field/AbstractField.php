@@ -114,7 +114,7 @@ abstract class AbstractField implements ArrayAccess
      */
     public function setLabel($label)
     {
-        if (Kernel::get('container')->has('translator')) {
+        if (App::get('container')->has('translator')) {
             $this->label = App::get('translator')->trans($label);
         } else {
             $this->label = $label;
