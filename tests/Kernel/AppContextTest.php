@@ -78,20 +78,18 @@ class AppContextTest extends PHPUnit_Framework_TestCase
         $this->assertNull($app->getRoutes('/ninguno'));
         $this->assertEquals('Index', $app->getRoutes('/'));
 
-        $request->query->set('_url', '/admin/usuarios/index/');
-
         $app->setRequest($request);
-        
+
         $app->setCurrentModule('K2/Backend')
                 ->setCurrentModuleUrl('/admin')
                 ->setCurrentController('usuarios')
                 ->setCurrentAction('index')
                 ->setCurrentParameters();
 
-//        $this->assertEquals('K2/Backend', $app->getCurrentModule());
-//        $this->assertEquals('usuarios', $app->getCurrentController());
-//        $this->assertEquals('index', $app->getCurrentAction());
-//        $this->assertEquals(array(), $app->getCurrentParameters());
+        $this->assertEquals('K2/Backend', $app->getCurrentModule());
+        $this->assertEquals('usuarios', $app->getCurrentController());
+        $this->assertEquals('index', $app->getCurrentAction());
+        $this->assertEquals(array(), $app->getCurrentParameters());
 
         $this->assertEquals($this->modules['K2/Backend'], $app->getModules($app->getRoutes($app->getCurrentModuleUrl())));
         $this->assertEquals($this->modules['K2/Backend'], $app->getModules($app->getCurrentModule()));
@@ -105,9 +103,11 @@ class AppContextTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('http://localhost/k2/admin/usuarios/index', $app->getCurrentUrl());
         $this->assertEquals('http://localhost/k2/admin/usuarios/index', $app->getCurrentUrl(true));
 
-        $request->query->set('_url', '/admin/usuarios/edit/4');
-
-        $app->setRequest($request);
+        $app->setCurrentModule('K2/Backend')
+                ->setCurrentModuleUrl('/admin')
+                ->setCurrentController('usuarios')
+                ->setCurrentAction('edit')
+                ->setCurrentParameters(array(4));
 
         $this->assertEquals('http://localhost/k2/admin/usuarios', $app->getControllerUrl());
         $this->assertEquals('http://localhost/k2/admin/usuarios/edit', $app->getCurrentUrl());
@@ -118,9 +118,11 @@ class AppContextTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('edit', $app->getCurrentAction());
         $this->assertEquals(array(4), $app->getCurrentParameters());
 
-        $request->query->set('_url', '/admin/usuarios/edit/4/10');
-
-        $app->setRequest($request);
+        $app->setCurrentModule('K2/Backend')
+                ->setCurrentModuleUrl('/admin')
+                ->setCurrentController('usuarios')
+                ->setCurrentAction('edit')
+                ->setCurrentParameters(array(4, 10));
 
         $this->assertEquals('http://localhost/k2/admin/usuarios', $app->getControllerUrl());
         $this->assertEquals('http://localhost/k2/admin/usuarios/edit', $app->getCurrentUrl());
