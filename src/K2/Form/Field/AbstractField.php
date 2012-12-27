@@ -3,7 +3,7 @@
 namespace K2\Form\Field;
 
 use \ArrayAccess;
-use K2\Kernel\Kernel;
+use K2\Kernel\App;
 use K2\Validation\ValidationBuilder;
 
 /**
@@ -115,7 +115,7 @@ abstract class AbstractField implements ArrayAccess
     public function setLabel($label)
     {
         if (Kernel::get('container')->has('translator')) {
-            $this->label = Kernel::get('translator')->trans($label);
+            $this->label = App::get('translator')->trans($label);
         } else {
             $this->label = $label;
         }

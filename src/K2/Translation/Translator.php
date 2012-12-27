@@ -2,7 +2,7 @@
 
 namespace K2\Translation;
 
-use K2\Kernel\Kernel;
+use K2\Kernel\App;
 use K2\Translation\TranslatorInterface;
 use K2\Translation\Provider\ProviderInterface;
 
@@ -17,12 +17,12 @@ class Translator implements TranslatorInterface
 
     public function __construct()
     {
-        $config = Kernel::getParam('translator');
+        $config = App::getParameter('translator');
 
         $provider = $config['provider'];
 
         if ('@' === $provider[0]) {
-            $this->messages = Kernel::get(substr($provider, 1));
+            $this->messages = App::get(substr($provider, 1));
             if (!$this->messages instanceof ProviderInterface) {
                 $class = get_class($this->messages);
                 throw new \LogicException("La clase {$class} debe implementar la Interfaz K2\\Translation\\Provider\\ProviderInterface");
@@ -36,7 +36,7 @@ class Translator implements TranslatorInterface
     public function trans($text, array $params = array(), $locale = null)
     {
         //obtenemos el locale actual si no se especifica
-        $locale || $locale = Kernel::get('request')->getLocale();
+        $locale || $locale = App::getRequest()->getLocale();
 
         if (false === $translation = $this->messages->get($text, $locale)) {
             $translation = $text;

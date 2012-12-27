@@ -2,12 +2,9 @@
 
 namespace K2\View;
 
+use K2\Kernel\App;
 use K2\Kernel\Response;
-use K2\Loader\Autoload;
-use K2\View\ViewContainer;
-use K2\Kernel\KernelInterface;
 use K2\View\Helper\AbstractHelper;
-use K2\Di\Container\ContainerInterface;
 
 require_once 'functions.php';
 
@@ -24,22 +21,6 @@ class View
     protected $response;
     protected static $variables = array();
     protected static $content = '';
-
-    /**
-     * 
-     * @var ContainerInterface 
-     */
-    private static $container;
-
-    /**
-     * @Service(container,$container)
-     * @param ContainerInterface $container 
-     */
-    public function __construct(ContainerInterface $container)
-    {
-        self::$container = $container;
-        define('APP_CHARSET', self::$container['config']['charset'] ? : 'UTF-8');
-    }
 
     /**
      * Devuelve un objeto response a partir de los parametros especificados en el
@@ -65,9 +46,9 @@ class View
         $this->response = isset($params['response']) ? $params['response'] : null;
         self::$variables = isset($params['params']) ? (array) $params['params'] : array();
 
-        Autoload::registerDirectories(array(__DIR__ . '/Helper/'));
+        App::getLoader()->add(null, array(__DIR__ . '/Helper/'));
 
-        AbstractHelper::setAppContext(self::$container->get('app.context'));
+        AbstractHelper::setAppContext(App::get('app.context'));
 
         $response = new Response($this->getContent());
         $response->setCharset(APP_CHARSET);
@@ -113,7 +94,7 @@ class View
         self::$content = '';
         if ($showFlash) {
             try {
-                $configView = self::$container->getParameter('view');
+                $configView = App::getParameter('view');
                 if (is_array($configView) && isset($configView['flash'])) {
                     self::partial($configView['flash']);
                 } else {
@@ -131,7 +112,7 @@ class View
      */
     public static function flash()
     {
-        return self::$container->get('flash');
+        return App::get('flash');
     }
 
     /**
@@ -139,26 +120,16 @@ class View
      */
     public static function app()
     {
-        return self::$container->get('app.context');
-    }
-
-    /**
-     *
-     * @param string $service
-     * @return object
-     */
-    public static function get($service)
-    {
-        return self::$container->get($service);
+        return App::get('app.context');
     }
 
     public static function partial($partial, $time = false, $params = array())
     {
         /* @var $app \K2\Kernel\AppContext */
-        $app = self::$container->get('app.context');
+        $app = App::get('app.context');
 
         if ($time || $app->InProduction()) {
-            $cache = self::$container->get('cache');
+            $cache = App::get('cache');
             if ($content = $cache->getContent(md5($partial), 'partials')) {
                 echo $content;
                 return;
@@ -187,7 +158,7 @@ class View
         echo $content = ob_get_clean();
 
         if ($time || $app->InProduction()) {
-            $cache = self::$container->get('cache');
+            $cache = App::get('cache');
             $cache->saveContent(md5(join(':', $partial)), $content, $time, 'partials');
         }
     }
@@ -195,7 +166,7 @@ class View
     protected function findTemplate($template)
     {
         /* @var $app \K2\Kernel\AppContext */
-        $app = self::$container->get('app.context');
+        $app = App::get('app.context');
 
         $template = explode(':', $template);
 
@@ -214,7 +185,7 @@ class View
     protected function findView($view, $scaffold = false)
     {
         /* @var $app \K2\Kernel\AppContext */
-        $app = self::$container->get('app.context');
+        $app = App::get('app.context');
 
         $view = explode(':', $view);
 

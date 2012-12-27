@@ -1,5 +1,10 @@
 <?php
 
+use K2\Kernel\App;
+
+$config = App::getParameter('config');
+define('APP_CHARSET', isset($config['charset']) ? $config['charset'] : 'UTF-8');
+
 /**
  * Atajo para htmlspecialchars, por defecto toma el charset de la
  * aplicacion
@@ -35,6 +40,6 @@ function eh($s, $charset = APP_CHARSET)
  */
 function trans($text, array $params = array(), $locale = null)
 {
-    return K2\Kernel\Kernel::get('translator')
+    return K2\Kernel\App::get('translator')
                     ->trans($text, $params, $locale);
 }

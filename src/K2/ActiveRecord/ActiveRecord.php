@@ -2,8 +2,8 @@
 
 namespace K2\ActiveRecord;
 
+use K2\Kernel\App;
 use ActiveRecord\Model;
-use K2\Kernel\Kernel;
 use ActiveRecord\Config\Config;
 use ActiveRecord\Adapter\Adapter;
 use K2\Validation\Validator;
@@ -79,9 +79,9 @@ class ActiveRecord extends Model implements Validatable
     protected function validate($update = FALSE)
     {
         if ($update) {
-            return Kernel::get('validator')->validateOnUpdate($this);
+            return App::get('validator')->validateOnUpdate($this);
         } else {
-            return Kernel::get('validator')->validate($this);
+            return App::get('validator')->validate($this);
         }
     }
 
@@ -112,5 +112,5 @@ if (!Config::initialized()) {
     //lo inicializamos.
     Reader::readDatabases();
     //le pasamos la instancia del EventDispatcher al Adapter del ActiveRecord
-    Adapter::setEventDispatcher(Kernel::get('event.dispatcher'));
+    Adapter::setEventDispatcher(App::get('event.dispatcher'));
 }

@@ -2,7 +2,7 @@
 
 namespace K2\Translation\Provider;
 
-use K2\Kernel\Kernel;
+use K2\Kernel\App;
 use K2\Translation\Provider\ProviderInterface;
 
 class Arrays implements ProviderInterface
@@ -21,14 +21,13 @@ class Arrays implements ProviderInterface
     public function getMessages($locale)
     {
         if (!array_key_exists($locale, $this->messages)) {
-            if (is_file($file = Kernel::getParam('app_dir') . "config/messages/$locale.php")) {
+            if (is_file($file = App::appPath() . "config/messages/$locale.php")) {
                 $messages = require_once $file;
                 $this->messages[$locale] = $messages;
             } else {
                 $this->messages[$locale] = array();
             }
         }
-
 
         return $this->messages[$locale];
     }

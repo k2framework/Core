@@ -2,7 +2,7 @@
 
 namespace K2\Kernel\Exception;
 
-use K2\Kernel\KernelInterface;
+use K2\Kernel\App;
 use K2\Kernel\Response;
 
 /**
@@ -13,16 +13,9 @@ use K2\Kernel\Response;
 class ExceptionHandler
 {
 
-    /**
-     *
-     * @var KernelInterface 
-     */
-    static private $kernel;
-
-    static public function handle(KernelInterface $kernel)
+    static public function handle()
     {
         set_exception_handler(array(__CLASS__, 'onException'));
-        self::$kernel = $kernel;
     }
 
     public static function onException(\Exception $e)
@@ -38,7 +31,7 @@ class ExceptionHandler
     public static function createException(\Exception $e)
     {
         /* @var $app \K2\Kernel\AppContext */
-        $app = self::$kernel->get('app.context');
+        $app = App::get('app.context');
 
         $code = $e->getCode();
 

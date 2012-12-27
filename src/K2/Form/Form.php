@@ -3,7 +3,7 @@
 namespace K2\Form;
 
 use \ArrayAccess;
-use K2\Kernel\Kernel;
+use K2\Kernel\App;
 use K2\Kernel\Request;
 use K2\Form\Field\File;
 use K2\Validation\Validatable;
@@ -219,9 +219,9 @@ class Form implements ArrayAccess, Validatable
     public function getAction()
     {
         if ($this->action) {
-            return Kernel::get('app.context')->createUrl($this->action);
+            return App::get('app.context')->createUrl($this->action);
         } else {
-            return Kernel::get('app.context')->getCurrentUrl(true);
+            return App::get('app.context')->getCurrentUrl(true);
         }
     }
 
@@ -352,11 +352,11 @@ class Form implements ArrayAccess, Validatable
                 $string .= $field . "</label></li>" . PHP_EOL;
             }
         }
-        if (Kernel::get('container')->has('translator')) {
+        if (App::get('container')->has('translator')) {
             $string .= "<li>" . $this->add('submitSend', 'submit')
-                            ->setValue(Kernel::get('translator')->trans('Enviar')) . " " . PHP_EOL;
+                            ->setValue(App::get('translator')->trans('Enviar')) . " " . PHP_EOL;
             $string .= $this->add('buttonReset', 'reset')
-                            ->setValue(Kernel::get('translator')->trans('Resetear')) . "</li>" . PHP_EOL;
+                            ->setValue(App::get('translator')->trans('Resetear')) . "</li>" . PHP_EOL;
         } else {
             $string .= "<li>" . $this->add('submitSend', 'submit')->setValue('Enviar') . " " . PHP_EOL;
             $string .= $this->add('buttonReset', 'reset')->setValue('Resetear') . "</li>" . PHP_EOL;
@@ -374,10 +374,10 @@ class Form implements ArrayAccess, Validatable
         if ($this->model instanceof ActiveRecord) {
             if (isset($this->model->{$this->model->metadata()->getPK()})
                     && $this->model->exists()) {
-                return Kernel::get('validator')->validateOnUpdate($this);
+                return App::get('validator')->validateOnUpdate($this);
             }
         }
-        return Kernel::get('validator')->validate($this);
+        return App::get('validator')->validate($this);
     }
 
     /**

@@ -28,20 +28,4 @@ interface KernelInterface
      * @throws \LogicException excepcion si no se puede devolver una respuesta
      */
     public function execute(Request $request, $type = KernelInterface::MASTER_REQUEST);
-
-    /**
-     * Devuelve un servicio del container, se usa en casos especiales donde
-     * no sea posible pasarlo a travez del inyector de dependencias,
-     * por ejemplo en el active record.
-     * 
-     * Por favor evitar en los posible su uso
-     * 
-     * @return object
-     */
-    public static function get($service);
-
-    /**
-     * Devuelve un parametro del contenedor 
-     */
-    public static function getParam($param);
 }

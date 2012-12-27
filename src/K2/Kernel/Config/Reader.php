@@ -2,7 +2,7 @@
 
 namespace K2\Kernel\Config;
 
-use K2\Kernel\Kernel;
+use K2\Kernel\App;
 
 abstract class Reader
 {
@@ -22,7 +22,7 @@ abstract class Reader
             return self::$config[$file];
         }
 
-        self::$config[$file] = parse_ini_file(Kernel::getParam('app_dir') . "config/$file.ini", true);
+        self::$config[$file] = parse_ini_file(App::appPath() . "config/$file.ini", true);
 
         return self::$config[$file];
     }

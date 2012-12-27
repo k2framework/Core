@@ -2,7 +2,7 @@
 
 namespace K2\Form\Field;
 
-use K2\Kernel\Kernel;
+use K2\Kernel\App;
 use K2\Form\Field\Text;
 
 /**
@@ -30,7 +30,7 @@ class File extends Text
 
     public function getValue()
     {
-        return Kernel::get('request')->files
+        return App::getRequest()->files
             ->get($this->getFieldName(), $this->formName);
     }
 

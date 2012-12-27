@@ -2,7 +2,6 @@
 
 namespace K2\Kernel;
 
-use K2\Loader\Autoload;
 use K2\Kernel\AppContext;
 use K2\Di\DependencyInjection;
 use K2\Di\Container\Container;
@@ -49,7 +48,7 @@ abstract class Kernel implements KernelInterface
      *  
      * @var Container
      */
-    protected static $container;
+    protected $container;
 
     /**
      * Objeto Request
@@ -88,11 +87,7 @@ abstract class Kernel implements KernelInterface
         ob_start(); //arrancamos el buffer de salida.
         $this->production = $production;
 
-        Autoload::registerDirectories(
-                $this->modules = $this->registerModules()
-        );
-
-        Autoload::register();
+        App::getLoader()->add(null, $this->modules = $this->registerModules());
 
         ExceptionHandler::handle($this);
 
@@ -122,14 +117,14 @@ abstract class Kernel implements KernelInterface
         //iniciamos el container con esa config
         $this->initContainer($config->getConfig());
         //asignamos el kernel al container como un servicio
-        self::$container->setInstance('app.kernel', $this);
+        $this->container->setInstance('app.kernel', $this);
         //iniciamos el dispatcher con esa config
         $this->initDispatcher();
         //seteamos el contexto de la aplicación como servicio
-        self::$container->setInstance('app.context', $context);
+        $this->container->setInstance('app.context', $context);
         //si se usan locales los añadimos.
-        if (isset(self::$container['config']['locales'])) {
-            $context->setLocales(self::$container['config']['locales']);
+        if (isset($this->container['config']['locales'])) {
+            $context->setLocales($this->container['config']['locales']);
         }
         //establecemos el Request en el AppContext
         $context->setRequest($request);
@@ -146,9 +141,9 @@ abstract class Kernel implements KernelInterface
                 //original. y actualizamos el AppContext.
                 //tambien el tipo de request
                 $originalRequest = $this->request;
-                $originalRequestType = self::$container->get('app.context')
+                $originalRequestType = $this->container->get('app.context')
                         ->getRequestType();
-                self::$container->get('app.context')
+                $this->container->get('app.context')
                         ->setRequest($request)
                         ->setRequestType($type);
 
@@ -157,8 +152,8 @@ abstract class Kernel implements KernelInterface
                 //Luego devolvemos el request original al kernel,
                 //al AppContext, y el tipo de request
                 $this->request = $originalRequest;
-                self::$container->setInstance('request', $originalRequest);
-                self::$container->get('app.context')
+                $this->container->setInstance('request', $originalRequest);
+                $this->container->get('app.context')
                         ->setRequest($originalRequest)
                         ->setRequestType($originalRequestType);
 
@@ -173,12 +168,12 @@ abstract class Kernel implements KernelInterface
     {
         $this->request = $request;
 
-        if (!self::$container) { //si no se ha creado el container lo creamos.
+        if (!$this->container) { //si no se ha creado el container lo creamos.
             $this->init($request);
-            self::$container->get('app.context')->setRequestType($type);
+            $this->container->get('app.context')->setRequestType($type);
         }
         //agregamos el request al container
-        self::$container->setInstance('request', $this->request);
+        $this->container->setInstance('request', $this->request);
 
         //ejecutamos el evento request
         $this->dispatcher->dispatch(KumbiaEvents::REQUEST, $event = new RequestEvent($request));
@@ -186,7 +181,7 @@ abstract class Kernel implements KernelInterface
         if (!$event->hasResponse()) {
 
             //creamos el resolver.
-            $resolver = new ControllerResolver(self::$container);
+            $resolver = new ControllerResolver($this->container);
             //obtenemos la instancia del controlador, el nombre de la accion
             //a ejecutar, y los parametros que recibirá dicha acción a traves del método
             //getController del $resolver y lo pasamos al ControllerEvent
@@ -219,7 +214,7 @@ abstract class Kernel implements KernelInterface
         //para pasarlos al servicio view, y este construya la respuesta
         //llamamos al render del servicio "view" y esté nos devolverá
         //una instancia de response con la respuesta creada
-        return self::$container->get('view')->render(array(
+        return $this->container->get('view')->render(array(
                     'template' => $resolver->callMethod('getTemplate'),
                     'view' => $resolver->callMethod('getView'),
                     'response' => $resolver->callMethod('getResponse'),
@@ -262,16 +257,6 @@ abstract class Kernel implements KernelInterface
         return $this->production;
     }
 
-    public static function get($service)
-    {
-        return self::$container->get($service);
-    }
-
-    public static function getParam($param)
-    {
-        return self::$container->getParameter($param);
-    }
-
     /**
      * clase abstracta que está implementada en el AppKernel de la carpeta app
      * del proyecto, donde se especifican las rutas y los modulos que trabajará 
@@ -310,7 +295,8 @@ abstract class Kernel implements KernelInterface
 
         $this->di = new DependencyInjection();
 
-        self::$container = new Container($this->di, $config);
+        $this->container = new Container($this->di, $config);
+        App::setContainer($this->container);
     }
 
     /**
@@ -318,8 +304,8 @@ abstract class Kernel implements KernelInterface
      */
     protected function initDispatcher()
     {
-        $this->dispatcher = new EventDispatcher(self::$container);
-        self::$container->setInstance('event.dispatcher', $this->dispatcher);
+        $this->dispatcher = new EventDispatcher($this->container);
+        $this->container->setInstance('event.dispatcher', $this->dispatcher);
     }
 
 }
