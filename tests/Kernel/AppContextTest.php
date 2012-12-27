@@ -83,6 +83,7 @@ class AppContextTest extends PHPUnit_Framework_TestCase
         $app->setRequest($request);
         
         $app->setCurrentModule('K2/Backend')
+                ->setCurrentModuleUrl('/admin')
                 ->setCurrentController('usuarios')
                 ->setCurrentAction('index')
                 ->setCurrentParameters();
