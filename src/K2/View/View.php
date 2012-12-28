@@ -139,7 +139,7 @@ class View
         $partial = explode(':', $partial);
 
         if (count($partial) > 1) {
-            $modulePath = rtrim($app->getPath($partial[0]), '/');
+            $modulePath = rtrim(App::get('app.kernel')->getModules($partial[0])->getPath(), '/');
             $file = $modulePath . '/View/_shared/partials/' . $partial[1] . '.phtml';
         } else {
             $file = rtrim($app->getAppPath(), '/') . '/view/partials/' . $partial[0] . '.phtml';
