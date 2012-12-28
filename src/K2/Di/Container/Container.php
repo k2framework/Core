@@ -3,8 +3,6 @@
 namespace K2\Di\Container;
 
 use K2\Di\Container\ContainerInterface;
-use K2\Di\DependencyInjectionInterface as Di;
-use K2\Di\Definition\Service;
 use K2\Di\Exception\IndexNotDefinedException;
 
 /**
@@ -23,23 +21,17 @@ class Container implements ContainerInterface
 
     /**
      *
-     * @var Di 
-     */
-    protected $di;
-
-    /**
-     *
      * @var array 
      */
     protected $definitions;
 
-    public function __construct(Di $di, array $definitions = array())
+    public function __construct()
     {
         $this->services = array();
-        $this->di = $di;
-        $this->definitions = $definitions + array('parameters' => array(), 'services' => array());
-
-        $di->setContainer($this);
+        $this->definitions = array(
+            'parameters' => array(),
+            'services' => array()
+        );
 
         //agregamos al container como servicio.
         $this->setInstance('container', $this);
@@ -57,10 +49,7 @@ class Container implements ContainerInterface
             return $this->services[$id];
         }
         //si existe pero no se ha creado, creamos la instancia
-        $config = $this->definitions['services'][$id];
-
-        //retorna la instancia recien creada
-        return $this->di->newInstance($id, $config);
+        return $this->services[$id] = $this->definitions['services'][$id]($this);
     }
 
     public function has($id)
@@ -84,9 +73,7 @@ class Container implements ContainerInterface
         //y lo agregamos a las definiciones. (solo será a gregado si no existe)
         if (!isset($this->definitions['services'][$id])) {
 
-            $this->definitions['services'][$id] = array(
-                'class' => get_class($object)
-            );
+            $this->definitions['services'][$id] = true;
         }
     }
 
@@ -104,7 +91,6 @@ class Container implements ContainerInterface
         return array_key_exists($id, $this->definitions['parameters']);
     }
 
-    
     public function getDefinitions()
     {
         return $this->definitions;
@@ -127,10 +113,9 @@ class Container implements ContainerInterface
      * @param string $className Nombre de la Clase a Instanciar
      * @param array $config configuración para el servicio.
      */
-    public function set($id, $className, array $config = array())
+    public function set($id, \Closure $function)
     {
-        $config['class'] = $className;
-        $this->definitions['services'][$id] = $config;
+        $this->definitions['services'][$id] = $function;
         return $this;
     }
 

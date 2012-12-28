@@ -182,38 +182,6 @@ class AppContext
     }
 
     /**
-     * devuelve los modulos registrados en el proyecto
-     * @return array 
-     */
-    public function getModules($module = NULL)
-    {
-        if ($module) {
-            return isset($this->modules[$module]) ? $this->modules[$module] : NULL;
-        } else {
-            return $this->modules;
-        }
-    }
-
-    /**
-     * devuelve las rutas registrados en el proyecto
-     * @param string $route si se suministra un prefijo, devuelve solo
-     * el valor de la ruta para ese prefijo.
-     * @return array|string|NULL 
-     */
-    public function getRoutes($route = NULL)
-    {
-        if ($route) {
-            if (isset($this->routes[$route])) {
-                return isset($this->modules[$this->routes[$route]]) ? $this->routes[$route] : NULL;
-            } else {
-                return NULL;
-            }
-        } else {
-            return $this->routes;
-        }
-    }
-
-    /**
      * Devuelve el prefijo actual del modulo que se está ejecutando
      * @return string 
      */

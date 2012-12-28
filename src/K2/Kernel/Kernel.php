@@ -3,7 +3,6 @@
 namespace K2\Kernel;
 
 use K2\Kernel\AppContext;
-use K2\Di\DependencyInjection;
 use K2\Di\Container\Container;
 use K2\Kernel\KernelInterface;
 use K2\Kernel\Event\KumbiaEvents;
@@ -75,7 +74,7 @@ abstract class Kernel implements KernelInterface
      * @var string
      */
     protected $appPath;
-    
+
     /**
      * Contiene los locales permitidos en la App
      * @var array 
@@ -94,7 +93,7 @@ abstract class Kernel implements KernelInterface
         ob_start(); //arrancamos el buffer de salida.
         $this->production = $production;
 
-        App::getLoader()->add(null, $this->modules = $this->registerModules());
+        App::getLoader()->add(null, $this->getAppPath() . '/modules/');
 
         ExceptionHandler::handle($this);
 
@@ -120,13 +119,15 @@ abstract class Kernel implements KernelInterface
         //creamos la instancia del AppContext
         $context = new AppContext($this->production, $this->getAppPath(), $this->modules, $this->routes);
         //leemos la config de la app
-        $config = new ConfigReader($context);
+        //$config = new ConfigReader($context);
         //iniciamos el container con esa config
-        $this->initContainer($config->getConfig());
+        $this->initContainer(/* $config->getConfig() */);
         //asignamos el kernel al container como un servicio
         $this->container->setInstance('app.kernel', $this);
         //iniciamos el dispatcher con esa config
         $this->initDispatcher();
+        //inicializamos los modulos de la app.
+        $this->initModules();
         //seteamos el contexto de la aplicación como servicio
         $this->container->setInstance('app.context', $context);
         //si se usan locales los añadimos.
@@ -347,12 +348,19 @@ abstract class Kernel implements KernelInterface
      */
     protected function initContainer(array $config = array())
     {
-        $config['parameters']['app_dir'] = $this->getAppPath();
-
-        $this->di = new DependencyInjection();
-
-        $this->container = new Container($this->di, $config);
+        $this->container = new Container();
+        $this->container->setParameter('app_dir', $this->getAppPath());
         App::setContainer($this->container);
+    }
+
+    protected function initModules()
+    {
+        $this->modules = (array) $this->registerModules();
+        foreach ($this->modules as $name => $module) {
+            $module->setContainer($this->container);
+            $module->setEventDispatcher($this->dispatcher);
+            $module->init();
+        }
     }
 
     /**
@@ -397,13 +405,53 @@ abstract class Kernel implements KernelInterface
         foreach ($routes as $route) {
             if (0 === strpos($url, $route)) {
                 if ('/' === $route) {
-                    return array($route, App::getContext()->getRoutes('/'), $url);
+                    return array($route, $this->getRoutes('/'), $url);
                 } elseif ('/' === substr($url, strlen($route), 1) || strlen($url) === strlen($route)) {
-                    return array($route, App::getContext()->getRoutes($route), $url);
+                    return array($route, $this->getRoutes($route), $url);
                 }
             }
         }
         return false;
+    }
+
+    /**
+     * devuelve los modulos registrados en el proyecto
+     * @return array 
+     */
+    public function getModules($name = null)
+    {
+        if ($name) {
+            foreach ($this->modules as $module) {
+                if ($name === $module->getName()) {
+                    return $module;
+                }
+            }
+            return null;
+        } else {
+            return $this->modules;
+        }
+    }
+
+    /**
+     * devuelve las rutas registradas en el proyecto
+     * @param string $route si se suministra un prefijo, devuelve solo
+     * el valor de la ruta para ese prefijo.
+     * @return array|string|null 
+     */
+    protected function getRoutes($route = null)
+    {
+        if ($route) {
+            if (isset($this->routes[$route])) {
+                foreach ($this->modules as $module) {
+                    if ($this->routes[$route] === $module->getName()) {
+                        return $this->routes[$route];
+                    }
+                }
+            }
+            return null;
+        } else {
+            return $this->routes;
+        }
     }
 
 }

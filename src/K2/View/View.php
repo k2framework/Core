@@ -171,7 +171,7 @@ class View
         $template = explode(':', $template);
 
         if (count($template) > 1) {
-            $modulePath = rtrim($app->getPath($template[0]), '/');
+            $modulePath = rtrim(App::get('app.kernel')->getModules($template[0])->getPath(), '/');
             $file = $modulePath . '/View/_shared/templates/' . $template[1] . '.phtml';
         } else {
             $file = rtrim($app->getAppPath(), '/') . '/view/templates/' . $template[0] . '.phtml';
@@ -203,7 +203,7 @@ class View
             $view = $view[0];
         }
 
-        $file = rtrim($app->getPath($module), '/') . '/View/' . $controller . '/' . $view . '.phtml';
+        $file = rtrim(App::get('app.kernel')->getModules($module)->getPath(), '/') . '/View/' . $controller . '/' . $view . '.phtml';
         if (!is_file($file)) {
             if (is_string($scaffold)) {
                 $view = '/view/scaffolds/' . $scaffold . '/' . $view . '.phtml';
