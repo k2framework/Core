@@ -148,7 +148,11 @@ class Container implements ContainerInterface
 
     public function offsetSet($offset, $value)
     {
-        //nada por ahora
+        if($value instanceof \Closure){
+            $this->set($offset, $value);
+        }else{
+            $this->setParameter($offset, $value);
+        }
     }
 
     public function offsetUnset($offset)
