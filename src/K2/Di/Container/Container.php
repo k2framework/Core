@@ -49,7 +49,13 @@ class Container implements ContainerInterface
             return $this->services[$id];
         }
         //si existe pero no se ha creado, creamos la instancia
-        return $this->services[$id] = $this->definitions['services'][$id]($this);
+        $this->services[$id] = $this->definitions['services'][$id]($this);
+                
+        if (!is_object($this->services[$id])){
+            throw new \K2\Di\Exception\DiException("La función que crea el servicio $id bebe retornar un objeto");
+        }
+        
+        return $this->services[$id];
     }
 
     public function has($id)

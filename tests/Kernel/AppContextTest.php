@@ -59,8 +59,6 @@ class AppContextTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(__DIR__, $app->getAppPath());
         $this->assertEquals($request->getBaseUrl(), $app->getBaseUrl());
         $this->assertEquals($request->getRequestUrl(), $app->getRequestUrl());
-
-        $this->assertEquals($this->modules, $app->getModules());
     }
 
     public function testRoutes()
@@ -84,8 +82,6 @@ class AppContextTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('usuarios', $app->getCurrentController());
         $this->assertEquals('index', $app->getCurrentAction());
         $this->assertEquals(array(), $app->getCurrentParameters());
-
-        $this->assertEquals($this->modules['K2/Backend'], $app->getModules($app->getCurrentModule()));
 
         $backendPath = $this->modules['K2/Backend'] . 'K2/Backend/';
 
