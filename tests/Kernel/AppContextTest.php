@@ -72,11 +72,6 @@ class AppContextTest extends PHPUnit_Framework_TestCase
 
         $app->setRequest($request);
 
-        $this->assertEquals('K2/Backend', $app->getRoutes('/admin'));
-
-        $this->assertNull($app->getRoutes('/ninguno'));
-        $this->assertEquals('Index', $app->getRoutes('/'));
-
         $app->setRequest($request);
 
         $app->setCurrentModule('K2/Backend')
@@ -90,12 +85,10 @@ class AppContextTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('index', $app->getCurrentAction());
         $this->assertEquals(array(), $app->getCurrentParameters());
 
-        $this->assertEquals($this->modules['K2/Backend'], $app->getModules($app->getRoutes($app->getCurrentModuleUrl())));
         $this->assertEquals($this->modules['K2/Backend'], $app->getModules($app->getCurrentModule()));
 
         $backendPath = $this->modules['K2/Backend'] . 'K2/Backend/';
 
-        $this->assertEquals($backendPath, $app->getPath($app->getRoutes($app->getCurrentModuleUrl())));
         $this->assertEquals($backendPath, $app->getPath($app->getCurrentModule()));
 
         $this->assertEquals('http://localhost/k2/admin/usuarios', $app->getControllerUrl());
