@@ -3,7 +3,7 @@
 namespace K2;
 
 use K2\Kernel\Module;
-use K2\Kernel\Event\KumbiaEvents;
+use K2\Kernel\Event\K2Events;
 
 class K2Module extends Module
 {
@@ -37,7 +37,7 @@ class K2Module extends Module
             //si es el router por defecto quien reescribirá las url
             if ('router' === $router) {
                 //le añadimos un listener.
-                $this->dispatcher->addListener(KumbiaEvents::REQUEST, array('router', 'rewrite'), 10000);
+                $this->dispatcher->addListener(K2Events::REQUEST, array('router', 'rewrite'), 10000);
             }
         }
 

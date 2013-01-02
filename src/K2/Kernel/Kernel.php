@@ -5,12 +5,11 @@ namespace K2\Kernel;
 use K2\Kernel\AppContext;
 use K2\Di\Container\Container;
 use K2\Kernel\KernelInterface;
-use K2\Kernel\Event\KumbiaEvents;
+use K2\Kernel\Event\K2Events;
 use K2\Kernel\Event\RequestEvent;
 use K2\Kernel\Event\ResponseEvent;
 use K2\Kernel\Config\ConfigReader;
 use K2\Kernel\Event\ExceptionEvent;
-use K2\Kernel\Event\ControllerEvent;
 use K2\EventDispatcher\EventDispatcher;
 use K2\Kernel\Exception\ExceptionHandler;
 use K2\Kernel\Exception\NotFoundException;
@@ -35,13 +34,6 @@ abstract class Kernel implements KernelInterface
      * @var array 
      */
     protected $routes;
-
-    /**
-     * Objeto inyector de dependencias
-     *
-     * @var DependencyInjection
-     */
-    protected $di;
 
     /**
      * Objeto contenedor de servicios
@@ -116,26 +108,26 @@ abstract class Kernel implements KernelInterface
      */
     public function init(Request $request)
     {
-//creamos la instancia del AppContext
+        //creamos la instancia del AppContext
         $context = new AppContext($this->production, $this->getAppPath(), $this->modules, $this->routes);
-//leemos la config de la app
-//$config = new ConfigReader($context);
-//iniciamos el container con esa config
+        //leemos la config de la app
+        //$config = new ConfigReader($context);
+        //iniciamos el container con esa config
         $this->initContainer(/* $config->getConfig() */);
-//asignamos el kernel al container como un servicio
+        //asignamos el kernel al container como un servicio
         $this->container->setInstance('app.kernel', $this);
-//iniciamos el dispatcher con esa config
+        //iniciamos el dispatcher con esa config
         $this->initDispatcher();
-//inicializamos los modulos de la app.
+        //inicializamos los modulos de la app.
         $this->initModules();
-//seteamos el contexto de la aplicación como servicio
+        //seteamos el contexto de la aplicación como servicio
         $this->container->setInstance('app.context', $context);
-//si se usan locales los añadimos.
+        //si se usan locales los añadimos.
         if (isset($this->container['config']['locales'])) {
             $this->locales = $this->container['config']['locales'];
         }
         $this->readConfig();
-//establecemos el Request en el AppContext
+        //establecemos el Request en el AppContext
         $context->setRequest($request);
     }
 
@@ -150,7 +142,7 @@ abstract class Kernel implements KernelInterface
         $action = 'index'; //accion por defecto si no se especifica.
         $moduleUrl = '/';
         $params = array(); //parametros de la url, de existir.
-//obtenemos la url actual de la petición.
+        //obtenemos la url actual de la petición.
         $currentUrl = '/' . trim($this->request->getRequestUrl(), '/');
 
         list($moduleUrl, $module, $currentUrl) = $this->getModule($currentUrl);
@@ -161,18 +153,18 @@ abstract class Kernel implements KernelInterface
 
         if ($url = explode('/', trim(substr($currentUrl, strlen($moduleUrl)), '/'))) {
 
-//ahora obtengo el controlador
+            //ahora obtengo el controlador
             if (current($url)) {
-//si no es un controlador lanzo la excepcion
+                //si no es un controlador lanzo la excepcion
                 $controller = current($url);
                 next($url);
             }
-//luego obtenemos la acción
+            //luego obtenemos la acción
             if (current($url)) {
                 $action = current($url);
                 next($url);
             }
-//por ultimo los parametros
+            //por ultimo los parametros
             if (current($url)) {
                 $params = array_slice($url, key($url));
             }
@@ -188,13 +180,13 @@ abstract class Kernel implements KernelInterface
     public function execute(Request $request, $type = Kernel::MASTER_REQUEST)
     {
         try {
-//verificamos el tipo de petición
+            //verificamos el tipo de petición
             if (self::MASTER_REQUEST === $type) {
                 return $this->_execute($request, $type);
             } else {
-//almacenamos en una variable temporal el request
-//original. y actualizamos el AppContext.
-//tambien el tipo de request
+                //almacenamos en una variable temporal el request
+                //original. y actualizamos el AppContext.
+                //tambien el tipo de request
                 $originalRequest = $this->request;
                 $originalRequestType = $this->container->get('app.context')
                         ->getRequestType();
@@ -204,8 +196,8 @@ abstract class Kernel implements KernelInterface
 
                 $response = $this->_execute($request, $type);
 
-//Luego devolvemos el request original al kernel,
-//al AppContext, y el tipo de request
+                //Luego devolvemos el request original al kernel,
+                //al AppContext, y el tipo de request
                 $this->request = $originalRequest;
                 $this->container->setInstance('request', $originalRequest);
                 $this->container->get('app.context')
@@ -227,28 +219,22 @@ abstract class Kernel implements KernelInterface
             $this->init($request);
             $this->container->get('app.context')->setRequestType($type);
         }
-//agregamos el request al container
+        //agregamos el request al container
         $this->container->setInstance('request', $this->request);
 
-//parseamos la url para obtener el modulo,controlador,accion,parametros
+        //parseamos la url para obtener el modulo,controlador,accion,parametros
         $this->parseUrl();
 
-//ejecutamos el evento request
-        $this->dispatcher->dispatch(KumbiaEvents::REQUEST, $event = new RequestEvent($request));
+        //ejecutamos el evento request
+        $this->dispatcher->dispatch(K2Events::REQUEST, $event = new RequestEvent($request));
 
         if (!$event->hasResponse()) {
 
-//creamos el resolver.
+            //creamos el resolver.
             $resolver = new ControllerResolver($this->container);
-//obtenemos la instancia del controlador, el nombre de la accion
-//a ejecutar, y los parametros que recibirá dicha acción a traves del método
-//getController del $resolver y lo pasamos al ControllerEvent
-            $event = new ControllerEvent($request, $resolver->getController($request));
-//ejecutamos el evento controller.
-            $this->dispatcher->dispatch(KumbiaEvents::CONTROLLER, $event);
 
-//ejecutamos la acción de controlador pasandole los parametros.
-            $response = $resolver->executeAction($event);
+            //ejecutamos la acción de controlador pasandole los parametros.
+            $response = $resolver->executeAction();
             if (!$response instanceof Response) {
                 $response = $this->createResponse($resolver);
             }
@@ -267,11 +253,11 @@ abstract class Kernel implements KernelInterface
      */
     private function createResponse(ControllerResolver $resolver)
     {
-//como la acción no devolvió respuesta, debemos
-//obtener la vista y el template establecidos en el controlador
-//para pasarlos al servicio view, y este construya la respuesta
-//llamamos al render del servicio "view" y esté nos devolverá
-//una instancia de response con la respuesta creada
+        //como la acción no devolvió respuesta, debemos
+        //obtener la vista y el template establecidos en el controlador
+        //para pasarlos al servicio view, y este construya la respuesta
+        //llamamos al render del servicio "view" y esté nos devolverá
+        //una instancia de response con la respuesta creada
         return $this->container->get('view')->render(array(
                     'template' => $resolver->callMethod('getTemplate'),
                     'view' => $resolver->callMethod('getView'),
@@ -284,7 +270,7 @@ abstract class Kernel implements KernelInterface
     private function exception(\Exception $e)
     {
         $event = new ExceptionEvent($e, $this->request);
-        $this->dispatcher->dispatch(KumbiaEvents::EXCEPTION, $event);
+        $this->dispatcher->dispatch(K2Events::EXCEPTION, $event);
 
         if ($event->hasResponse()) {
             return $this->response($event->getResponse());
@@ -300,9 +286,9 @@ abstract class Kernel implements KernelInterface
     private function response(Response $response)
     {
         $event = new ResponseEvent($this->request, $response);
-//ejecutamos el evento response.
-        $this->dispatcher->dispatch(KumbiaEvents::RESPONSE, $event);
-//retornamos la respuesta
+        //ejecutamos el evento response.
+        $this->dispatcher->dispatch(K2Events::RESPONSE, $event);
+        //retornamos la respuesta
         return $event->getResponse();
     }
 

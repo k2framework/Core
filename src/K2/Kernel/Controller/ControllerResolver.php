@@ -66,8 +66,7 @@ class ControllerResolver
     }
 
     /**
-     * Crea y devuelve la Instancia del controlador, la acción a ejecutar y los parametros
-     * @return array(Controller $controller,string $action,array $parameters)
+     * Crea la Instancia del controlador
      * @throws NotFoundException si no encuentra el controlador
      */
     public function getController()
@@ -93,20 +92,15 @@ class ControllerResolver
 
         $this->controller = $reflectionClass->newInstanceArgs(array($this->container));
         $this->setViewDefault($app->getCurrentAction());
-
-        return array($this->controller, $this->action, $this->parameters);
     }
 
     /**
      * Ejecuta la acción en el controlador, y los filtros.
-     * @param ControllerEvent $controllerEvent objeto con la instancia del controlador,
-     * el nombre de la acción a ejecutar y los parametros para el método. 
      */
-    public function executeAction(ControllerEvent $controllerEvent)
+    public function executeAction()
     {
-        $this->controller = $controllerEvent->getController();
-        $this->action = $controllerEvent->getAction();
-
+        $this->getController();
+        
         $controller = new ReflectionObject($this->controller);
 
         if (($response = $this->executeBeforeFilter($controller)) instanceof Response) {
@@ -116,9 +110,9 @@ class ControllerResolver
         if (false === $this->action) {
             return; //si el before devuelve false, es porque no queremos que se ejecute nuestra acción.
         }
-        $this->validateAction($controller, $controllerEvent->getParameters());
+        $this->validateAction($controller, $this->parameters);
 
-        $response = call_user_func_array(array($this->controller, $this->action), $controllerEvent->getParameters());
+        $response = call_user_func_array(array($this->controller, $this->action), $this->parameters);
 
         $this->executeAfterFilter($controller);
 

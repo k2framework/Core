@@ -7,11 +7,10 @@ namespace K2\Kernel\Event;
  *
  * @author manuel
  */
-final class KumbiaEvents
+final class K2Events
 {
 
     const REQUEST = 'kumbia.request';
-    const CONTROLLER = 'kumbia.controller';
     const RESPONSE = 'kumbia.response';
     const EXCEPTION = 'kumbia.exception';
 
