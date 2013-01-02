@@ -60,7 +60,6 @@ class AppContextTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($request->getBaseUrl(), $app->getBaseUrl());
         $this->assertEquals($request->getRequestUrl(), $app->getRequestUrl());
 
-        $this->assertEquals($this->routes, $app->getRoutes());
         $this->assertEquals($this->modules, $app->getModules());
     }
 
