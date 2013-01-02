@@ -73,7 +73,7 @@ class ControllerResolver
     public function getController()
     {
         if ('/logout' === $this->module) {
-            throw new NotFoundException(sprintf("La ruta \"%s\" no concuerda con ningún módulo ni controlador en la App", $this->module), 404);
+            throw new NotFoundException(sprintf("La ruta \"%s\" no concuerda con ningún módulo ni controlador en la App", $this->module));
         }
 
         $app = $this->container->get('app.context');
@@ -88,7 +88,7 @@ class ControllerResolver
             }
         } catch (\Exception $e) {
             $modulePath = $app->getPath($this->module);
-            throw new NotFoundException(sprintf("No existe el controlador \"%s\" en la ruta \"%sController/%s.php\"", $this->controllerName, $modulePath, $this->controllerName), 404);
+            throw new NotFoundException(sprintf("No existe el controlador \"%s\" en la ruta \"%sController/%s.php\"", $this->controllerName, $modulePath, $this->controllerName));
         }
 
         $this->controller = $reflectionClass->newInstanceArgs(array($this->container));
@@ -158,7 +158,7 @@ class ControllerResolver
         }
         //verificamos la existencia del metodo.
         if (!$controller->hasMethod($this->action)) {
-            throw new NotFoundException(sprintf("No existe el metodo \"%s\" en el controlador \"%s\"", $this->action, $this->controllerName), 404);
+            throw new NotFoundException(sprintf("No existe el metodo \"%s\" en el controlador \"%s\"", $this->action, $this->controllerName));
         }
 
         $reflectionMethod = $controller->getMethod($this->action);
@@ -166,12 +166,12 @@ class ControllerResolver
         //el nombre del metodo debe ser exactamente igual al camelCase
         //de la porcion de url
         if ($reflectionMethod->getName() !== $this->action) {
-            throw new NotFoundException(sprintf("No existe el metodo <b>%s</b> en el controlador \"%s\"", $this->action, $this->controllerName), 404);
+            throw new NotFoundException(sprintf("No existe el metodo <b>%s</b> en el controlador \"%s\"", $this->action, $this->controllerName));
         }
 
         //se verifica que el metodo sea public
         if (!$reflectionMethod->isPublic()) {
-            throw new NotFoundException(sprintf("Éstas Tratando de acceder a un metodo no publico \"%s\" en el controlador \"%s\"", $this->action, $this->controllerName), 404);
+            throw new NotFoundException(sprintf("Éstas Tratando de acceder a un metodo no publico \"%s\" en el controlador \"%s\"", $this->action, $this->controllerName));
         }
 
         /**
@@ -180,7 +180,7 @@ class ControllerResolver
         if ($limitParams && (count($params) < $reflectionMethod->getNumberOfRequiredParameters() ||
                 count($params) > $reflectionMethod->getNumberOfParameters())) {
 
-            throw new NotFoundException(sprintf("Número de parámetros erróneo para ejecutar la acción \"%s\" en el controlador \"%sr\"", $this->action, $this->controllerName), 404);
+            throw new NotFoundException(sprintf("Número de parámetros erróneo para ejecutar la acción \"%s\" en el controlador \"%sr\"", $this->action, $this->controllerName));
         }
     }
 
