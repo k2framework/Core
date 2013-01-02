@@ -104,10 +104,11 @@ class Controller
 
     /**
      * Establece la vista a usar
+     * @final
      * @param string $view
      * @param string $template 
      */
-    protected function setView($view, $template = false)
+    final protected function setView($view, $template = false)
     {
         $this->view = $view;
         if ($template !== false) {
@@ -117,10 +118,11 @@ class Controller
 
     /**
      * Establece el response para la vista
+     * @final
      * @param string $response
      * @param string $template 
      */
-    protected function setResponse($response, $template = false)
+    final protected function setResponse($response, $template = false)
     {
         $this->response = $response;
         if ($template !== false) {
@@ -130,36 +132,40 @@ class Controller
 
     /**
      * Establece el template a usar
+     * @final
      * @param string $template 
      */
-    protected function setTemplate($template)
+    final protected function setTemplate($template)
     {
         $this->template = $template;
     }
 
     /**
      * devuelve la vista a mostrar
+     * @final
      * @return string 
      */
-    protected function getView()
+    final protected function getView()
     {
         return $this->view;
     }
 
     /**
      * devuelve el response a usar
+     * @final
      * @return string 
      */
-    protected function getResponse()
+    final protected function getResponse()
     {
         return $this->response;
     }
 
     /**
-     * devuelve el template a mostarr
+     * devuelve el template a mostar
+     * @final
      * @return string 
      */
-    protected function getTemplate()
+    final protected function getTemplate()
     {
         return $this->template;
     }
@@ -168,6 +174,7 @@ class Controller
      * Especifica un tiempo de cache para la vista.
      * 
      * Debe ser una cadena que represente un formato de fecha relativa.
+     * @final
      * 
      * @example $this->cache("+2 days");
      * @example $this->cache("+3 hours");
@@ -175,12 +182,12 @@ class Controller
      * 
      * @param string $time
      */
-    protected function cache($time = false)
+    final protected function cache($time = false)
     {
         $this->cache = $time;
     }
 
-    protected function getCache()
+    final protected function getCache()
     {
         return $this->cache;
     }
