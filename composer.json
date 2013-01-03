@@ -17,7 +17,7 @@
     },
     "autoload": {
         "psr-0":{ 
-            "KumbiaPHP\\": "src/"
+            "K2\\": "src/"
         }
     },
     "minimum-stability": "dev"
