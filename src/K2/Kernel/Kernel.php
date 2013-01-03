@@ -342,6 +342,12 @@ abstract class Kernel implements KernelInterface
             $module->setContainer($this->container);
             $module->setEventDispatcher($this->dispatcher);
             $module->init();
+            if (null !== $module->extend()) {
+                if (null === $parent = $this->getModules($module->extend())) {
+                    throw new InvalidArgumentException("No exite el módulo {$module->extend()} para extenderlo");
+                }
+                $parent->setChildren($module);
+            }
         }
     }
 
@@ -383,7 +389,7 @@ abstract class Kernel implements KernelInterface
         }
 
         if ('/logout' === $url) {
-            return array($url, $url, $url);
+            return array($url, new Module(), $url);
         }
 
         $routes = array_keys($this->routes);
@@ -396,9 +402,9 @@ abstract class Kernel implements KernelInterface
         foreach ($routes as $route) {
             if (0 === strpos($url, $route)) {
                 if ('/' === $route) {
-                    return array($route, $this->getRoutes('/'), $url);
+                    return array($route, $this->getModules($this->getRoutes('/')), $url);
                 } elseif ('/' === substr($url, strlen($route), 1) || strlen($url) === strlen($route)) {
-                    return array($route, $this->getRoutes($route), $url);
+                    return array($route, $this->getModules($this->getRoutes($route)), $url);
                 }
             }
         }

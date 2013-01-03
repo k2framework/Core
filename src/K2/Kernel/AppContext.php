@@ -40,7 +40,7 @@ class AppContext
 
     /**
      * Contiene el prefijo actual que representa a un modulo en el proyecto
-     * @var string 
+     * @var Module 
      */
     protected $currentModule;
 
@@ -183,7 +183,7 @@ class AppContext
 
     /**
      * Devuelve el prefijo actual del modulo que se está ejecutando
-     * @return string 
+     * @return Module 
      */
     public function getCurrentModule()
     {
@@ -192,10 +192,10 @@ class AppContext
 
     /**
      * Establece el módulo actual en ejecucion
-     * @param string $currentModule 
+     * @param Module $currentModule 
      * @return AppContext
      */
-    public function setCurrentModule($currentModule)
+    public function setCurrentModule(Module $currentModule)
     {
         $this->currentModule = $currentModule;
         return $this;
@@ -269,7 +269,7 @@ class AppContext
      */
     public function getCurrentUrl($parameters = FALSE)
     {
-        $url = $this->createUrl("{$this->currentModule}:{$this->currentController}/{$this->currentAction}");
+        $url = $this->createUrl("{$this->currentModule->getName()}:{$this->currentController}/{$this->currentAction}");
         if ($parameters && count($this->currentParameters)) {
             $url .= '/' . join('/', $this->currentParameters);
         }
@@ -292,7 +292,7 @@ class AppContext
      */
     public function getControllerUrl($action = null)
     {
-        return rtrim($this->createUrl("{$this->currentModule}:{$this->currentController}/{$action}"), '/');
+        return rtrim($this->createUrl("{$this->currentModule->getName()}:{$this->currentController}/{$action}"), '/');
     }
 
     /**
