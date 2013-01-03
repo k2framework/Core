@@ -8,7 +8,6 @@ use K2\Kernel\KernelInterface;
 use K2\Kernel\Event\K2Events;
 use K2\Kernel\Event\RequestEvent;
 use K2\Kernel\Event\ResponseEvent;
-use K2\Kernel\Config\ConfigReader;
 use K2\Kernel\Event\ExceptionEvent;
 use K2\EventDispatcher\EventDispatcher;
 use K2\Kernel\Exception\ExceptionHandler;
@@ -110,10 +109,8 @@ abstract class Kernel implements KernelInterface
     {
         //creamos la instancia del AppContext
         $context = new AppContext($this->production, $this->getAppPath(), $this->modules, $this->routes);
-        //leemos la config de la app
-        //$config = new ConfigReader($context);
-        //iniciamos el container con esa config
-        $this->initContainer(/* $config->getConfig() */);
+        //iniciamos el container
+        $this->initContainer();
         //asignamos el kernel al container como un servicio
         $this->container->setInstance('app.kernel', $this);
         //iniciamos el dispatcher con esa config
@@ -126,7 +123,6 @@ abstract class Kernel implements KernelInterface
         if (isset($this->container['config']['locales'])) {
             $this->locales = explode(',', $this->container['config']['locales']);
         }
-        $this->readConfig();
         //establecemos el Request en el AppContext
         $context->setRequest($request);
     }
@@ -330,14 +326,13 @@ abstract class Kernel implements KernelInterface
 
     /**
      * Esta función inicializa el contenedor de servicios.
-     * @param array $config toda la configuracion de los archivos de config
-     * de cada lib y modulo compilados en uno solo.
      */
     protected function initContainer(array $config = array())
     {
         $this->container = new Container();
         $this->container->setParameter('app_dir', $this->getAppPath());
         App::setContainer($this->container);
+        $this->readConfig();
     }
 
     protected function initModules()
@@ -364,9 +359,6 @@ abstract class Kernel implements KernelInterface
         $config = Config\Reader::read('config');
 
         foreach ($config as $section => $values) {
-            if ($this->container->hasParameter($section)) {
-                $values = $this->mergeConfig($this->container->getParameter($section), $values);
-            }
             $this->container->setParameter($section, $values);
         }
     }
@@ -451,19 +443,6 @@ abstract class Kernel implements KernelInterface
         } else {
             return $this->routes;
         }
-    }
-
-    private function mergeConfig($config, $newConfig)
-    {
-        foreach ($newConfig as $key => $value) {
-            if (array_key_exists($key, $config) && is_array($value)) {
-                $config[$key] = $this->mergeConfig($config[$key], $newConfig[$key]);
-            } else {
-                $config[$key] = $value;
-            }
-        }
-
-        return $config;
     }
 
 }
