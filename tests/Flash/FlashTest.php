@@ -2,9 +2,9 @@
 
 require_once __DIR__ . '/../autoload.php';
 
-use KumbiaPHP\Flash\Flash;
-use KumbiaPHP\Flash\FlashCollection;
-use KumbiaPHP\Kernel\Session\Session;
+use K2\Flash\Flash;
+use K2\Flash\FlashCollection;
+use K2\Kernel\Session\Session;
 
 class FlashTest extends PHPUnit_Framework_TestCase
 {
@@ -49,7 +49,7 @@ class FlashTest extends PHPUnit_Framework_TestCase
     public function testFlash()
     {
         $session = new Session(__DIR__);
-        
+
         $session->destroy();
         $session->start();
 
@@ -62,7 +62,7 @@ class FlashTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals(array('Archivo Creado'), $flash->get('mensaje'));
         $this->assertNull($flash->get('mensaje'));
-        
+
         $session->destroy();
     }
 

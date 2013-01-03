@@ -1,0 +1,43 @@
+<?php
+
+namespace K2\Security\Auth;
+
+use K2\Security\Auth\Token\TokenInterface;
+use K2\Security\Exception\UserNotFoundException;
+use K2\Security\Auth\Provider\UserProviderInterface;
+
+/**
+ * Description of AuthManager
+ *
+ * @author manuel
+ */
+class AuthManager
+{
+
+    /**
+     *
+     * @var UserProviderInterface
+     */
+    protected $userProvider;
+
+    function __construct(UserProviderInterface $userProvider)
+    {
+        $this->userProvider = $userProvider;
+    }
+
+//put your code here
+    public function autenticate(TokenInterface $token)
+    {
+        $user = $this->userProvider->loadUser($token);
+
+        if (TRUE !== $user->auth($token->getUser())) {
+            throw new UserNotFoundException("no existe el usuario {$token->getUsername()}");
+        }
+
+        $token->setUser($user);
+        $token->setAutenticated(TRUE);
+
+        return TRUE;
+    }
+
+}
