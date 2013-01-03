@@ -50,11 +50,11 @@ class Container implements ContainerInterface
         }
         //si existe pero no se ha creado, creamos la instancia
         $this->services[$id] = $this->definitions['services'][$id]($this);
-                
-        if (!is_object($this->services[$id])){
+
+        if (!is_object($this->services[$id])) {
             throw new \K2\Di\Exception\DiException("La función que crea el servicio $id bebe retornar un objeto");
         }
-        
+
         return $this->services[$id];
     }
 
@@ -111,18 +111,39 @@ class Container implements ContainerInterface
     /**
      * Crea ó Actualiza la configuración para la creación de un servicio.
      * 
-     * @example $container->set("session", "Lib\\Session\Session", array(
-     *              'construct' => '@request'
-     * ));
+     * @example $container->set("session", function($c){
+     *      return new K2\Kernel\Session\Session($c['request']);
+     * });
      * 
      * @param string $id identificador del servicio
-     * @param string $className Nombre de la Clase a Instanciar
-     * @param array $config configuración para el servicio.
+     * @param \Closure funcion que crea el servicio
+     * @param boolean $singleton Indica si se va a mentener una sola instancia de la clase
+     * ó se creará una nueva cada vez que el servicio sea solicitado
      */
-    public function set($id, \Closure $function)
+    public function set($id, \Closure $function, $singleton = true)
     {
         $this->definitions['services'][$id] = $function;
         return $this;
+    }
+
+    /**
+     * Crea ó Actualiza la configuración para la creación de varios servicios.
+     * 
+     * @example $container->setFromArray(array(
+     *                  "session" => function($c){
+     *                      return new K2\Kernel\Session\Session($c['request']);
+     *                  },
+     *                  "flash" => function($c){
+     *                      return new K2\Flash\Flash($c['session']);
+     *                  },
+     *               )
+     * );
+     * 
+     * @param array $services Arreglo con las definciones de los servicios
+     */
+    public function setFromArray(array $services)
+    {
+        $this->definitions['services'] = $services + $this->definitions['services'];
     }
 
     /**
@@ -154,9 +175,9 @@ class Container implements ContainerInterface
 
     public function offsetSet($offset, $value)
     {
-        if($value instanceof \Closure){
+        if ($value instanceof \Closure) {
             $this->set($offset, $value);
-        }else{
+        } else {
             $this->setParameter($offset, $value);
         }
     }
