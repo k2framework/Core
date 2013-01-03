@@ -124,7 +124,7 @@ abstract class Kernel implements KernelInterface
         $this->container->setInstance('app.context', $context);
         //si se usan locales los añadimos.
         if (isset($this->container['config']['locales'])) {
-            $this->locales = $this->container['config']['locales'];
+            $this->locales = explode(',', $this->container['config']['locales']);
         }
         $this->readConfig();
         //establecemos el Request en el AppContext

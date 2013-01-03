@@ -11,25 +11,35 @@ class K2Module extends Module
     public function init()
     {
         //acá establecemos los servicios en el container
-        $this->container->set('router', function() {
-                    return new Kernel\Router\Router();
-                })->set('session', function() {
-                    return new Kernel\Session\Session(Kernel\App::appPath());
-                })->set('view', function() {
-                    return new View\View();
-                })->set('cache', function() {
-                    return Cache\Cache::factory(App::appPath());
-                })->set('flash', function($c) {
-                    return new Flash\Flash($c->get('session'));
-                })->set('validator', function($c) {
-                    return new Validation\Validator($c);
-                })->set('security', function($c) {
-                    return new Security\Security($c->get('session'));
-                })->set('activerecord.provider', function($c) {
-                    return new Security\Auth\Provider\ActiveRecord($c);
-                });
+        $this->container->setFromArray(array(
+            'router' => function() {
+                return new Kernel\Router\Router();
+            },
+            'session' => function() {
+                return new Kernel\Session\Session(Kernel\App::appPath());
+            },
+            'view' => function() {
+                return new View\View();
+            },
+            'cache' => function() {
+                return Cache\Cache::factory(App::appPath());
+            },
+            'flash' => function($c) {
+                return new Flash\Flash($c->get('session'));
+            },
+            'validator' => function($c) {
+                return new Validation\Validator($c);
+            },
+            'security' => function($c) {
+                return new Security\Security($c->get('session'));
+            },
+            'activerecord.provider' => function($c) {
+                return new Security\Auth\Provider\ActiveRecord($c);
+            }
+        ));
 
-        $config = $this->container->getParameter('config');
+        $config = Kernel\Config\Reader::read('config');
+        $config = $config['config'];
 
         //si se usa el routes lo añadimos al container
         if (isset($config['routes'])) {
@@ -58,6 +68,7 @@ class K2Module extends Module
         $this->container->setParameter('translator', array(
             'provider' => 'arrays'
         ));
+        $this->container->setParameter('config', $config);
     }
 
 }
