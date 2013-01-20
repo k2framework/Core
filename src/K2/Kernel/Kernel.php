@@ -253,17 +253,18 @@ abstract class Kernel implements KernelInterface
      */
     private function createResponse(ControllerResolver $resolver)
     {
+        $controller = $resolver->getController();
         //como la acción no devolvió respuesta, debemos
         //obtener la vista y el template establecidos en el controlador
         //para pasarlos al servicio view, y este construya la respuesta
         //llamamos al render del servicio "view" y esté nos devolverá
         //una instancia de response con la respuesta creada
         return $this->container->get('view')->render(array(
-                    'template' => $resolver->callMethod('getTemplate'),
-                    'view' => $resolver->callMethod('getView'),
-                    'response' => $resolver->callMethod('getResponse'),
-                    'time' => $resolver->callMethod('getCache'),
-                    'params' => $resolver->getPublicProperties(), //nos devuelve las propiedades publicas del controlador
+                    'template' => $controller->getTemplate(),
+                    'view' => $controller->getView(),
+                    'response' => $controller->getResponse(),
+                    'time' => $controller->getCache(),
+                    'params' => get_object_vars($controller),
                 ));
     }
 
@@ -388,10 +389,6 @@ abstract class Kernel implements KernelInterface
             } else {
                 $this->request->setLocale($this->locales[0]);
             }
-        }
-
-        if ('/logout' === $url) {
-            return array($url, $url, $url);
         }
 
         $routes = array_keys($this->routes);
