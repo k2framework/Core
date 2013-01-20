@@ -26,6 +26,13 @@ class Module
      */
     protected $path;
     protected $name;
+    protected $namespace;
+
+    /**
+     *
+     * @var Module
+     */
+    private $children;
 
     public function setContainer(Container $container)
     {
@@ -50,8 +57,7 @@ class Module
     public function getName()
     {
         if (!$this->name) {
-            $r = new \ReflectionObject($this);
-            $this->name = str_replace('\\', '/', $r->getNamespaceName());
+            $this->name = str_replace('\\', '/', $this->getNamespace());
         }
         return $this->name;
     }
@@ -63,6 +69,35 @@ class Module
             $this->path = dirname($r->getFileName()) . '/';
         }
         return $this->path;
+    }
+
+    public function getNamespace()
+    {
+        if (!$this->namespace) {
+            $r = new \ReflectionObject($this);
+            $this->namespace = $r->getNamespaceName();
+        }
+        return $this->namespace;
+    }
+
+    public function extend()
+    {
+        return null;
+    }
+
+    public function getChildren()
+    {
+        return $this->children;
+    }
+
+    public function hasChildren()
+    {
+        return null !== $this->children;
+    }
+
+    public function setChildren(Module $children)
+    {
+        $this->children = $children;
     }
 
 }

@@ -139,7 +139,14 @@ class View
         $partial = explode(':', $partial);
 
         if (count($partial) > 1) {
-            $modulePath = rtrim(App::get('app.kernel')->getModules($partial[0])->getPath(), '/');
+            $module = App::get('app.kernel')->getModules($partial[0]);
+            if ($module->hasChildren()) {
+                $file = rtrim($module->getChildren()->getPath(), '/') . '/View/_shared/templates/' . $partial[1] . '.phtml';
+                if (is_file($file)) {
+                    return $file;
+                }
+            }
+            $modulePath = rtrim($module->getPath(), '/');
             $file = $modulePath . '/View/_shared/partials/' . $partial[1] . '.phtml';
         } else {
             $file = rtrim($app->getAppPath(), '/') . '/view/partials/' . $partial[0] . '.phtml';
@@ -171,7 +178,14 @@ class View
         $template = explode(':', $template);
 
         if (count($template) > 1) {
-            $modulePath = rtrim(App::get('app.kernel')->getModules($template[0])->getPath(), '/');
+            $module = App::get('app.kernel')->getModules($template[0]);
+            if ($module->hasChildren()) {
+                $file = rtrim($module->getChildren()->getPath(), '/') . '/View/_shared/templates/' . $template[1] . '.phtml';
+                if (is_file($file)) {
+                    return $file;
+                }
+            }
+            $modulePath = rtrim($module->getPath(), '/');
             $file = $modulePath . '/View/_shared/templates/' . $template[1] . '.phtml';
         } else {
             $file = rtrim($app->getAppPath(), '/') . '/view/templates/' . $template[0] . '.phtml';
@@ -194,7 +208,7 @@ class View
                 $view = join(':', $view);
                 throw new \LogicException("No se está especificando el \"Módulo:controlador:vista\" en el nombre de la vista correctamente $view");
             }
-            $module = $view[0];
+            $module = App::get('app.kernel')->getModules($view[0]);
             $controller = $view[1];
             $view = $view[2];
         } else {
@@ -203,7 +217,14 @@ class View
             $view = $view[0];
         }
 
-        $file = rtrim(App::get('app.kernel')->getModules($module)->getPath(), '/') . '/View/' . $controller . '/' . $view . '.phtml';
+        if ($module->hasChildren()) {
+            $file = rtrim($module->getChildren()->getPath(), '/') . '/View/' . $controller . '/' . $view . '.phtml';
+            if (is_file($file)) {
+                return $file;
+            }
+        }
+
+        $file = rtrim($module->getPath(), '/') . '/View/' . $controller . '/' . $view . '.phtml';
         if (!is_file($file)) {
             if (is_string($scaffold)) {
                 $view = '/view/scaffolds/' . $scaffold . '/' . $view . '.phtml';

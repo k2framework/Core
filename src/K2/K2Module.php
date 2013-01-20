@@ -58,6 +58,11 @@ class K2Module extends Module
                         return new Translation\Translator();
                     });
         }
+        
+        //si se define el timezone, lo asignamos a php
+        if(isset($config['timezone'])){
+            ini_set('date.timezone', $config['timezone']);
+        }
 
         $this->container->setParameter('security', array(
             'provider' => array(
