@@ -108,7 +108,7 @@ class Controller
      * @param string $view
      * @param string $template 
      */
-    final protected function setView($view, $template = false)
+    final public function setView($view, $template = false)
     {
         $this->view = $view;
         if ($template !== false) {
@@ -122,7 +122,7 @@ class Controller
      * @param string $response
      * @param string $template 
      */
-    final protected function setResponse($response, $template = false)
+    final public function setResponse($response, $template = false)
     {
         $this->response = $response;
         if ($template !== false) {
@@ -135,7 +135,7 @@ class Controller
      * @final
      * @param string $template 
      */
-    final protected function setTemplate($template)
+    final public function setTemplate($template)
     {
         $this->template = $template;
     }
@@ -145,7 +145,7 @@ class Controller
      * @final
      * @return string 
      */
-    final protected function getView()
+    final public function getView()
     {
         return $this->view;
     }
@@ -155,7 +155,7 @@ class Controller
      * @final
      * @return string 
      */
-    final protected function getResponse()
+    final public function getResponse()
     {
         return $this->response;
     }
@@ -165,7 +165,7 @@ class Controller
      * @final
      * @return string 
      */
-    final protected function getTemplate()
+    final public function getTemplate()
     {
         return $this->template;
     }
@@ -182,12 +182,12 @@ class Controller
      * 
      * @param string $time
      */
-    final protected function cache($time = false)
+    final public function cache($time = false)
     {
         $this->cache = $time;
     }
 
-    final protected function getCache()
+    final public function getCache()
     {
         return $this->cache;
     }
