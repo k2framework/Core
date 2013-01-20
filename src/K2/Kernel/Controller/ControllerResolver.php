@@ -5,7 +5,6 @@ namespace K2\Kernel\Controller;
 use \ReflectionClass;
 use \ReflectionObject;
 use K2\Kernel\Response;
-use K2\Kernel\Event\ControllerEvent;
 use K2\Di\Container\ContainerInterface;
 use K2\Kernel\Exception\NotFoundException;
 
@@ -66,13 +65,14 @@ class ControllerResolver
     }
 
     /**
-     * Crea la Instancia del controlador
+     * Devuelve la instancia del controlador, si no existe la crea.
+     * @return Controller la instancia del controlador en ejecución
      * @throws NotFoundException si no encuentra el controlador
      */
     public function getController()
     {
-        if ('/logout' === $this->module) {
-            throw new NotFoundException(sprintf("La ruta \"%s\" no concuerda con ningún módulo ni controlador en la App", $this->module));
+        if ($this->controller instanceof Controller) {
+            return $this->controller;
         }
 
         $app = $this->container->get('app.context');
@@ -91,7 +91,9 @@ class ControllerResolver
         }
 
         $this->controller = $reflectionClass->newInstanceArgs(array($this->container));
-        $this->setViewDefault($app->getCurrentAction());
+        $this->controller->setView($app->getCurrentAction());
+
+        return $this->controller;
     }
 
     /**
@@ -100,7 +102,7 @@ class ControllerResolver
     public function executeAction()
     {
         $this->getController();
-        
+
         $controller = new ReflectionObject($this->controller);
 
         if (($response = $this->executeBeforeFilter($controller)) instanceof Response) {
@@ -117,15 +119,6 @@ class ControllerResolver
         $this->executeAfterFilter($controller);
 
         return $response;
-    }
-
-    /**
-     * Devuelve los atributos Publicos del controlador
-     * @return array()
-     */
-    public function getPublicProperties()
-    {
-        return get_object_vars($this->controller);
     }
 
     /**
@@ -259,14 +252,7 @@ class ControllerResolver
      */
     protected function setViewDefault($action)
     {
-        $reflection = new \ReflectionClass($this->controller);
-
-        //obtengo el parametro del controlador.
-        $propertie = $reflection->getProperty('view');
-
-        //lo hago accesible para poderlo leer
-        $propertie->setAccessible(true);
-        $propertie->setValue($this->controller, $action);
+        $this->controller->setView($action);
     }
 
 }
