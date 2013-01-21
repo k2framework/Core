@@ -4,6 +4,7 @@ namespace K2\Di\Container;
 
 use K2\Di\Container\ContainerInterface;
 use K2\Di\Exception\IndexNotDefinedException;
+use K2\Di\Exception\DiException;
 
 /**
  * Description of Container
@@ -49,13 +50,13 @@ class Container implements ContainerInterface
             return $this->services[$id];
         }
         //si existe pero no se ha creado, creamos la instancia
-        $this->services[$id] = $this->definitions['services'][$id]($this);
+        $instance = $this->getInstance($id);
 
-        if (!is_object($this->services[$id])) {
-            throw new \K2\Di\Exception\DiException("La función que crea el servicio $id bebe retornar un objeto");
+        if (!is_object($instance)) {
+            throw new DiException("La función que crea el servicio $id bebe retornar un objeto");
         }
 
-        return $this->services[$id];
+        return $instance;
     }
 
     public function has($id)
@@ -122,7 +123,7 @@ class Container implements ContainerInterface
      */
     public function set($id, \Closure $function, $singleton = true)
     {
-        $this->definitions['services'][$id] = $function;
+        $this->definitions['services'][$id] = array($function, $singleton);
         return $this;
     }
 
@@ -185,6 +186,32 @@ class Container implements ContainerInterface
     public function offsetUnset($offset)
     {
         //nada por ahora
+    }
+
+    protected function getInstance($id)
+    {
+        $data = $this->definitions['services'][$id];
+
+        if ($data instanceof \Closure) {
+            return $this->services[$id] = $data($this);
+        }
+
+        if (is_array($data)) {
+
+            if (!$data[0] instanceof \Closure) {
+                throw new DiException("No se reconoce el valor para la definición del servicio $id");
+            }
+
+            $instance = $data[0]($this);
+
+            if (isset($data[1]) && true === $data[1]) {
+                $this->services[$id] = $instance;
+            }
+
+            return $instance;
+        }
+
+        throw new DiException("No se reconoce el valor para la definición del servicio $id");
     }
 
 }
