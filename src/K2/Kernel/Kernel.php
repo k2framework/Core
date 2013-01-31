@@ -11,7 +11,6 @@ use K2\Kernel\Event\ResponseEvent;
 use K2\Kernel\Event\ExceptionEvent;
 use K2\EventDispatcher\EventDispatcher;
 use K2\Kernel\Exception\ExceptionHandler;
-use K2\Kernel\Exception\NotFoundException;
 use K2\Kernel\Controller\ControllerResolver;
 
 /**
@@ -113,64 +112,18 @@ abstract class Kernel implements KernelInterface
         $this->initContainer();
         //asignamos el kernel al container como un servicio
         $this->container->setInstance('app.kernel', $this);
+        //si se usan locales los añadimos.
+        if (isset($this->container['config']['locales'])) {
+            $this->locales = explode(',', $this->container['config']['locales']);
+        }
         //iniciamos el dispatcher con esa config
         $this->initDispatcher();
         //inicializamos los modulos de la app.
         $this->initModules();
         //seteamos el contexto de la aplicación como servicio
         $this->container->setInstance('app.context', $context);
-        //si se usan locales los añadimos.
-        if (isset($this->container['config']['locales'])) {
-            $this->locales = explode(',', $this->container['config']['locales']);
-        }
         //establecemos el Request en el AppContext
         $context->setRequest($request);
-    }
-
-    /**
-     * Lee la Url de la petición actual, extrae el módulo/controlador/acción/parametros
-     * y los almacena en los atributos de la clase.
-     * @throws NotFoundException 
-     */
-    public function parseUrl()
-    {
-        $controller = 'index'; //controlador por defecto si no se especifica.
-        $action = 'index'; //accion por defecto si no se especifica.
-        $moduleUrl = '/';
-        $params = array(); //parametros de la url, de existir.
-        //obtenemos la url actual de la petición.
-        $currentUrl = '/' . trim($this->request->getRequestUrl(), '/');
-
-        list($moduleUrl, $module, $currentUrl) = $this->getModule($currentUrl);
-
-        if (!$moduleUrl || !$module) {
-            throw new NotFoundException(sprintf("La ruta \"%s\" no concuerda con ningún módulo ni controlador en la App", $currentUrl), 404);
-        }
-
-        if ($url = explode('/', trim(substr($currentUrl, strlen($moduleUrl)), '/'))) {
-
-            //ahora obtengo el controlador
-            if (current($url)) {
-                //si no es un controlador lanzo la excepcion
-                $controller = current($url);
-                next($url);
-            }
-            //luego obtenemos la acción
-            if (current($url)) {
-                $action = current($url);
-                next($url);
-            }
-            //por ultimo los parametros
-            if (current($url)) {
-                $params = array_slice($url, key($url));
-            }
-        }
-
-        App::getContext()->setCurrentModule($module)
-                ->setCurrentModuleUrl($moduleUrl)
-                ->setCurrentController($controller)
-                ->setCurrentAction($action)
-                ->setCurrentParameters($params);
     }
 
     public function execute(Request $request, $type = Kernel::MASTER_REQUEST)
@@ -217,9 +170,6 @@ abstract class Kernel implements KernelInterface
         }
         //agregamos el request al container
         $this->container->setInstance('request', $this->request);
-
-        //parseamos la url para obtener el modulo,controlador,accion,parametros
-        $this->parseUrl();
 
         //ejecutamos el evento request
         $this->dispatcher->dispatch(K2Events::REQUEST, $event = new RequestEvent($request));
@@ -376,7 +326,7 @@ abstract class Kernel implements KernelInterface
      * @param boolean $recursive
      * @return array ($moduleUrl, $moduleName, $currentUrl)
      */
-    protected function getModule($url, $recursive = true)
+    public function getModule($url, $recursive = true)
     {
         if (count($this->locales) && $recursive) {
             $_url = explode('/', trim($url, '/'));
@@ -432,7 +382,7 @@ abstract class Kernel implements KernelInterface
      * el valor de la ruta para ese prefijo.
      * @return array|string|null 
      */
-    protected function getRoutes($route = null)
+    public function getRoutes($route = null)
     {
         if ($route) {
             if (isset($this->routes[$route])) {

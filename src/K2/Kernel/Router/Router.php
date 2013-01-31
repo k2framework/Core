@@ -4,11 +4,11 @@ namespace K2\Kernel\Router;
 
 use K2\Kernel\App;
 use K2\Kernel\Kernel;
-use K2\Kernel\Request;
 use K2\Kernel\Config\Reader;
 use K2\Kernel\RedirectResponse;
 use K2\Kernel\Event\RequestEvent;
 use K2\Kernel\Router\RouterInterface;
+use K2\Kernel\Exception\NotFoundException;
 
 /**
  * Servicio Router del framework
@@ -60,7 +60,7 @@ class Router implements RouterInterface
         //clono el request y le asigno la nueva url.
         $request = clone App::getRequest();
 
-        $request->query->set('_url', '/' . ltrim(App::get('app.context')->createUrl($url, false), '/'));
+        $_GET['_url'] = '/' . ltrim(App::get('app.context')->createUrl($url, false), '/');
 
         //retorno la respuesta del kernel.
         return App::get('app.kernel')->execute($request, Kernel::SUB_REQUEST);
@@ -98,6 +98,55 @@ class Router implements RouterInterface
             $event->getRequest()->query->set('_url', '/' . ltrim($newUrl, '/'));
             App::get('app.kernel')->parseUrl();
         }
+    }
+
+    /**
+     * Lee la Url de la petición actual, extrae el módulo/controlador/acción/parametros
+     * y los almacena en los atributos de la clase.
+     * 
+     * Es llamado en el evento kumbia.request
+     * 
+     * @throws NotFoundException 
+     */
+    public function parseUrl()
+    {
+        $controller = 'index'; //controlador por defecto si no se especifica.
+        $action = 'index'; //accion por defecto si no se especifica.
+        $moduleUrl = '/';
+        $params = array(); //parametros de la url, de existir.
+        //obtenemos la url actual de la petición.
+        $currentUrl = '/' . trim(App::getRequest()->getRequestUrl(), '/');
+
+        list($moduleUrl, $module, $currentUrl) = App::get('app.kernel')->getModule($currentUrl);
+
+        if (!$moduleUrl || !$module) {
+            throw new NotFoundException(sprintf("La ruta \"%s\" no concuerda con ningún módulo ni controlador en la App", $currentUrl), 404);
+        }
+
+        if ($url = explode('/', trim(substr($currentUrl, strlen($moduleUrl)), '/'))) {
+
+            //ahora obtengo el controlador
+            if (current($url)) {
+                //si no es un controlador lanzo la excepcion
+                $controller = current($url);
+                next($url);
+            }
+            //luego obtenemos la acción
+            if (current($url)) {
+                $action = current($url);
+                next($url);
+            }
+            //por ultimo los parametros
+            if (current($url)) {
+                $params = array_slice($url, key($url));
+            }
+        }
+
+        App::getContext()->setCurrentModule($module)
+                ->setCurrentModuleUrl($moduleUrl)
+                ->setCurrentController($controller)
+                ->setCurrentAction($action)
+                ->setCurrentParameters($params);
     }
 
 }

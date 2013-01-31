@@ -10,6 +10,39 @@ class K2Module extends Module
 
     public function init()
     {
+        $this->setServices();
+        $this->setListeners();
+
+        $config = Kernel\Config\Reader::read('config');
+        $config = $config['config'];
+
+        //si se estan usando locales y ningun módulo a establecido una definición para
+        //el servicio translator, lo hacemos por acá.
+        if (isset($config['locales']) && !$this->container->has('translator')) {
+            $this->container->set('translator', function() {
+                        return new Translation\Translator();
+                    });
+        }
+
+        //si se define el timezone, lo asignamos a php
+        if (isset($config['timezone'])) {
+            ini_set('date.timezone', $config['timezone']);
+        }
+
+        $this->container->setParameter('security', array(
+            'provider' => array(
+                'active_record' => 'K2\\Security\\Auth\\Provider\\ActiveRecord',
+                'memory' => 'K2\\Security\\Auth\\Provider\\Memory',
+            ),
+        ));
+        $this->container->setParameter('translator', array(
+            'provider' => 'arrays'
+        ));
+        $this->container->setParameter('config', $config);
+    }
+
+    protected function setServices()
+    {
         //acá establecemos los servicios en el container
         $this->container->setFromArray(array(
             'router' => function() {
@@ -37,43 +70,12 @@ class K2Module extends Module
                 return new Security\Auth\Provider\ActiveRecord($c);
             }
         ));
+    }
 
-        $config = Kernel\Config\Reader::read('config');
-        $config = $config['config'];
-
-        //si se usa el routes lo añadimos al container
-        if (isset($config['routes'])) {
-            $router = substr($config['routes'], 1);
-            //si es el router por defecto quien reescribirá las url
-            if ('router' === $router) {
-                //le añadimos un listener.
-                $this->dispatcher->addListener(K2Events::REQUEST, array('router', 'rewrite'), 10000);
-            }
-        }
-
-        //si se estan usando locales y ningun módulo a establecido una definición para
-        //el servicio translator, lo hacemos por acá.
-        if (isset($config['locales']) && !$this->container->has('translator')) {
-            $this->container->set('translator', function() {
-                        return new Translation\Translator();
-                    });
-        }
-        
-        //si se define el timezone, lo asignamos a php
-        if(isset($config['timezone'])){
-            ini_set('date.timezone', $config['timezone']);
-        }
-
-        $this->container->setParameter('security', array(
-            'provider' => array(
-                'active_record' => 'K2\\Security\\Auth\\Provider\\ActiveRecord',
-                'memory' => 'K2\\Security\\Auth\\Provider\\Memory',
-            ),
-        ));
-        $this->container->setParameter('translator', array(
-            'provider' => 'arrays'
-        ));
-        $this->container->setParameter('config', $config);
+    protected function setListeners()
+    {
+        $this->dispatcher->addListener(K2Events::REQUEST
+                , array($this->container->get('router'), 'parseUrl'), 10000);
     }
 
 }

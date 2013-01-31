@@ -2,10 +2,7 @@
 
 namespace K2\Kernel;
 
-use K2\Kernel\Collection;
 use K2\Kernel\AppContext;
-use K2\Kernel\FilesCollection;
-use K2\Kernel\CookiesCollection;
 use K2\Kernel\Session\SessionInterface;
 
 /**
@@ -15,36 +12,6 @@ use K2\Kernel\Session\SessionInterface;
  */
 class Request
 {
-
-    /**
-     * Contiene la Informaci�n de la variable $_SERVER
-     * @var Collection
-     */
-    public $server;
-
-    /**
-     * Contiene la Informaci�n de la variable $_REQUEST
-     * @var Collection
-     */
-    public $request;
-
-    /**
-     * Contiene la Informaci�n de la variable $_GET
-     * @var Collection 
-     */
-    public $query;
-
-    /**
-     * Contiene la informaci�n de la variable $_COOKIE
-     * @var Collection 
-     */
-    public $cookies;
-
-    /**
-     * Contiene la informaci�n de la variable $_FILES
-     * @var Collection 
-     */
-    public $files;
 
     /**
      * Contiene el contexto de ejecución de la aplicación
@@ -67,32 +34,19 @@ class Request
 
     /**
      * Constructor de la clase. 
-     * Rellena los parametros de la clase con la info de la petición
-     * los valores de las variables globales $_SERVER, $_POST, $_GET , $_COOKIE
-     * $_FILES pasan a estár contenidos en atributos de la clase con el fin
-     * de ofrecer una arquitectura de comunicacion con estos valores orientada 
-     * a objetos. 
      */
-    public function __construct($baseUrl = NULL)
+    public function __construct($baseUrl = null)
     {
-        $this->server = new Collection($_SERVER);
-        $this->request = new Collection($_POST);
-        $this->query = new Collection($_GET);
-        $this->cookies = new CookiesCollection();
-        $this->files = new FilesCollection();
-
         //este fix es para permitir tener en el request los valores para peticiones
         //PUT y DELETE, ya que php no ofrece una forma facil de obtenerlos
         //actualmente.
-        if (0 === strpos($this->server->get('CONTENT_TYPE'), 'application/x-www-form-urlencoded')
-                && in_array($this->getMethod(), array('PUT', 'DELETE'))
+        if (0 === strpos($this->server('CONTENT_TYPE'), 'application/x-www-form-urlencoded') && in_array($this->getMethod(), array('PUT', 'DELETE'))
         ) {
-            parse_str($this->getContent(), $data);
-            $this->request = new Collection($data);
-        } elseif (0 === strpos($this->server->get('CONTENT_TYPE'), 'application/json')) {
+            parse_str($this->getContent(), $_REQUEST);
+        } elseif (0 === strpos($this->server('CONTENT_TYPE'), 'application/json')) {
             //si los datos de la petición se envian en formato JSON
             //los convertimos en una arreglo.
-            $this->request = new Collection((array) json_decode($this->getContent(), TRUE));
+            $_REQUEST = json_decode($this->getContent(), true);
         }
 
         if ($baseUrl) {
@@ -102,23 +56,19 @@ class Request
         }
     }
 
-    /**
-     * Devuelve el valor para un indice de las variables globales de la petición
-     * 
-     * Primero busca en request, sino lo encuentra busca en query y si no existe
-     * lo busca en las cookies.
-     * 
-     * De no exitir en ninguna de las variables devuelve el valor por defecto.
-     * 
-     * @param string $key
-     * @param mixed $default
-     * @return mixed 
-     */
-    public function get($key, $default = NULL)
+    public function get($key, $default = null)
     {
-        //busca en request, si no existe busca en query sino existe busca en 
-        //cookies, si no devuelve $default.
-        return $this->request->get($key, $this->query->get($key, $this->cookies->get($key, $default)));
+        return array_key_exists($key, $_GET) ? $_GET[$key] : $default;
+    }
+
+    public function post($key, $default = null)
+    {
+        return array_key_exists($key, $_POST) ? $_POST[$key] : $default;
+    }
+
+    public function request($key, $default = null)
+    {
+        return array_key_exists($key, $_REQUEST) ? $_REQUEST[$key] : $default;
     }
 
     /**
@@ -145,7 +95,7 @@ class Request
      */
     public function getMethod()
     {
-        return $this->server->get('REQUEST_METHOD', 'GET');
+        return $this->server('REQUEST_METHOD', 'GET');
     }
 
     /**
@@ -154,7 +104,7 @@ class Request
      */
     public function getClientIp()
     {
-        return $this->server->get('REMOTE_ADDR');
+        return $this->server('REMOTE_ADDR');
     }
 
     /**
@@ -163,7 +113,7 @@ class Request
      */
     public function isAjax()
     {
-        return $this->server->get('HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest';
+        return 'XMLHttpRequest' === $this->server('HTTP_X_REQUESTED_WITH');
     }
 
     /**
@@ -191,7 +141,7 @@ class Request
      */
     public function getRequestUrl()
     {
-        return $this->query->get('_url', '/');
+        return $this->get('_url', '/');
     }
 
     /**
@@ -200,7 +150,7 @@ class Request
      */
     public function getContent()
     {
-        if (FALSE === $this->content) {
+        if (false === $this->content) {
             $this->content = file_get_contents('php://input');
         }
         return $this->content;
@@ -229,14 +179,19 @@ class Request
         $this->locale = $locale;
     }
 
+    public function server($key, $default = null)
+    {
+        return array_key_exists($key, $_SERVER) ? $_SERVER[$key] : $default;
+    }
+
     /**
      * Crea la url base de la petición.
      * @return string 
      */
     private function createBaseUrl()
     {
-        $uri = $this->server->get('REQUEST_URI');
-        if ($qString = $this->server->get('QUERY_STRING')) {
+        $uri = $this->server('REQUEST_URI');
+        if ($qString = $this->server('QUERY_STRING')) {
             if (false !== $pos = strpos($uri, '?')) {
                 $uri = substr($uri, 0, $pos);
             }
