@@ -1,4 +1,4 @@
-CORE KumbiaPHP 2
+CORE K2 Framework
 ===========
 
 ..  image:: https://secure.travis-ci.org/manuelj555/Core.png?branch=master
