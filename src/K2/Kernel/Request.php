@@ -29,7 +29,12 @@ class Request
      * Contenido del Request Body de la petición
      * @var string 
      */
-    protected $content = FALSE;
+    protected $content = false;
+
+    /**
+     * Locale actual usado en la App
+     * @var string 
+     */
     protected $locale;
 
     /**
@@ -56,16 +61,34 @@ class Request
         }
     }
 
+    /**
+     * Devuelve un valor del arreglo $_GET
+     * @param string $key indice del arreglo
+     * @param mixed $default valor por defecto si no existe el indice
+     * @return mixed valor retornado
+     */
     public function get($key, $default = null)
     {
-        return array_key_exists($key, $_GET) ? $_GET[$key] : $default;
+        return filter_has_var(INPUT_GET, $key) ? filter_input(INPUT_GET, $key, FILTER_SANITIZE_STRING) : $default;
     }
 
+    /**
+     * Devuelve un valor del arreglo $_POST
+     * @param string $key indice del arreglo
+     * @param mixed $default valor por defecto si no existe el indice
+     * @return mixed valor retornado
+     */
     public function post($key, $default = null)
     {
-        return array_key_exists($key, $_POST) ? $_POST[$key] : $default;
+        return filter_has_var(INPUT_POST, $key) ? $_POST[$key] : $default;
     }
 
+    /**
+     * Devuelve un valor del arreglo $_REQUEST
+     * @param string $key indice del arreglo
+     * @param mixed $default valor por defecto si no existe el indice
+     * @return mixed valor retornado
+     */
     public function request($key, $default = null)
     {
         return array_key_exists($key, $_REQUEST) ? $_REQUEST[$key] : $default;
@@ -81,7 +104,7 @@ class Request
     }
 
     /**
-     * Estabelce la instancia del objeto que tiene el contexto de la aplicación
+     * Establece la instancia del objeto que tiene el contexto de la aplicación
      * @param SessionInterface $session 
      */
     public function setAppContext(AppContext $app)
@@ -90,7 +113,7 @@ class Request
     }
 
     /**
-     * Devuelve el metodo de la petición
+     * Devuelve el método de la petición GET, POST, DELETE, PUT, ...
      * @return string 
      */
     public function getMethod()
@@ -108,7 +131,7 @@ class Request
     }
 
     /**
-     * Devuelve TRUE si la petición es Ajax
+     * Devuelve true si la petición es Ajax
      * @return boolean 
      */
     public function isAjax()
@@ -117,8 +140,8 @@ class Request
     }
 
     /**
-     * Devuelve TRUE si el metodo de la petición es el pasado por parametro
-     * @param string $method
+     * Devuelve true si el método de la petición es el pasado por parametro
+     * @param string $method método que se quiere verificar
      * @return boolean 
      */
     public function isMethod($method)
@@ -141,7 +164,7 @@ class Request
      */
     public function getRequestUrl()
     {
-        return $this->get('_url', '/');
+        return isset($_GET['_url']) ? $_GET['_url'] : '/';
     }
 
     /**
@@ -188,11 +211,11 @@ class Request
      * Crea la url base de la petición.
      * @return string 
      */
-    private function createBaseUrl()
+    protected function createBaseUrl()
     {
         $uri = $this->server('REQUEST_URI');
-        if ($qString = $this->server('QUERY_STRING')) {
-            if (false !== $pos = strpos($uri, '?')) {
+        if (($qString = $this->server('QUERY_STRING'))) {
+            if (false !== ($pos = strpos($uri, '?'))) {
                 $uri = substr($uri, 0, $pos);
             }
             return str_replace($this->getRequestUrl(), '/', urldecode($uri));

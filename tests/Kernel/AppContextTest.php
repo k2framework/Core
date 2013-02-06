@@ -41,7 +41,7 @@ class AppContextTest extends PHPUnit_Framework_TestCase
     protected function createRequest()
     {
         $request = new Request('http://localhost/k2/');
-        $request->query->set('_url', 'index/hola_mundo');
+        $_GET['_url'] = 'index/hola_mundo';
 
         return $request;
     }
