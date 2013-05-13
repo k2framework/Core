@@ -3,7 +3,7 @@
 namespace K2\Validation\Validators;
 
 use K2\Validation\Validatable;
-use K2\Di\Container\ContainerInterface;
+use K2\Di\Container\Container;
 
 /**
  * KumbiaPHP web & app Framework
@@ -33,7 +33,7 @@ abstract class ValidatorBase
 
     /**
      *
-     * @var ContainerInterface 
+     * @var Container 
      */
     protected static $container;
 
@@ -51,7 +51,7 @@ abstract class ValidatorBase
         return true;
     }
 
-    public static function setContainer(ContainerInterface $container)
+    public static function setContainer(Container $container)
     {
         self::$container = $container;
     }

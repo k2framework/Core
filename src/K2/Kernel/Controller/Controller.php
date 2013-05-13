@@ -2,7 +2,7 @@
 
 namespace K2\Kernel\Controller;
 
-use K2\Di\Container\ContainerInterface;
+use K2\Di\Container\Container;
 use K2\Kernel\Request;
 use K2\Kernel\Router\Router;
 use K2\Kernel\Response;
@@ -17,7 +17,7 @@ class Controller
 
     /**
      *
-     * @var ContainerInterface; 
+     * @var Container; 
      */
     protected $container;
 
@@ -57,9 +57,9 @@ class Controller
 
     /**
      * Constructor de la clase
-     * @param ContainerInterface $container
+     * @param Container $container
      */
-    public final function __construct(ContainerInterface $container)
+    public final function __construct(Container $container)
     {
         $this->container = $container;
     }

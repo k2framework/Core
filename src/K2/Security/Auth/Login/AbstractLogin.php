@@ -3,7 +3,7 @@
 namespace K2\Security\Auth\Login;
 
 use K2\Kernel\Response;
-use K2\Di\Container\ContainerInterface;
+use K2\Di\Container\Container;
 
 /**
  * Description of LoginInterface
@@ -15,11 +15,11 @@ abstract class AbstractLogin
 
     /**
      *
-     * @var ContainerInterface
+     * @var Container
      */
     protected $container;
 
-    public function __construct(ContainerInterface $container)
+    public function __construct(Container $container)
     {
         $this->container = $container;
     }

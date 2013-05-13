@@ -2,7 +2,6 @@
 
 namespace K2\Di\Container;
 
-use K2\Di\Container\ContainerInterface;
 use K2\Di\Exception\IndexNotDefinedException;
 use K2\Di\Exception\DiException;
 
@@ -11,7 +10,7 @@ use K2\Di\Exception\DiException;
  *
  * @author manuel
  */
-class Container implements ContainerInterface
+class Container implements \ArrayAccess
 {
 
     /**

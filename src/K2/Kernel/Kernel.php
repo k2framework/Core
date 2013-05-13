@@ -4,7 +4,6 @@ namespace K2\Kernel;
 
 use K2\Kernel\AppContext;
 use K2\Di\Container\Container;
-use K2\Kernel\KernelInterface;
 use K2\Kernel\Event\K2Events;
 use K2\Kernel\Event\RequestEvent;
 use K2\Kernel\Event\ResponseEvent;
@@ -18,9 +17,11 @@ use K2\Kernel\Controller\ControllerResolver;
  *
  * @author manuel
  */
-abstract class Kernel implements KernelInterface
+abstract class Kernel
 {
 
+    const MASTER_REQUEST = 1;
+    const SUB_REQUEST = 2;
     /**
      * Arreglo con los namespaces definidos en la aplicación
      * @var array 
@@ -126,7 +127,14 @@ abstract class Kernel implements KernelInterface
         $context->setRequest($request);
     }
 
-    public function execute(Request $request, $type = Kernel::MASTER_REQUEST)
+    /**
+     * Metodó que ejecuta todo el proceso de la ejecucion de la petición.
+     * @param Request $request objeto que contiene toda la info de la petición 
+     * @param int $type indica si la petición es la original ó es una sub petición. 
+     * @return Response objeto respuesta
+     * @throws \LogicException excepcion si no se puede devolver una respuesta
+     */
+    public function execute(Request $request, $type = self::MASTER_REQUEST)
     {
         try {
             //verificamos el tipo de petición

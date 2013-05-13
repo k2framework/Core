@@ -5,7 +5,7 @@ namespace K2\Kernel;
 use K2\Kernel\Request;
 use K2\Kernel\AppContext;
 use Composer\Autoload\ClassLoader;
-use K2\Di\Container\ContainerInterface;
+use K2\Di\Container\Container;
 use K2\Security\Auth\User\UserInterface;
 
 class App
@@ -13,7 +13,7 @@ class App
 
     /**
      *
-     * @var ContainerInterface
+     * @var Container
      */
     protected static $container;
 
@@ -25,9 +25,9 @@ class App
 
     /**
      * 
-     * @param ContainerInterface $container
+     * @param Container $container
      */
-    public static function setContainer(ContainerInterface $container)
+    public static function setContainer(Container $container)
     {
         self::$container = $container;
     }

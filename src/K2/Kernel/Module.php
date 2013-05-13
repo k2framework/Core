@@ -3,7 +3,7 @@
 namespace K2\Kernel;
 
 use K2\Di\Container\Container;
-use K2\EventDispatcher\EventDispatcherInterface;
+use K2\EventDispatcher\EventDispatcher;
 
 class Module
 {
@@ -16,7 +16,7 @@ class Module
 
     /**
      *
-     * @var EventDispatcherInterface 
+     * @var EventDispatcher 
      */
     protected $dispatcher;
 
@@ -39,7 +39,7 @@ class Module
         $this->container = $container;
     }
 
-    public function setEventDispatcher(EventDispatcherInterface $dispatcher)
+    public function setEventDispatcher(EventDispatcher $dispatcher)
     {
         $this->dispatcher = $dispatcher;
     }

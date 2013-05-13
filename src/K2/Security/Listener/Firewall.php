@@ -9,7 +9,7 @@ use K2\Security\Acl\AclManager;
 use K2\Kernel\Event\RequestEvent;
 use K2\Security\Auth\AuthManager;
 use K2\Security\Event\SecurityEvent;
-use K2\Di\Container\ContainerInterface;
+use K2\Di\Container\Container;
 use K2\Security\Exception\AuthException;
 use K2\Security\Exception\UserNotFoundException;
 use K2\Security\Exception\UserNotAuthorizedException;
@@ -24,11 +24,11 @@ class Firewall
 
     /**
      *
-     * @var ContainerInterface
+     * @var Container
      */
     protected $container;
 
-    function __construct(ContainerInterface $container)
+    function __construct(Container $container)
     {
         $this->container = $container;
         Reader::read('security');

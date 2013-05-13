@@ -2,15 +2,14 @@
 
 namespace K2\EventDispatcher;
 
-use K2\EventDispatcher\EventDispatcherInterface;
-use K2\Di\Container\ContainerInterface;
+use K2\Di\Container\Container;
 
 /**
  * Clase que se encarga de despachar los eventos basicos del fw.
  *
  * @author manuel
  */
-class EventDispatcher implements EventDispatcherInterface
+class EventDispatcher
 {
 
     /**
@@ -24,7 +23,7 @@ class EventDispatcher implements EventDispatcherInterface
      * Clase container para obtener las instancias de los servicios
      * que escuchan eventos, para llamarlos el despachar un evento.
      *
-     * @var ContainerInterface 
+     * @var Container
      */
     protected $container;
 
@@ -36,9 +35,9 @@ class EventDispatcher implements EventDispatcherInterface
 
     /**
      * Constructor de la clase.
-     * @param ContainerInterface $container 
+     * @param Container $container 
      */
-    public function __construct(ContainerInterface $container = null)
+    public function __construct(Container $container = null)
     {
         if ($container) {
             $this->setContainer($container);
@@ -48,9 +47,9 @@ class EventDispatcher implements EventDispatcherInterface
     /**
      * Establece el contenedor en el dispatcher, y de una vez recorre las definiciones
      * del mismo para obtener los escuchas y subscriptores de eventos.
-     * @param ContainerInterface $container 
+     * @param Container $container 
      */
-    public function setContainer(ContainerInterface $container)
+    public function setContainer(Container $container)
     {
         $this->container = $container;
 //        $definitions = $container->getDefinitions();

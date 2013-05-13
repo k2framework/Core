@@ -4,7 +4,7 @@ namespace K2\Kernel;
 
 use K2\Kernel\Request;
 use K2\Kernel\Response;
-use K2\Di\Container\ContainerInterface;
+use K2\Di\Container\Container;
 
 /**
  * Interface base para el kernel del FW

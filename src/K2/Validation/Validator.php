@@ -4,7 +4,7 @@ namespace K2\Validation;
 
 use K2\Validation\Validatable;
 use K2\Validation\ValidationBuilder;
-use K2\Di\Container\ContainerInterface;
+use K2\Di\Container\Container;
 use K2\Validation\Validators\ValidatorBase;
 
 /**
@@ -15,7 +15,7 @@ use K2\Validation\Validators\ValidatorBase;
 class Validator
 {
 
-    public function __construct(ContainerInterface $container)
+    public function __construct(Container $container)
     {
         ValidatorBase::setContainer($container);
     }

@@ -5,7 +5,7 @@ namespace K2\Kernel\Controller;
 use \ReflectionClass;
 use \ReflectionObject;
 use K2\Kernel\Response;
-use K2\Di\Container\ContainerInterface;
+use K2\Di\Container\Container;
 use K2\Kernel\Exception\NotFoundException;
 
 /**
@@ -18,7 +18,7 @@ class ControllerResolver
 
     /**
      *
-     * @var ContainerInterface 
+     * @var Container 
      */
     protected $container;
 
@@ -52,7 +52,7 @@ class ControllerResolver
      */
     protected $parameters;
 
-    public function __construct(ContainerInterface $con)
+    public function __construct(Container $con)
     {
         $this->container = $con;
 

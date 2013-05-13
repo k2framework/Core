@@ -2,7 +2,7 @@
 
 namespace K2\Security\Auth\Provider;
 
-use K2\Di\Container\ContainerInterface;
+use K2\Di\Container\Container;
 use K2\Security\Auth\Provider\UserProviderInterface;
 
 /**
@@ -15,7 +15,7 @@ abstract class AbstractProvider implements UserProviderInterface
 
     protected $container;
 
-    public function __construct(ContainerInterface $container)
+    public function __construct(Container $container)
     {
         $this->container = $container;
     }

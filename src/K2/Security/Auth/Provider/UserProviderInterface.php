@@ -4,7 +4,7 @@ namespace K2\Security\Auth\Provider;
 
 use K2\Security\Auth\Token\TokenInterface;
 use K2\Security\Auth\User\UserInterface;
-use K2\Di\Container\ContainerInterface;
+use K2\Di\Container\Container;
 
 /**
  *
@@ -13,7 +13,7 @@ use K2\Di\Container\ContainerInterface;
 interface UserProviderInterface
 {
 
-    public function __construct(ContainerInterface $container);
+    public function __construct(Container $container);
     /**
      *  @return UserInterface
      */
