@@ -101,7 +101,6 @@ class ControllerResolver
         $reflectionClass = new ReflectionClass($controllerClass);
 
         $this->controller = $reflectionClass->newInstanceArgs(array($this->container));
-        $this->controller->setView($app->getCurrentAction());
 
         return $this->controller;
     }
@@ -254,15 +253,6 @@ class ControllerResolver
         } else {
             return null;
         }
-    }
-
-    /**
-     * Establece el nombre de la vista que usará por defecto la lib View
-     * @param string $action 
-     */
-    protected function setViewDefault($action)
-    {
-        $this->controller->setView($action);
     }
 
 }

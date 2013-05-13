@@ -205,9 +205,7 @@ abstract class Kernel implements KernelInterface
         //para pasarlos al servicio view, y este construya la respuesta
         //llamamos al render del servicio "view" y esté nos devolverá
         //una instancia de response con la respuesta creada
-        return $this->container->get('view')->render(array(
-                    'template' => $controller->getTemplate(),
-                    'view' => $controller->getView(),
+        return $this->container->get('view')->render($controller->getView(),array(
                     'response' => $controller->getResponse(),
                     'time' => $controller->getCache(),
                     'params' => get_object_vars($controller),

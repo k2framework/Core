@@ -28,12 +28,6 @@ class Controller
     protected $view;
 
     /**
-     * Template a llamar por el servicio de template @template
-     * @var string 
-     */
-    protected $template = 'default';
-
-    /**
      * response a usar en la vista, por ejemplo si response es xml la vista será
      * 
      * nombrevista.xml.phtml, si es json la vista es por ejemplo index.json.phtml
@@ -108,12 +102,9 @@ class Controller
      * @param string $view
      * @param string $template 
      */
-    final public function setView($view, $template = false)
+    final public function setView($view)
     {
         $this->view = $view;
-        if ($template !== false) {
-            $this->setTemplate($template);
-        }
     }
 
     /**
@@ -128,16 +119,6 @@ class Controller
         if ($template !== false) {
             $this->setTemplate($template);
         }
-    }
-
-    /**
-     * Establece el template a usar
-     * @final
-     * @param string $template 
-     */
-    final public function setTemplate($template)
-    {
-        $this->template = $template;
     }
 
     /**
@@ -158,16 +139,6 @@ class Controller
     final public function getResponse()
     {
         return $this->response;
-    }
-
-    /**
-     * devuelve el template a mostar
-     * @final
-     * @return string 
-     */
-    final public function getTemplate()
-    {
-        return $this->template;
     }
 
     /**
@@ -203,12 +174,11 @@ class Controller
     protected function render(array $params = array(), $time = null)
     {
         return $this->get('view')->render(array(
-                    'template' => $this->getTemplate(),
                     'view' => $this->getView(),
                     'response' => $this->getResponse(),
                     'params' => $params,
                     'time' => $time,
-                ));
+        ));
     }
 
 }
