@@ -31,7 +31,7 @@ class Router implements RouterInterface
      */
     public function redirect($url = NULL, $status = 302)
     {
-        return new RedirectResponse(App::get('app.context')->createUrl($url), $status);
+        return new RedirectResponse($this->createUrl($url), $status);
     }
 
     /**
@@ -41,8 +41,16 @@ class Router implements RouterInterface
      */
     public function toAction($action = NULL, $status = 302)
     {
-        $url = App::get('app.context')->getControllerUrl($action);
-        return new RedirectResponse($url, $status);
+        $context = App::getContext();
+
+        $url = '';
+
+        $context['module_url'] && $url .= $context['module_url'] . '/';
+        $context['controller'] && $url .= $context['controller'] . '/';
+
+        $url .= $action;
+
+        return $this->redirect($url, $status);
     }
 
     /**
@@ -57,13 +65,8 @@ class Router implements RouterInterface
         if ($this->forwards++ > 10) {
             throw new \LogicException("Se ha detectado un ciclo de redirección Infinito...!!!");
         }
-        //clono el request y le asigno la nueva url.
-        $request = clone App::getRequest();
-
-        $_GET['_url'] = '/' . ltrim(App::get('app.context')->createUrl($url, false), '/');
-
         //retorno la respuesta del kernel.
-        return App::get('app.kernel')->execute($request, Kernel::SUB_REQUEST);
+        return App::get('app.kernel')->execute(new \K2\Kernel\Request($url), Kernel::SUB_REQUEST);
     }
 
     public function rewrite(RequestEvent $event)
