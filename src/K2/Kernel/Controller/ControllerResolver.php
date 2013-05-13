@@ -199,7 +199,7 @@ class ControllerResolver
                 if (false === $result) {
                     //si el resultado es false, es porque no queremos que se ejecute la acción
                     $this->action = false;
-                    $this->container->get('app.context')->setCurrentAction(false);
+                    App::setContext(array('action' => false));
                     return;
                 }
                 if ($result instanceof Response) {
@@ -214,7 +214,7 @@ class ControllerResolver
                 //si el beforeFilter del controlador devuelve un valor, el mismo será
                 //usado como el nuevo nombre de la acción a ejecutar.
                 $this->action = $result;
-                $this->container->get('app.context')->setCurrentAction($result);
+                App::setContext(array('action' => $result));
             }
         }
     }

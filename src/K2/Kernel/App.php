@@ -104,7 +104,12 @@ class App
 
     public static function setContext(array $data)
     {
-        static::$context[static::getRequest()->getRequestUrl()] = $data;
+        $uri = static::getRequest()->getRequestUrl();
+        if (isset(static::$context[$uri])) {
+            static::$context[$uri] = array_merge(static::$context[$uri], $data);
+        } else {
+            static::$context[$uri] = $data;
+        }
     }
 
     public static function getContext($index = null)
