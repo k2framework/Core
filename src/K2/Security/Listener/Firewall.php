@@ -99,6 +99,7 @@ class Firewall
     protected function isSecure($url)
     {
         $routes = (array) Reader::get('security.routes');
+        $url = '/' . ltrim($url, '/');
         if (isset($routes[$url])) {
             return $routes[$url];
         }
@@ -215,7 +216,7 @@ class Firewall
             die("No existe el Tipo del Logueo $typeLoginClassName");
         }
 
-        $event = new SecurityEvent($this->container->get('request')
+        $event = new SecurityEvent(\K2\Kernel\App::getRequest()
                 , $this->container->get('security'));
 
         $this->container->get('event.dispatcher')->dispatch(Events::LOGOUT, $event);

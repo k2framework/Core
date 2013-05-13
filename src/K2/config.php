@@ -38,6 +38,10 @@ return array(
                 'charset' => isset($config['charset']) ? $config['charset'] : 'UTF-8',
             ));
 
+            if (!PRODUCTION) {
+                $twig->addExtension(new \Twig_Extension_Debug());
+            }
+
             $twig->addExtension(new View\Twig\Extension\Core());
 
             return $twig;
