@@ -20,12 +20,12 @@ class Extension extends \Twig_Extension
     public function getFunctions()
     {
         return array(
-            new \Twig_SimpleFunction('asset', function($file) {
-                        return PUBLIC_PATH . $file;
-                    }),
             'url' => new \Twig_Function_Method($this, 'url'),
             'k2_memory_usage' => new \Twig_Function_Method($this, 'memoryUsage'),
             'k2_execution_time' => new \Twig_Function_Method($this, 'executionTime'),
+            new \Twig_SimpleFunction('asset', function($file) {
+                        return PUBLIC_PATH . $file;
+                    }),
         );
     }
 
