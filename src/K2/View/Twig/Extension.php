@@ -23,16 +23,7 @@ class Extension extends \Twig_Extension
             new \Twig_SimpleFunction('asset', function($file) {
                         return PUBLIC_PATH . $file;
                     }),
-            new \Twig_SimpleFunction('url', function($route = null) {
-                        if (null === $route) {
-                            return App::getContext()->getCurrentUrl();
-                        } else {
-                            return App::get('router')->createUrl($route);
-                        }
-                    }),
-            new \Twig_SimpleFunction('url_action', function($action) {
-                        return App::getContext()->getControllerUrl($action);
-                    }),
+            'url' => new \Twig_Function_Method($this, 'url'),
             'k2_memory_usage' => new \Twig_Function_Method($this, 'memoryUsage'),
             'k2_execution_time' => new \Twig_Function_Method($this, 'executionTime'),
         );
@@ -47,6 +38,31 @@ class Extension extends \Twig_Extension
                 'user' => \K2\Kernel\App::getUser(),
             ),
         );
+    }
+
+    public function url($url = false, $module = false, $controller = false, $action = false, array $parameters = array())
+    {
+        if (0 === func_num_args()) {
+            //si no se envió nada, se usa la url actual
+            return rtrim(PUBLIC_PATH, '/') . App::getRequest()->getRequestUrl();
+        } elseif ($url) {
+            //si se envió un string, se devuelve como una url
+            return PUBLIC_PATH . ltrim($url);
+        } else {
+            //si no se envió un string, sino parametros con nombres, se crea la url
+            $url = '';
+            $context = App::getContext();
+
+            $module = $module ? : $context['module']['name'];
+
+            $url .= App::prefix($module) . '/';
+
+            $url .= ($controller ? : $context['controller']) . '/';
+            $url .= ($action ? : $context['action']) . '/';
+            $url .= join('/', $parameters);
+
+            return PUBLIC_PATH . ltrim($url, '/');
+        }
     }
 
     public function memoryUsage()

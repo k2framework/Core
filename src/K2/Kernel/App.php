@@ -145,29 +145,24 @@ class App
         if (null === $modules) {
             return static::$modules;
         } else {
-            foreach ($modules as $module) {
+            foreach ($modules as $index => $module) {
                 static::$modules[$module['name']] = $module + array(
                     'parameters' => array(),
                     'services' => array(),
                     'listeners' => array(),
                     'init' => null,
                 );
+                //si el indice no es numerico, agregamos el mismo a las rutas
+                if (!is_numeric($index)) {
+                    static::$routes[$index] = $module['name'];
+                }
             }
         }
     }
 
-    public static function routes(array $routes = null)
+    public static function routes()
     {
-        if (null === $routes) {
-            return static::$routes;
-        } else {
-            foreach ($routes as $routeName => $moduleName) {
-                if (!isset(static::$modules[$moduleName])) {
-                    throw new Exception\NotFoundException(sprintf('No existe el Módulo %s en la creación de la ruta %s', $moduleName, $routeName));
-                }
-                static::$routes[$routeName] = $moduleName;
-            }
-        }
+        return static::$routes;
     }
 
     public static function getModule($name, $index = null, $throw = true)
@@ -203,6 +198,18 @@ class App
         }
 
         return null;
+    }
+
+    public static function prefix($module, $throw = true)
+    {
+        if (!in_array($module, static::$routes)) {
+            if ($throw) {
+                throw new \InvalidArgumentException(sprintf('No existe un prefijo de ruta para el módulo %s', $module));
+            }
+            return null;
+        }
+
+        return array_search($module, static::$routes);
     }
 
 }
