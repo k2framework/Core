@@ -45,7 +45,7 @@ class Extension extends \Twig_Extension
         if (0 === func_num_args()) {
             //si no se envió nada, se usa la url actual
             return rtrim(PUBLIC_PATH, '/') . App::getRequest()->getRequestUrl();
-        } elseif ($url) {
+        } elseif (false !== $url) {
             //si se envió un string, se devuelve como una url
             return PUBLIC_PATH . ltrim($url);
         } else {
