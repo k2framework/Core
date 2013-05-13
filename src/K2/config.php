@@ -38,7 +38,7 @@ return array(
                 'charset' => isset($config['charset']) ? $config['charset'] : 'UTF-8',
             ));
 
-            $twig->addExtension(new View\Twig\Extension());
+            $twig->addExtension(new View\Twig\Extension\Core());
 
             return $twig;
         },

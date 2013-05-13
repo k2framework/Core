@@ -1,10 +1,10 @@
 <?php
 
-namespace K2\View\Twig;
+namespace K2\View\Twig\Extension;
 
 use K2\Kernel\App;
 
-class Extension extends \Twig_Extension
+class Core extends \Twig_Extension
 {
 
     public function getName()
@@ -36,6 +36,7 @@ class Extension extends \Twig_Extension
                 'context' => \K2\Kernel\App::getContext(),
                 'request' => \K2\Kernel\App::getRequest(),
                 'user' => \K2\Kernel\App::getUser(),
+                'messages' => App::get('flash')->getAll(),
             ),
         );
     }
@@ -53,12 +54,23 @@ class Extension extends \Twig_Extension
             $url = '';
             $context = App::getContext();
 
+            //solo si no se especifica el modulo podemos usar el controlador y accion actual
+            //de no ser especificados estos.
+            if (!$module) {
+                $controller || $controller = $context['controller'];
+                $action || $action = $context['action'];
+            } else {
+                //de lo contrario, se asignaran valores por defecto a controller y action
+                $controller || $controller = 'index';
+                $action || $action = 'index';
+            }
+
             $module = $module ? : $context['module']['name'];
 
             $url .= App::prefix($module) . '/';
 
-            $url .= ($controller ? : $context['controller']) . '/';
-            $url .= ($action ? : $context['action']) . '/';
+            $url .= $controller . '/';
+            $url .= $action . '/';
             $url .= join('/', $parameters);
 
             return PUBLIC_PATH . ltrim($url, '/');
