@@ -219,9 +219,9 @@ class Form implements ArrayAccess, Validatable
     public function getAction()
     {
         if ($this->action) {
-            return App::get('app.context')->createUrl($this->action);
+            return App::get('router')->createUrl($this->action);
         } else {
-            return App::get('app.context')->getCurrentUrl(true);
+            return App::requestUrl();
         }
     }
 

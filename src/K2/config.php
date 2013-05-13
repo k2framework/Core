@@ -65,6 +65,14 @@ return array(
         ),
     ),
     'init' => function(Container $c) {
-        
+        $c->setParameter('security', array(
+            'provider' => array(
+                'active_record' => 'K2\\Security\\Auth\\Provider\\ActiveRecord',
+                'memory' => 'K2\\Security\\Auth\\Provider\\Memory',
+            ),
+        ));
+        $c->setParameter('translator', array(
+            'provider' => 'arrays'
+        ));
     },
 );

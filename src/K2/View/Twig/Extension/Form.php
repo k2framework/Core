@@ -16,7 +16,7 @@ class Form extends \Twig_Extension
     {
         return array(
             'form_multipart' => new \Twig_Function_Method($this, 'multipart'),
-            'form_field' => new \Twig_Function_Method($this, 'field'),
+            //'form_field' => new \Twig_Function_Method($this, 'field'),
         );
     }
 
