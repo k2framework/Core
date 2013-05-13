@@ -24,8 +24,8 @@ return $result;
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Ha Ocurrido una Excepción</title>
-<link href="<?php echo $app->getBaseUrl() ?>css/exception.css" rel="stylesheet" type="text/css" media="screen" />
-<link href="<?php echo $app->getBaseUrl() ?>css/structure.css" rel="stylesheet" type="text/css" media="screen" />
+<link href="<?php //echo $app->getBaseUrl() ?>css/exception.css" rel="stylesheet" type="text/css" media="screen" />
+<link href="<?php //echo $app->getBaseUrl() ?>css/structure.css" rel="stylesheet" type="text/css" media="screen" />
 </head>
 <body>
 <div class="exception">
@@ -38,7 +38,7 @@ return $result;
 <div class="exception_information">
 <h2>Rastro</h2>
 <?php foreach ($e->getTrace() as $trace): ?>
-<?php if (isset($trace ['file']) && !(strpos($trace ['file'], $app->getAppPath()) === false) && !(strpos($trace ['file'], 'index.php'))): ?>
+<?php if (isset($trace ['file']) && !(strpos($trace ['file'], APP_PATH) === false) && !(strpos($trace ['file'], 'index.php'))): ?>
 <p><strong><?php echo htmlspecialchars($trace['file'], ENT_NOQUOTES, 'UTF-8') . "(" . $trace ['line'] . ")" ?></strong></p>
 <p>La excepción se ha generado en el archivo <span class="italic"><?php echo $trace['file'] ?></span> en la línea: <span class="italic"><?php echo $trace['line'] ?></span>:</p>
 
@@ -79,8 +79,8 @@ $line = explode(" ", $line);
 
 <div class="exception_information">
 <h2>Información Adicional</h2>
-<strong>En producción:</strong> <?php echo $app->InProduction() ? 'Sí' : 'No' ?><br />
-<strong>Ubicación actual:</strong> <?php echo $app->getCurrentUrl() ?><br />
+<strong>En producción:</strong> <?php echo PRODUCTION ? 'Sí' : 'No' ?><br />
+<strong>Ubicación actual:</strong> <?php //echo $app->getCurrentUrl() ?><br />
 <strong>Server: </strong> <?php echo $_SERVER['SERVER_SOFTWARE'] ?><br />
 <strong>IP Server: </strong> <?php echo $_SERVER['SERVER_ADDR'] ?><br />
 <strong>IP Visitante: </strong> <?php echo $_SERVER['REMOTE_ADDR'] ?><br />

@@ -30,9 +30,6 @@ class ExceptionHandler
      */
     public static function createException(\Exception $e)
     {
-        /* @var $app \K2\Kernel\AppContext */
-        $app = App::get('app.context');
-
         $code = $e->getCode();
 
         while (ob_get_level()) {
@@ -40,18 +37,18 @@ class ExceptionHandler
         }
 
         ob_start();
-        if ($app->InProduction()) {
+        if (PRODUCTION) {
             if (404 === $e->getCode()) {
                 header('HTTP/1.1 404 Not Found');
                 $code = 404;
-                include $app->getAppPath() . 'view/errors/404.phtml';
+                include APP_PATH . '/view/errors/404.phtml';
             } else {
                 header('HTTP/1.1 500 Internal Server Error');
                 $code = 500;
-                if (is_file($app->getAppPath() . 'view/errors/500.phtml')) {
-                    include $app->getAppPath() . 'view/errors/500.phtml';
+                if (is_file(APP_PATH . '/view/errors/500.phtml')) {
+                    include APP_PATH . '/view/errors/500.phtml';
                 } else {
-                    include $app->getAppPath() . 'view/errors/404.phtml';
+                    include APP_PATH . '/view/errors/404.phtml';
                 }
             }
         } else {

@@ -22,7 +22,7 @@ abstract class Reader
             return self::$config[$file];
         }
 
-        self::$config[$file] = parse_ini_file(App::appPath() . "config/$file.ini", true);
+        self::$config[$file] = parse_ini_file(APP_PATH . "/config/$file.ini", true);
 
         return self::$config[$file];
     }

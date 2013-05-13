@@ -2,6 +2,8 @@
 
 namespace K2\View\Twig;
 
+use K2\Kernel\App;
+
 class Extension extends \Twig_Extension
 {
 
@@ -19,17 +21,17 @@ class Extension extends \Twig_Extension
     {
         return array(
             new \Twig_SimpleFunction('asset', function($file) {
-                        return \K2\Kernel\App::getRequest()->getBaseUrl() . $file;
+                        return PUBLIC_PATH . $file;
                     }),
             new \Twig_SimpleFunction('url', function($route = null) {
                         if (null === $route) {
-                            return \K2\Kernel\App::getContext()->getCurrentUrl();
+                            return App::getContext()->getCurrentUrl();
                         } else {
-                            return \K2\Kernel\App::getContext()->createUrl($route);
+                            return App::get('router')->createUrl($route);
                         }
                     }),
             new \Twig_SimpleFunction('url_action', function($action) {
-                        return \K2\Kernel\App::getContext()->getControllerUrl($action);
+                        return App::getContext()->getControllerUrl($action);
                     }),
             'k2_memory_usage' => new \Twig_Function_Method($this, 'memoryUsage'),
             'k2_execution_time' => new \Twig_Function_Method($this, 'executionTime'),

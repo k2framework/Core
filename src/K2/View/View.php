@@ -2,6 +2,7 @@
 
 namespace K2\View;
 
+use K2\Kernel\App;
 use K2\Kernel\Response;
 use \Twig_Environment;
 
@@ -44,10 +45,8 @@ class View
         $variables = isset($params['params']) ? (array) $params['params'] : array();
 
         if (null == $view) {
-            $module = strtr(\K2\Kernel\App::getContext()->getCurrentModule()->getName(), '/', '_');
-            $controller = \K2\Kernel\App::getContext()->getCurrentController();
-            $action = \K2\Kernel\App::getContext()->getCurrentAction();
-            $view = '@' . trim($module, '/') . '/' . $controller . '/' . $action;
+            $context = App::getContext();
+            $view = '@' . trim($context['module']['name'], '/') . '/' . $context['controller'] . '/' . $context['action'];
         }
 
         if (isset($params['response'])) {

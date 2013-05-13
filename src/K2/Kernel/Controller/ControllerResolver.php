@@ -7,6 +7,7 @@ use \ReflectionObject;
 use K2\Kernel\Response;
 use K2\Di\Container\Container;
 use K2\Kernel\Exception\NotFoundException;
+use K2\Kernel\App;
 
 /**
  * Description of ControllerResolver
@@ -56,13 +57,13 @@ class ControllerResolver
     {
         $this->container = $con;
 
-        $app = $con->get('app.context');
+        $context = App::getContext();
 
-        $this->module = $app->getCurrentModule();
-        $this->controllerUrl = $app->getCurrentController();
-        $this->action = $app->getCurrentAction() . '_action';
-        $this->parameters = $app->getCurrentParameters();
-        if ('/logout' === $app->getCurrentUrl()) {
+        $this->module = $context['module'];
+        $this->controllerUrl = $context['controller'];
+        $this->action = $context['action'] . '_action';
+        $this->parameters = $context['parameters'];
+        if ('/logout' === App::getRequest()->getRequestUrl()) {
             throw new NotFoundException("La ruta \"/logout\" no concuerda con ningún módulo ni controlador en la App");
         }
     }
@@ -78,29 +79,29 @@ class ControllerResolver
             return $this->controller;
         }
 
-        $app = $this->container->get('app.context');
+        $module = App::getContext('module');
 
-        $this->controllerName = $app->getCurrentController() . 'Controller';
+        $this->controllerName = App::getContext('controller') . 'Controller';
 
         //uno el namespace y el nombre del controlador.
-        $controllerClass = $this->module->getNamespace() . "\\Controller\\{$this->controllerName}";
+        $controllerClass = $module['namespace'] . "\\Controller\\{$this->controllerName}";
 
-        if ($this->module->hasChildren()) {
-            $children = $this->module->getChildren();
-            $childrenControllerClass = $children->getNamespace() . "\\Controller\\{$this->controllerName}";
-            if (class_exists($childrenControllerClass)) {
-                $controllerClass = $childrenControllerClass;
-                $this->module = $children;
-            }
-        }
+//        if ($this->module->hasChildren()) {
+//            $children = $this->module->getChildren();
+//            $childrenControllerClass = $children->getNamespace() . "\\Controller\\{$this->controllerName}";
+//            if (class_exists($childrenControllerClass)) {
+//                $controllerClass = $childrenControllerClass;
+//                $this->module = $children;
+//            }
+//        }
 
         if (!class_exists($controllerClass)) {
-            throw new NotFoundException(sprintf("No existe el controlador \"%s\" en la ruta \"%sController/%s.php\"", $this->controllerName, $this->module->getPath(), $this->controllerName));
+            throw new NotFoundException(sprintf("No existe el controlador \"%s\" en la ruta \"%s/Controller/%s.php\"", $this->controllerName, $module['path'], $this->controllerName));
         }
 
         $reflectionClass = new ReflectionClass($controllerClass);
 
-        $this->controller = $reflectionClass->newInstanceArgs(array($this->container));
+        $this->controller = $reflectionClass->newInstance();
 
         return $this->controller;
     }

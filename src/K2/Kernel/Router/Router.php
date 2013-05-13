@@ -141,12 +141,29 @@ class Router implements RouterInterface
                 $params = array_slice($url, key($url));
             }
         }
+        App::setContext(array(
+            'module' => $module,
+            'module_url' => $moduleUrl,
+            'controller' => $controller,
+            'action' => $action,
+            'parameters' => $params,
+        ));
+    }
 
-        App::getContext()->setCurrentModule($module)
-                ->setCurrentModuleUrl($moduleUrl)
-                ->setCurrentController($controller)
-                ->setCurrentAction($action)
-                ->setCurrentParameters($params);
+    public function createUrl($url, $baseUrl = true)
+    {
+        $url = explode(':', $url);
+        if (count($url) > 1) {
+            if (!$route = array_search($url[0], App::routes())) {
+                throw new NotFoundException("No Existe el módulo {$url[0]}, no se pudo crear la url");
+            }
+            $url = ltrim(trim($route, '/') . '/' . $url[1], '/');
+        } else {
+            $url = ltrim($url[0], '/');
+        }
+        //si se usa locale, lo añadimos a la url.
+        App::getRequest()->getLocale() && $url = App::getRequest()->getLocale() . '/' . $url;
+        return $baseUrl ? PUBLIC_PATH . $url : $url;
     }
 
 }

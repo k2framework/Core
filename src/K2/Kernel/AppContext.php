@@ -103,85 +103,6 @@ class AppContext
     }
 
     /**
-     * Establece la nueva url cuando se hace un forward.
-     * @param Request $request 
-     * @return AppContext
-     */
-    public function setRequest(Request $request)
-    {
-        $request->setAppContext($this);
-        $this->request = $request;
-        return $this;
-    }
-
-    public function setLocales($locales = null)
-    {
-        $this->locales = explode(',', $locales);
-        return $this;
-    }
-
-    /**
-     * Establece el tipo de request del kernel, (MASTER, SUB)
-     * @param string $type
-     * @return \K2\Kernel\AppContext 
-     */
-    public function setRequestType($type)
-    {
-        $this->requestType = $type;
-        return $this;
-    }
-
-    /**
-     * Devuelve el tipo de request (MASTER, SUB)
-     * @return string 
-     */
-    public function getRequestType()
-    {
-        return $this->requestType;
-    }
-
-    /**
-     * Devuelve la url base del proyecto
-     * @return string 
-     */
-    public function getBaseUrl()
-    {
-        return $this->request->getBaseUrl();
-    }
-
-    /**
-     * Devuelve la ruta hacia la carpeta app
-     * @return string 
-     */
-    public function getAppPath()
-    {
-        return $this->appPath;
-    }
-
-    /**
-     * devuelve la url actual de la petición
-     * @return string 
-     */
-    public function getRequestUrl()
-    {
-        return $this->request->getRequestUrl();
-    }
-
-    /**
-     * Devuelve la ruta hacia la carpeta del módulo en cuestión.
-     * @param string $module nombre del Módulo
-     * @return null|string 
-     */
-    public function getPath($module)
-    {
-        if (isset($this->modules[$module])) {
-            return rtrim($this->modules[$module], '/') . "/{$module}/";
-        } else {
-            return NULL;
-        }
-    }
-
-    /**
      * Devuelve el prefijo actual del modulo que se está ejecutando
      * @return Module 
      */
@@ -277,15 +198,6 @@ class AppContext
     }
 
     /**
-     * devuelve TRUE si la app se encuentra en producción.
-     * @return boolean 
-     */
-    public function InProduction()
-    {
-        return $this->inProduction;
-    }
-
-    /**
      * Devuelve la ruta hasta el controlador actual ejecutandose.
      * @param string $action si se especifica se añade al final de la URL
      * @return string 
@@ -315,39 +227,5 @@ class AppContext
         return $this;
     }
 
-    /**
-     * Crea una url válida. todos las libs y helpers la usan.
-     * 
-     * Ejemplos:
-     * 
-     * $this->createUrl('admin/usuarios/perfil');
-     * $this->createUrl('admin/roles');
-     * $this->createUrl('admin/recursos/editar/2');
-     * $this->createUrl('K2/Backend:usuarios'); módulo:controlador/accion/params
-     * 
-     * El ultimo ejemplo es una forma especial de crear rutas
-     * donde especificamos el nombre del módulo en vez del prefijo.
-     * ya que el prefijo lo podemos cambiar a nuestro antojo.
-     * 
-     * @param string $url
-     * @param boolean $baseUrl indica si se devuelve con el baseUrl delante ó no
-     * @return string
-     * @throws NotFoundException si no existe el módulo
-     */
-    public function createUrl($url, $baseUrl = true)
-    {
-        $url = explode(':', $url);
-        if (count($url) > 1) {
-            if (!$route = array_search($url[0], $this->routes)) {
-                throw new NotFoundException("No Existe el módulo {$url[0]}, no se pudo crear la url");
-            }
-            $url = ltrim(trim($route, '/') . '/' . $url[1], '/');
-        } else {
-            $url = ltrim($url[0], '/');
-        }
-        //si se usa locale, lo añadimos a la url.
-        $this->request->getLocale() && $url = $this->request->getLocale() . '/' . $url;
-        return $baseUrl ? $this->request->getBaseUrl() . $url : $url;
-    }
 }
 

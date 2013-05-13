@@ -20,12 +20,6 @@ class Request
     protected $app;
 
     /**
-     *
-     * @var string 
-     */
-    private $baseUrl;
-
-    /**
      * Contenido del Request Body de la petición
      * @var string 
      */
@@ -36,11 +30,12 @@ class Request
      * @var string 
      */
     protected $locale;
+    protected $uri;
 
     /**
      * Constructor de la clase. 
      */
-    public function __construct($baseUrl = null)
+    public function __construct($uri)
     {
         //este fix es para permitir tener en el request los valores para peticiones
         //PUT y DELETE, ya que php no ofrece una forma facil de obtenerlos
@@ -54,11 +49,7 @@ class Request
             $_REQUEST = json_decode($this->getContent(), true);
         }
 
-        if ($baseUrl) {
-            $this->baseUrl = $baseUrl;
-        } else {
-            $this->baseUrl = $this->createBaseUrl();
-        }
+        $this->uri = $uri;
     }
 
     /**
@@ -150,21 +141,12 @@ class Request
     }
 
     /**
-     * Devuelve el url base del proyecto
-     * @return string 
-     */
-    public function getBaseUrl()
-    {
-        return $this->baseUrl;
-    }
-
-    /**
      * Devuelve la url de la petición actual
      * @return type 
      */
     public function getRequestUrl()
     {
-        return isset($_GET['_url']) ? $_GET['_url'] : '/';
+        return $this->uri;
     }
 
     /**
@@ -181,7 +163,7 @@ class Request
 
     public function __clone()
     {
-        $this->__construct($this->getBaseUrl());
+        $this->__construct($this->uri);
     }
 
     /**
@@ -205,23 +187,6 @@ class Request
     public function server($key, $default = null)
     {
         return array_key_exists($key, $_SERVER) ? $_SERVER[$key] : $default;
-    }
-
-    /**
-     * Crea la url base de la petición.
-     * @return string 
-     */
-    protected function createBaseUrl()
-    {
-        $uri = $this->server('REQUEST_URI');
-        if (($qString = $this->server('QUERY_STRING'))) {
-            if (false !== ($pos = strpos($uri, '?'))) {
-                $uri = substr($uri, 0, $pos);
-            }
-            return str_replace($this->getRequestUrl(), '/', urldecode($uri));
-        } else {
-            return $uri;
-        }
     }
 
 }

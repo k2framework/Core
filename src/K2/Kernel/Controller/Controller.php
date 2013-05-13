@@ -2,10 +2,9 @@
 
 namespace K2\Kernel\Controller;
 
-use K2\Di\Container\Container;
-use K2\Kernel\Request;
-use K2\Kernel\Router\Router;
+use K2\Kernel\App;
 use K2\Kernel\Response;
+use K2\Kernel\Router\RouterInterface;
 
 /**
  * Controlador padre de todos los controllers de la aplicación
@@ -16,12 +15,6 @@ class Controller
 {
 
     /**
-     *
-     * @var Container; 
-     */
-    protected $container;
-
-    /**
      * Vista a llamar por el servicio de template @view
      * @var string 
      */
@@ -30,7 +23,7 @@ class Controller
     /**
      * response a usar en la vista, por ejemplo si response es xml la vista será
      * 
-     * nombrevista.xml.phtml, si es json la vista es por ejemplo index.json.phtml
+     * nombrevista.xml.twig, si es json la vista es por ejemplo index.json.twig
      * 
      * @var string 
      */
@@ -47,7 +40,7 @@ class Controller
      * indica si se deben limitar el numero de parametros en las acciones ó no.
      * @var boolean 
      */
-    protected $limitParams = TRUE;
+    protected $limitParams = true;
 
     /**
      * parametros de la url
@@ -55,52 +48,33 @@ class Controller
      */
     protected $parameters;
 
-    /**
-     * Constructor de la clase
-     * @param Container $container
-     */
-    public final function __construct(Container $container)
-    {
-        $this->container = $container;
-    }
-
     protected function renderNotFound($message)
     {
         throw new \K2\Kernel\Exception\NotFoundException($message);
     }
 
     /**
-     *
-     * @return object
-     */
-    protected function get($id)
-    {
-        return $this->container->get($id);
-    }
-
-    /**
-     * Devuelve el objeto resquest de la petición
-     * @return Request 
+     * 
+     * @return \K2\Kernel\Request;
      */
     protected function getRequest()
     {
-        return $this->container->get('request');
+        return App::getRequest();
     }
 
     /**
      * Devuelve el servicio router
-     * @return Router 
+     * @return RouterInterface
      */
     protected function getRouter()
     {
-        return $this->container->get('router');
+        return App::get('router');
     }
 
     /**
      * Establece la vista a usar
      * @final
-     * @param string $view
-     * @param string $template 
+     * @param string $view 
      */
     final public function setView($view)
     {
@@ -111,14 +85,10 @@ class Controller
      * Establece el response para la vista
      * @final
      * @param string $response
-     * @param string $template 
      */
-    final public function setResponse($response, $template = false)
+    final public function setResponse($response)
     {
         $this->response = $response;
-        if ($template !== false) {
-            $this->setTemplate($template);
-        }
     }
 
     /**
@@ -171,10 +141,9 @@ class Controller
      * @param type $time
      * @return Response 
      */
-    protected function render(array $params = array(), $time = null)
+    protected function render($view, array $params = array(), $time = null)
     {
-        return $this->get('view')->render(array(
-                    'view' => $this->getView(),
+        return App::get('view')->render($view, array(
                     'response' => $this->getResponse(),
                     'params' => $params,
                     'time' => $time,
