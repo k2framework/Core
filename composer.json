@@ -13,7 +13,8 @@
     "replace":{
         "k2/event-dispatcher": "self.version",
         "k2/validation": "self.version",
-        "k2/dependency-injection": "self.version"
+        "k2/dependency-injection": "self.version",
+        "twig/twig": "1.*"
     },
     "autoload": {
         "psr-0":{ 
