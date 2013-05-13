@@ -55,8 +55,8 @@ class K2Module extends Module
                 return new View\View($c['twig']);
             },
             'twig' => function() {
-                $loader = new \Twig_Loader_Filesystem(Kernel\App::appPath());
-
+                $loader = new \Twig_Loader_Filesystem(Kernel\App::appPath() . 'view');
+                
                 foreach (Kernel\App::get('app.kernel')->getModules() as $module) {
                     if (is_dir($dir = $module->getPath() . 'View/')) {
                         $loader->addPath($dir, $module->getName());
@@ -65,12 +65,16 @@ class K2Module extends Module
 
                 $config = \K2\Kernel\App::getParameter('config');
 
-                return new \Twig_Environment($loader, array(
+                $twig =  new \Twig_Environment($loader, array(
                     'cache' => Kernel\App::appPath() . '/temp/cache/twig/',
                     'debug' => !Kernel\App::get('app.kernel')->isProduction(),
                     'strict_variables' => false,
                     'charset' => isset($config['charset']) ? $config['charset'] : 'UTF-8',
                 ));
+                
+                $twig->addExtension(new View\Twig\Extension());
+                
+                return $twig;
             },
             'cache' => function() {
                 return Cache\Cache::factory(App::appPath());
