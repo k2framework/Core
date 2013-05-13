@@ -44,7 +44,7 @@ class View
         $variables = isset($params['params']) ? (array) $params['params'] : array();
 
         if (null == $view) {
-            $module = \K2\Kernel\App::getContext()->getCurrentModule()->getName();
+            $module = strtr(\K2\Kernel\App::getContext()->getCurrentModule()->getName(), '/', '_');
             $controller = \K2\Kernel\App::getContext()->getCurrentController();
             $action = \K2\Kernel\App::getContext()->getCurrentAction();
             $view = '@' . trim($module, '/') . '/' . $controller . '/' . $action;
