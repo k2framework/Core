@@ -132,31 +132,19 @@ class Form extends \Twig_Extension
     }
 
     /**
-     * Crea un arreglo para ser pasado a un form_select en las opciones
-     * a partir del nombre de un modelo ActiveRecord ó una clase cualquiera.
-     * @param string $modelName nombre de la clase a instanciar
-     * @param string $column propiedad de la clase a usar como label de las opciones
-     * @param string $method metodo a llamar en la clase
-     * @param mixed $parameters parametros a pasar al método
-     * @return array un arreglo con claves y valores
+     * Crea una arreglo con claves indice => valor a partir de una arreglo
+     * @param array $options
+     * @param string $column
+     * @param string $key
+     * @return array
      */
-    public function options($modelName, $column, $method = 'findAll', $parameters = array())
+    public function options($options, $column, $key = 'id')
     {
-        $class = new $modelName();
-
-        $result = (array) call_user_func_array(array($class, $method), (array) $parameters);
-
-        $id = (string) $class->metadata()->getPK();
-
-        if ($class instanceof \K2\ActiveRecord\ActiveRecord) {
-            $options = array();
-            foreach ($result as $e) {
-                $options[$e->{$id}] = $this->propertyOrArrayValue($e, $column);
-            }
-            return $options;
-        } else {
-            return $result;
+        $list = array();
+        foreach ($options as $e) {
+            $list[$this->propertyOrArrayValue($e, $key)] = $this->propertyOrArrayValue($e, $column);
         }
+        return $list;
     }
 
     /**
