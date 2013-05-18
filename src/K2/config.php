@@ -56,6 +56,9 @@ return array(
         },
         'activerecord.provider' => function($c) {
             return new Security\Auth\Provider\ActiveRecord($c);
+        },
+        'property_accesor' => function($c) {
+            return new \Symfony\Component\PropertyAccess\PropertyAccessor();
         }
     ),
     'parameters' => array(),
@@ -65,6 +68,14 @@ return array(
         ),
     ),
     'init' => function(Container $c) {
-        
+        $c->setParameter('security', array(
+            'provider' => array(
+                'active_record' => 'K2\\Security\\Auth\\Provider\\ActiveRecord',
+                'memory' => 'K2\\Security\\Auth\\Provider\\Memory',
+            ),
+        ));
+        $c->setParameter('translator', array(
+            'provider' => 'arrays'
+        ));
     },
 );

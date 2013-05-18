@@ -10,16 +10,13 @@
             "email": "programador.manuel@gmail.com"
         }
     ],
-    "replace":{
-        "k2/event-dispatcher": "self.version",
-        "k2/validation": "self.version",
-        "k2/dependency-injection": "self.version",
-        "twig/twig": "1.*"
+    "require": {
+        "twig/twig": "1.*",
+        "symfony/property-access": "v2.2.1"
     },
     "autoload": {
         "psr-0":{ 
             "K2\\": "src/"
         }
-    },
-    "minimum-stability": "dev"
+    }
 }
