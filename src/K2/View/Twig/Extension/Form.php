@@ -26,19 +26,29 @@ class Form extends \Twig_Extension
         );
     }
 
+    /**
+     * Crea una elemento html de tipo <label>
+     * @param string $field campo al que se asociará el label
+     * @param string $text texto a mostrar en el label
+     * @param array $attrs atributos adicionales para la etiqueta html
+     * @return srtring
+     */
     public function label($field, $text, array $attrs = array())
     {
-        $field = explode('.', trim($field));
-
-        if (count($field) > 1) {
-            $attrs['for'] = $field[0] . '_' . $field[1];
-        } else {
-            $attrs['for'] = $field[0];
-        }
+        $attrs['for'] = strtr(trim($field), '.', '_');
 
         return "<label {$this->attrsToString($attrs)}>" . $this->escape($text) . "</label>";
     }
 
+    /**
+     * Crea una etiqueta de tipo <input>
+     * @param array $context el contexto de la plantilla
+     * @param string $field campo del formulario
+     * @param string $type tipo de campo (text, date, number, password, ...) por defecto text
+     * @param array $attrs atributos adicionales para la etiqueta html
+     * @param string $value valor por defecto del campo
+     * @return string
+     */
     public function input($context, $field, $type = 'text', array $attrs = array(), $value = null)
     {
         $attrs['type'] = $type;
@@ -49,6 +59,14 @@ class Form extends \Twig_Extension
         return "<input {$this->attrsToString($attrs, $this->getValue($context, $field))} />";
     }
 
+    /**
+     * Crea una etiqueta de tipo <textaera>
+     * @param array $context el contexto de la plantilla
+     * @param string $field campo del formulario
+     * @param array $attrs atributos adicionales para la etiqueta html
+     * @param string $value valor por defecto del campo
+     * @return string
+     */
     public function textarea($context, $field, array $attrs = array(), $value = null)
     {
         $attrs['name'] = resolveName($field);
@@ -57,6 +75,15 @@ class Form extends \Twig_Extension
         return "<textarea {$this->attrsToString($attrs)}>{$this->escape($this->getValue($context, $field))}</textarea>";
     }
 
+    /**
+     * Crea una etiqueta de tipo <input type="checkbox" />
+     * @param array $context el contexto de la plantilla
+     * @param string $field campo del formulario
+     * @param string $value valor del campo
+     * @param array $attrs atributos adicionales para la etiqueta html
+     * @param boolean $check indica si se selecciona el checkbox ó no
+     * @return string
+     */
     public function check($context, $field, $value, array $attrs = array(), $check = false)
     {
         if ($check) {
@@ -66,6 +93,15 @@ class Form extends \Twig_Extension
         return $this->input($context, $field, 'checkbox', $attrs, $value);
     }
 
+    /**
+     * Crea una etiqueta de tipo <input type="radio" />
+     * @param array $context el contexto de la plantilla
+     * @param string $field campo del formulario
+     * @param string $value valor del campo
+     * @param array $attrs atributos adicionales para la etiqueta html
+     * @param boolean $check indica si se selecciona el radio ó no
+     * @return string
+     */
     public function radio($context, $field, $value, array $attrs = array(), $check = false)
     {
         if ($check) {
@@ -75,6 +111,16 @@ class Form extends \Twig_Extension
         return $this->input($context, $field, 'radio', $attrs, $value);
     }
 
+    /**
+     * Crea una etiqueta de tipo <select/>
+      @param array $context el contexto de la plantilla
+     * @param string $field campo del formulario
+     * @param array $options arreglo con las opciones del select
+     * @param string $empty opcion inicial a mostrar
+     * @param array $attrs atributos adicionales para la etiqueta html
+     * @param string $value valor por defecto del campo
+     * @return string
+     */
     public function select($context, $field, array $options = array(), $empty = 'Seleccione', array $attrs = array(), $value = null)
     {
         $attrs['name'] = resolveName($field);
@@ -85,6 +131,15 @@ class Form extends \Twig_Extension
         return "<select {$this->attrsToString($attrs)}>{$options}</select>";
     }
 
+    /**
+     * Crea un arreglo para ser pasado a un form_select en las opciones
+     * a partir del nombre de un modelo ActiveRecord ó una clase cualquiera.
+     * @param string $modelName nombre de la clase a instanciar
+     * @param string $column propiedad de la clase a usar como label de las opciones
+     * @param string $method metodo a llamar en la clase
+     * @param mixed $parameters parametros a pasar al método
+     * @return array un arreglo con claves y valores
+     */
     public function options($modelName, $column, $method = 'findAll', $parameters = array())
     {
         $class = new $modelName();
@@ -104,6 +159,15 @@ class Form extends \Twig_Extension
         }
     }
 
+    /**
+     * Devuelve un valor para los campos, primero busca en el Request, luego en el array
+     * pasado como primer argumento.
+     * @param array $data arreglo donde será buscado el valor
+     * @param string $fieldName nombre del campo, si tiene . se llamara a este método recursivamente
+     * hasta encontrar el valor en cuestión.
+     * @param boolean $sub indica si la llamada a getValue es recursiva ó no.
+     * @return mixed
+     */
     protected function getValue($data, $fieldName, $sub = false)
     {
 
@@ -131,6 +195,13 @@ class Form extends \Twig_Extension
         }
     }
 
+    /**
+     * Devuelve un valor contenido en $data usando el servicio property_accesor
+     * @param mixed $data donde será buscado el valor
+     * @param string $index indice ó propiedad de donde se obtendrá el valor
+     * @param mixed $default valor por defecto si no se encuentra el valor en $data
+     * @return mixed
+     */
     protected function propertyOrArrayValue($data, $index, $default = null)
     {
         try {
@@ -144,6 +215,12 @@ class Form extends \Twig_Extension
         }
     }
 
+    /**
+     * Convierte un arreglo de atributos en un string para pasarlos a la etiqueta
+     * @param array $attrs
+     * @param array $value
+     * @return string
+     */
     protected function attrsToString(array $attrs, $value = null)
     {
         if (null !== $value) {
@@ -162,11 +239,23 @@ class Form extends \Twig_Extension
         return $html;
     }
 
+    /**
+     * Escapa una variable
+     * @param type $string
+     * @return type
+     */
     protected function escape($string)
     {
         return twig_escape_filter(App::get('twig'), (string) $string);
     }
 
+    /**
+     * Crea etiquetas <option> para los select
+     * @param array $options
+     * @param array $value
+     * @param type $empty
+     * @return string
+     */
     protected function createOptions(array $options, $value = null, $empty)
     {
         $html = $empty ? "<option>{$this->escape($empty)}</option>" : '';
@@ -185,6 +274,19 @@ class Form extends \Twig_Extension
 
 }
 
+/**
+ * crea un nombre valido para el atributo name de los campos del formulario a partir
+ * de un string del tipo form.campo
+ * 
+ * <code>
+ *  <?php resolveName("persona.nombre"); // devuelve persona[nombre]
+ *  <?php resolveName("persona.estados.venezuela"); // devuelve persona[estados][venezuela]
+ *  <?php resolveName("persona.perfiles."); // devuelve persona[perfiles][]
+ * </code>
+ * @param type $fieldName
+ * @param type $first
+ * @return type
+ */
 function resolveName($fieldName, $first = true)
 {
     $fieldName = explode('.', trim($fieldName), 2);
