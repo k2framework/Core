@@ -7,17 +7,6 @@ use K2\Kernel\App;
 class Core extends \Twig_Extension
 {
 
-    public function initRuntime(\Twig_Environment $environment)
-    {
-        //si no existe la funciona en twig, que usa las de PHP
-        $environment->registerUndefinedFunctionCallback(function($name) {
-                    if (function_exists($name)) {
-                        return new \Twig_Function_Function($name);
-                    }
-                    return false;
-                });
-    }
-
     public function getName()
     {
         return 'k2_extension';

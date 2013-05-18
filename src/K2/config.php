@@ -44,6 +44,15 @@ return array(
             }
             $twig->addExtension(new View\Twig\Extension\Form());
 
+            //registramos un callback para cuando no se encuentre una funcion twig, busque primero
+            //si es una funcion de php y así no tire una excepción
+            $twig->registerUndefinedFunctionCallback(function($name) {
+                        if (function_exists($name)) {
+                            return new \Twig_Function_Function($name);
+                        }
+                        return false;
+                    });
+
             return $twig;
         },
         'cache' => function() {
