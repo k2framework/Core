@@ -166,7 +166,7 @@ class Firewall
 
             $this->container->get('session')->set('token', $token, 'security');
 
-            $event = new SecurityEvent($this->container->get('request')
+            $event = new SecurityEvent(\K2\Kernel\App::getRequest()
                     , $this->container->get('security'));
 
             $this->container->get('event.dispatcher')->dispatch(Events::LOGIN, $event);
@@ -217,7 +217,7 @@ class Firewall
             die("No existe el Tipo del Logueo $typeLoginClassName");
         }
 
-        $event = new SecurityEvent($this->container->get('request')
+        $event = new SecurityEvent(\K2\Kernel\App::getRequest()
                 , $this->container->get('security'));
 
         $this->container->get('event.dispatcher')->dispatch(Events::LOGOUT, $event);

@@ -2,6 +2,7 @@
 
 namespace K2\Security\Auth\Provider;
 
+use K2\Kernel\App;
 use K2\Kernel\Config\Reader;
 use K2\Security\Auth\User\Memory as User;
 use K2\Security\Auth\User\UserInterface;
@@ -43,15 +44,15 @@ class Memory extends AbstractProvider
         isset($config['username']) || $config['username'] = 'username';
         isset($config['password']) || $config['password'] = 'password';
 
-        $request = $this->container->get('request');
+        $request = App::getRequest();
 
         /**
          * Si data es diferente de nulo, se usa data, sino se busca en request 
          */
-        $form = $data ? : $request->get('form_login', array(
-                    $config['username'] => $request->server->get('PHP_AUTH_USER'),
-                    'password' => $request->server->get('PHP_AUTH_PW'),
-                ));
+        $form = $data ? : $request->request('login', array(
+                    $config['username'] => $request->server('PHP_AUTH_USER'),
+                    'password' => $request->server('PHP_AUTH_PW'),
+        ));
 
         $form['username'] = $form[$config['username']];
         $form['password'] = $form[$config['password']];
