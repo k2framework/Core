@@ -7,6 +7,17 @@ use K2\Kernel\App;
 class Core extends \Twig_Extension
 {
 
+    public function initRuntime(\Twig_Environment $environment)
+    {
+        //si no existe la funciona en twig, que usa las de PHP
+        $environment->registerUndefinedFunctionCallback(function($name) {
+                    if (function_exists($name)) {
+                        return new \Twig_Function_Function($name);
+                    }
+                    return false;
+                });
+    }
+
     public function getName()
     {
         return 'k2_extension';
@@ -21,8 +32,6 @@ class Core extends \Twig_Extension
     {
         return array(
             'url' => new \Twig_Function_Method($this, 'url'),
-            'k2_memory_usage' => new \Twig_Function_Method($this, 'memoryUsage'),
-            'k2_execution_time' => new \Twig_Function_Method($this, 'executionTime'),
             new \Twig_SimpleFunction('asset', function($file) {
                         return PUBLIC_PATH . $file;
                     }),
@@ -75,16 +84,6 @@ class Core extends \Twig_Extension
 
             return PUBLIC_PATH . ltrim($url, '/');
         }
-    }
-
-    public function memoryUsage()
-    {
-        return number_format(memory_get_usage() / 1048576, 2);
-    }
-
-    public function executionTime()
-    {
-        return round((microtime(1) - START_TIME), 4);
     }
 
 }
