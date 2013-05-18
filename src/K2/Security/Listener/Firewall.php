@@ -42,15 +42,16 @@ class Firewall
     {
 
         $url = rtrim($event->getRequest()->getRequestUrl(), '/');
+
+        $loginUrl = '/' . trim($this->container->get('router')
+                                ->createUrl(Reader::get('security.security.login_url'), false), '/');
+
         //verificamos la existencia del token en la session.
-        //if (!$this->container->get('session')->has('token', 'security')) {
         if (!$this->container->get('security')->isLogged()) {
-            if ($url === Reader::get('security.security.login_url')
-                    && !$event->getRequest()->isMethod('post')) {
+            if ($url === $loginUrl && !$event->getRequest()->isMethod('post')) {
                 //si no existe el token y la url es la del logueo, nos vamos.
                 return;
-            } elseif ((($this->isSecure($url) || $url === '/_autenticate')
-                    && $event->getRequest()->isMethod('post')) ||
+            } elseif ((($this->isSecure($url) || $url === '/_autenticate') && $event->getRequest()->isMethod('post')) ||
                     ('http' === Reader::get('security.security.type') &&
                     $event->getRequest()->server->get('PHP_AUTH_USER') &&
                     $event->getRequest()->server->get('PHP_AUTH_PW'))
@@ -60,8 +61,7 @@ class Firewall
                 $event->setResponse($this->loginCheck());
                 return;
             }
-        } elseif ($url === Reader::get('security.security.login_url')
-                || $url === '/_autenticate') {
+        } elseif ($url === $loginUrl || $url === '/_autenticate') {
             //si ya existe el token y estamos en la url del form de logueo, mandamos al target_login
             $event->stopPropagation();
             $event->setResponse($this->container->get('router')
@@ -110,7 +110,7 @@ class Firewall
                 return $roles;
             }
         }
-        return FALSE;
+        return false;
     }
 
     /**
@@ -128,12 +128,12 @@ class Firewall
             $provider = $this->container->get(str_replace('@', '', $provider));
         } else {
             $config = $this->container->getParameter('security');
-            
-            if(!isset($config['provider'][$provider])){
-                throw new AuthException("No existe el proveedor $provider");                
+
+            if (!isset($config['provider'][$provider])) {
+                throw new AuthException("No existe el proveedor $provider");
             }
-            
-            $providerClassName =$config['provider'][$provider];
+
+            $providerClassName = $config['provider'][$provider];
 
             if (!class_exists($providerClassName)) {
                 $providerClassName || $providerClassName = $provider;
@@ -167,7 +167,7 @@ class Firewall
             $this->container->get('session')->set('token', $token, 'security');
 
             $event = new SecurityEvent($this->container->get('request')
-                            , $this->container->get('security'));
+                    , $this->container->get('security'));
 
             $this->container->get('event.dispatcher')->dispatch(Events::LOGIN, $event);
 
@@ -218,7 +218,7 @@ class Firewall
         }
 
         $event = new SecurityEvent($this->container->get('request')
-                        , $this->container->get('security'));
+                , $this->container->get('security'));
 
         $this->container->get('event.dispatcher')->dispatch(Events::LOGOUT, $event);
 
