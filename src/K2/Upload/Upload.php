@@ -248,7 +248,7 @@ abstract class Upload
      */
     protected function saveFile($name)
     {
-        return $this->file->move($this->path, $name, false);
+        return $this->file->move($this->path, $name, true);
     }
 
     /**
@@ -266,8 +266,7 @@ abstract class Upload
             $name = $this->file->getName();
         }
         // Guarda el archivo
-        if (false !== $this->beforeSave($name) && $this->overwrite($name) && $this->validates() && $this->saveFile($name)) {
-            $this->afterSave($name);
+        if ($this->overwrite($name) && $this->validates() && $this->saveFile($name)) {
             $this->file->setName($name);
             return $this->file;
         }
