@@ -39,6 +39,10 @@ return array(
             ));
 
             $twig->addExtension(new View\Twig\Extension\Core());
+            if (!PRODUCTION) {
+                $twig->addExtension(new \Twig_Extension_Debug());
+            }
+            $twig->addExtension(new View\Twig\Extension\Form());
 
             return $twig;
         },

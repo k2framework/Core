@@ -16,19 +16,17 @@ class Reader
 
     public static function readDatabases()
     {
-        /* @var $app \K2\Kernel\AppContext */
-        $app = App::get('app.context');
-        $ini = $app->getAppPath() . 'config/databases.ini';
-        foreach (parse_ini_file($ini, TRUE) as $configName => $params) {
+        $ini = APP_PATH . '/config/databases.ini';
+        foreach (parse_ini_file($ini, true) as $configName => $params) {
             Config::add($parameter = new Parameters($configName, $params));
             if ('sqlite' === $parameter->getType()) {
-                $dbName = App::appPath() . ltrim($parameter->getDbName(), '/');
+                $dbName = APP_PATH . $parameter->getDbName();
                 $parameter->setDbName(str_replace(array('\\', '/'), DIRECTORY_SEPARATOR, $dbName));
             }
         }
-        
+
         $config = App::getParameter('config');
-        
+
         if (isset($config['database'])) {
             //lo seteamos solo si se ha definido.
             if (!Config::has($config['database'])) {
