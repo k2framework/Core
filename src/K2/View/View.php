@@ -53,9 +53,25 @@ class View
             $view .= $params['response'];
         }
 
-        $view .= '.twig';
 
-        $content = $this->twig->render($view, $variables);
+        $view .= '.twig';
+        try {
+            $content = $this->twig->render($view, $variables);
+        } catch (\Twig_Error_Loader $e) {
+            if (!isset($variables['scaffold'])) {
+                throw $e;
+            }
+            //si se usa scaffold, buscamos en views/scaffold
+            $view = '/scaffolds/' . $variables['scaffold'] . '/' . $context['action'];
+
+            if (isset($params['response'])) {
+                $view .= $params['response'];
+            }
+
+            $view .= '.twig';
+
+            $content = $this->twig->render($view, $variables);
+        }
 
         $response = new Response($content);
         $config = \K2\Kernel\App::getParameter('config');
