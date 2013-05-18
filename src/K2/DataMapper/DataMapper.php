@@ -68,8 +68,19 @@ class DataMapper
         }
     }
 
-    protected function resolve($item, $value)
+    protected function resolve(Item $item, $value)
     {
+        $filters = $item->getFilters();
+
+        foreach ($filters as $id => $filter) {
+            $data = array($value);
+            if (!is_int($filter)) {
+                $data[] = $id;
+            }
+            $data[] = $filter;
+            $value = call_user_func_array('filter_var', $data);
+        }
+
         return $value;
     }
 

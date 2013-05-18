@@ -14,12 +14,11 @@ class MapperBuilder
 
     protected $items = array();
 
-    public function add($item, array $config = array())
+    public function add($item, array $filters = null)
     {
-        $item = $this->resolveItem($item, $config);
+        $item = $this->resolveItem($item);
 
-        isset($config['filters']) && $item->setFilters((array) $config['filters']);
-        isset($config['validations']) && $item->setValidations((array) $config['validations']);
+        $item->setFilters((array) $filters);
 
         $this->items[$item->getKey()] = $item;
 
@@ -30,7 +29,7 @@ class MapperBuilder
      * 
      * @param Item $item
      */
-    protected function resolveItem($item, $config)
+    protected function resolveItem($item)
     {
         if ($item instanceof Item) {
             return $item;

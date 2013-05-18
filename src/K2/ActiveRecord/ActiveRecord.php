@@ -6,10 +6,11 @@ use K2\Kernel\App;
 use ActiveRecord\Model;
 use ActiveRecord\Config\Config;
 use ActiveRecord\Adapter\Adapter;
-use K2\Validation\Validator;
 use K2\Validation\Validatable;
 use K2\ActiveRecord\Config\Reader;
-use K2\ActiveRecord\Validation\ValidationBuilder;
+use K2\Validation\ValidationBuilder;
+use ActiveRecord\Exception\ActiveRecordException;
+use K2\ActiveRecord\Validation\ValidationBuilder as ARValidationBulder;
 
 /**
  * Description of ActiveRecord
@@ -46,10 +47,13 @@ class ActiveRecord extends Model implements Validatable
         $this->validated = $validated;
     }
 
-    public function getValidations()
+    public function createValidations(ValidationBuilder $builder)
     {
         if (!$this->validation) {
-            $this->validation = new ValidationBuilder();
+            if (!$builder instanceof ARValidationBulder) {
+                throw new ActiveRecordException('Se espera una instancia de K2\ActiveRecord\Validation\ValidationBuilder');
+            }
+            $this->validation = $builder;
             /* @var $attribute \ActiveRecord\Metadata\Attribute */
             foreach ($this->metadata()->getAttributes() as $field => $attribute) {
                 if (true === $attribute->notNull && !$attribute->PK && !$attribute->default) {
@@ -73,7 +77,7 @@ class ActiveRecord extends Model implements Validatable
                 }
             }
         }
-        return $this->validations($this->validation);
+        $this->validations($this->validation);
     }
 
     protected function validate($update = FALSE)
@@ -98,11 +102,10 @@ class ActiveRecord extends Model implements Validatable
     /**
      * método que implementarán los modelos para crear las validaciones.
      * @param ValidationBuilder $builder 
-     * @return ValidationBuilder
      */
-    protected function validations(ValidationBuilder $builder)
+    protected function validations(ARValidationBulder $builder)
     {
-        return $builder;
+        
     }
 
 }

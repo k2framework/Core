@@ -7,7 +7,6 @@ class Item
 
     protected $key;
     protected $filters = array();
-    protected $validations = array();
 
     public function __construct($key)
     {
@@ -33,15 +32,4 @@ class Item
     {
         $this->filters = $filters;
     }
-
-    public function getValidations()
-    {
-        return $this->validations;
-    }
-
-    public function setValidations($validations)
-    {
-        $this->validations = $validations;
-    }
-
 }
