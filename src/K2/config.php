@@ -24,6 +24,12 @@ return array(
             $loader = new \Twig_Loader_Filesystem(APP_PATH . '/view');
 
             foreach (App::modules() as $name => $module) {
+                //si existe en views una carpeta con el nombre de algun módulo
+                //se agrega a los paths de twig, esto permite reescribir templates
+                //en los proyectos :-)
+                if (is_dir($dir = APP_PATH . '/view/' . $module['name'] . '/')) {
+                    $loader->addPath($dir, $name);
+                }
                 if (is_dir($dir = rtrim($module['path'], '/') . '/View/')) {
                     $loader->addPath($dir, $name);
                 }
