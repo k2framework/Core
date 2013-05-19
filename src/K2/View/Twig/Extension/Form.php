@@ -93,9 +93,8 @@ class Form extends \Twig_Extension
         $attrs['type'] = 'checkbox';
         $attrs['name'] = resolveName($field);
         $attrs['id'] = strtr($field, '.', '_');
-        var_dump($this->getValue($context, $field));
-        if (null !== $value && null !== $this->getValue($context, $field)) {
-            
+        if (null !== $this->getValue($context, $field)) {
+            $attrs['checked'] = 'checked';
         }
 
         return "<input {$this->attrsToString($attrs, $value)} />";
@@ -115,8 +114,14 @@ class Form extends \Twig_Extension
         if ($check) {
             $attrs['checked'] = 'checked';
         }
+        $attrs['type'] = 'radio';
+        $attrs['name'] = resolveName($field);
+        $attrs['id'] = strtr($field, '.', '_');
+        if (null !== $this->getValue($context, $field)) {
+            $attrs['checked'] = 'checked';
+        }
 
-        return $this->input($context, $field, 'radio', $attrs, $value);
+        return "<input {$this->attrsToString($attrs, $value)} />";
     }
 
     /**
