@@ -92,7 +92,7 @@ class Form extends \Twig_Extension
         }
         $attrs['type'] = 'checkbox';
         $attrs['name'] = resolveName($field);
-        $attrs['id'] = strtr($field, '.', '_');
+        isset($attrs['id']) || $attrs['id'] = strtr($field, '.', '_');
         if (null !== $this->getValue($context, $field)) {
             $attrs['checked'] = 'checked';
         }
@@ -116,7 +116,7 @@ class Form extends \Twig_Extension
         }
         $attrs['type'] = 'radio';
         $attrs['name'] = resolveName($field);
-        $attrs['id'] = strtr($field, '.', '_');
+        isset($attrs['id']) || $attrs['id'] = strtr($field, '.', '_');
         if (null !== $this->getValue($context, $field)) {
             $attrs['checked'] = 'checked';
         }
@@ -159,7 +159,9 @@ class Form extends \Twig_Extension
         $function = $multiple ? 'check' : 'radio';
 
         $html = '<div class"form-choices">';
+        $i = 0;
         foreach ($options as $value => $label) {
+            $attrs['id'] = strtr($field, '.', '_') . '_' . $i++;
             $html .= "<label>" . $this->{$function}($context, $field . '.', $value, $attrs)
                     . $this->escape($label) . "</label>";
             ;
