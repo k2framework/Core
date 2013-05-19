@@ -156,15 +156,18 @@ class Form extends \Twig_Extension
      */
     public function choice($context, $field, array $options = array(), $multiple = true, array $attrs = array(), $value = null)
     {
-        $function = $multiple ? 'check' : 'radio';
-
         $html = '<div class"form-choices">';
         $i = 0;
         foreach ($options as $value => $label) {
-            $attrs['id'] = strtr($field, '.', '_') . '_' . $i++;
-            $html .= "<label>" . $this->{$function}($context, $field . '.', $value, $attrs)
-                    . $this->escape($label) . "</label>";
-            ;
+            $attrs['id'] = strtr($field, '.', '_') . '_' . $i;
+            if ($multiple) {
+                $html .= "<label>" . $this->check($context, $field . '.' . $i, $value, $attrs)
+                        . $this->escape($label) . "</label>";
+            } else {
+                $html .= "<label>" . $this->radio($context, $field, $value, $attrs)
+                        . $this->escape($label) . "</label>";
+            }
+            ++$i;
         }
         $html .= '</div>';
 
@@ -286,7 +289,7 @@ class Form extends \Twig_Extension
      */
     protected function createOptions(array $options, $value = null, $empty)
     {
-        $html = $empty ? "<option>{$this->escape($empty)}</option>" : '';
+        $html = $empty ? "<option value=\"\">{$this->escape($empty)}</option>" : '';
         $values = (array) $value;
         foreach ($options as $index => $value) {
             if (in_array($index, $values)) {
