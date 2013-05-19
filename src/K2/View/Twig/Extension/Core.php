@@ -9,7 +9,7 @@ class Core extends \Twig_Extension
 
     public function getName()
     {
-        return 'k2_extension';
+        return 'k2_core';
     }
 
     public function getFilters()
