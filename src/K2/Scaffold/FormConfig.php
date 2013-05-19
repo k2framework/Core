@@ -104,7 +104,7 @@ class FormConfig
     private function getLabelSelect(ActiveRecord $model)
     {
         foreach ($model->metadata()->getAttributes() as $name => $attr) {
-            if (!$attr->PK && $attr->FK) {
+            if (!$attr->PK && !$attr->FK) {
                 return $name;
             }
         }
