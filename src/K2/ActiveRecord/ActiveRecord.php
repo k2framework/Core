@@ -9,8 +9,6 @@ use ActiveRecord\Adapter\Adapter;
 use K2\Validation\Validatable;
 use K2\ActiveRecord\Config\Reader;
 use K2\Validation\ValidationBuilder;
-use ActiveRecord\Exception\ActiveRecordException;
-use K2\ActiveRecord\Validation\ValidationBuilder as ARValidationBulder;
 
 /**
  * Description of ActiveRecord
@@ -100,7 +98,7 @@ class ActiveRecord extends Model implements Validatable
      * método que implementarán los modelos para crear las validaciones.
      * @param ValidationBuilder $builder 
      */
-    protected function validations(ARValidationBulder $builder)
+    protected function validations(ValidationBuilder $builder)
     {
         
     }

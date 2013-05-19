@@ -33,11 +33,7 @@ class Validator
     public function validateOnUpdate(Validatable $object, ValidationBuilder $builder = null)
     {
         if (!$builder) {
-            if ($object instanceof ActiveRecord) {
-                $builder = new ARValidationBuilder();
-            } else {
-                $builder = new ValidationBuilder();
-            }
+            $builder = new ValidationBuilder();
         }
 
         return $this->execute($object, $builder, true);
