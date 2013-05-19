@@ -53,7 +53,6 @@ class View
             $view .= $params['response'];
         }
 
-
         $view .= '.twig';
         try {
             $content = $this->twig->render($view, $variables);
@@ -61,8 +60,11 @@ class View
             if (!isset($variables['scaffold'])) {
                 throw $e;
             }
+
             //si se usa scaffold, buscamos en views/scaffold
-            $view = '/scaffolds/' . $variables['scaffold'] . '/' . $context['action'];
+            $view = explode('/', $view);
+            $view = basename(end($view), '.twig');
+            $view = '/scaffolds/' . $variables['scaffold'] . '/' . $view;
 
             if (isset($params['response'])) {
                 $view .= $params['response'];
