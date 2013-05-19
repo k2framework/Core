@@ -15,6 +15,9 @@ class ValidationBuilder implements \Serializable
     const RANGE = 'K2\\Validation\\Validators\\Range';
     const URL = 'K2\\Validation\\Validators\\Url';
     const EQUAL_TO = 'K2\\Validation\\Validators\\EqualTo';
+    const DEFAULT_FIELD = 'K2\\ActiveRecord\\Validation\\Validators\\DefaultField';
+    const PRIMARY = 'K2\\ActiveRecord\\Validation\\Validators\\Primary';
+    const UNIQUE = 'K2\\ActiveRecord\\Validation\\Validators\\Unique';
 
     protected $valitations = array();
 
@@ -74,6 +77,22 @@ class ValidationBuilder implements \Serializable
     public function equalTo($field, array $params = array(), $replace = true)
     {
         return $this->set(self::EQUAL_TO, $field, $params, $replace);
+    }
+
+    //acá irán las validaciones del AR
+    public function defaultField($field, array $params = NULL, $replace = true)
+    {
+        return $this->set(self::DEFAULT_FIELD, $field, $params, $replace);
+    }
+
+    public function unique($field, array $params = NULL, $replace = true)
+    {
+        return $this->set(self::UNIQUE, $field, $params, $replace);
+    }
+
+    public function primary($field, array $params = NULL, $replace = true)
+    {
+        return $this->set(self::PRIMARY, $field, $params, $replace);
     }
 
     public function has($type, $field)

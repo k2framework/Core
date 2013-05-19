@@ -50,9 +50,6 @@ class ActiveRecord extends Model implements Validatable
     public function createValidations(ValidationBuilder $builder)
     {
         if (!$this->validation) {
-            if (!$builder instanceof ARValidationBulder) {
-                throw new ActiveRecordException('Se espera una instancia de K2\ActiveRecord\Validation\ValidationBuilder');
-            }
             $this->validation = $builder;
             /* @var $attribute \ActiveRecord\Metadata\Attribute */
             foreach ($this->metadata()->getAttributes() as $field => $attribute) {
