@@ -22,6 +22,7 @@ class Form extends \Twig_Extension
             new \Twig_SimpleFunction('form_check', array($this, 'check'), array('needs_context' => true, 'is_safe' => array('html'))),
             new \Twig_SimpleFunction('form_radio', array($this, 'radio'), array('needs_context' => true, 'is_safe' => array('html'))),
             new \Twig_SimpleFunction('form_select', array($this, 'select'), array('needs_context' => true, 'is_safe' => array('html'))),
+            new \Twig_SimpleFunction('form_choice', array($this, 'choice'), array('needs_context' => true, 'is_safe' => array('html'))),
             new \Twig_SimpleFunction('form_options', array($this, 'options')),
         );
     }
@@ -89,8 +90,15 @@ class Form extends \Twig_Extension
         if ($check) {
             $attrs['checked'] = 'checked';
         }
+        $attrs['type'] = 'checkbox';
+        $attrs['name'] = resolveName($field);
+        $attrs['id'] = strtr($field, '.', '_');
+        var_dump($this->getValue($context, $field));
+        if (null !== $value && null !== $this->getValue($context, $field)) {
+            
+        }
 
-        return $this->input($context, $field, 'checkbox', $attrs, $value);
+        return "<input {$this->attrsToString($attrs, $value)} />";
     }
 
     /**
@@ -113,15 +121,15 @@ class Form extends \Twig_Extension
 
     /**
      * Crea una etiqueta de tipo <select/>
-      @param array $context el contexto de la plantilla
+     * @param array $context el contexto de la plantilla
      * @param string $field campo del formulario
      * @param array $options arreglo con las opciones del select
-     * @param string $empty opcion inicial a mostrar
      * @param array $attrs atributos adicionales para la etiqueta html
      * @param string $value valor por defecto del campo
+     * @param string $empty opcion inicial a mostrar
      * @return string
      */
-    public function select($context, $field, array $options = array(), $empty = 'Seleccione', array $attrs = array(), $value = null)
+    public function select($context, $field, array $options = array(), array $attrs = array(), $value = null, $empty = 'Seleccione')
     {
         $attrs['name'] = resolveName($field);
         $attrs['id'] = strtr($field, '.', '_');
@@ -129,6 +137,31 @@ class Form extends \Twig_Extension
         $options = $this->createOptions($options, $this->getValue($context, $field), $empty);
 
         return "<select {$this->attrsToString($attrs)}>{$options}</select>";
+    }
+
+    /**
+     * Crea un grupo de opciones de tipo checkbox ó radio dependiendo del parametro $multiple
+     * @param array $context el contexto de la plantilla
+     * @param string $field campo del formulario
+     * @param array $options arreglo con las opciones del select
+     * @param boolean $multiple si es true, se crearán checboxs sino radios
+     * @param array $attrs atributos adicionales para la etiqueta html
+     * @param string $value valor por defecto del campo
+     * @return string
+     */
+    public function choice($context, $field, array $options = array(), $multiple = true, array $attrs = array(), $value = null)
+    {
+        $function = $multiple ? 'check' : 'radio';
+
+        $html = '<div class"form-choices">';
+        foreach ($options as $value => $label) {
+            $html .= "<label>" . $this->{$function}($context, $field . '.', $value, $attrs)
+                    . $this->escape($label) . "</label>";
+            ;
+        }
+        $html .= '</div>';
+
+        return $html;
     }
 
     /**
