@@ -66,10 +66,10 @@
         event.preventDefault()
         $('.trace .exception_trace').hide(0)
         var el = $(this).find('.exception_trace')
-        if(el.is(':visible')){
-            el.show(0)
+        if(el.css('display') === 'none'){
+            el.css('display', 'block')
         }else{
-            el.hide(0)            
+            el.css('display', 'none')
         }
     })
 </script>
