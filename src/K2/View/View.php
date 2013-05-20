@@ -44,35 +44,41 @@ class View
     {
         $variables = isset($params['params']) ? (array) $params['params'] : array();
 
-        if (null == $view) {
-            $context = App::getContext();
-            $view = '@' . trim($context['module']['name'], '/') . '/' . $context['controller'] . '/' . $context['action'];
-        }
+        if (false !== $view) {
 
-        if (isset($params['response'])) {
-            $view .= $params['response'];
-        }
-
-        $view .= '.twig';
-        try {
-            $content = $this->twig->render($view, $variables);
-        } catch (\Twig_Error_Loader $e) {
-            if (!isset($variables['scaffold'])) {
-                throw $e;
+            if (null == $view) {
+                $context = App::getContext();
+                $view = '@' . trim($context['module']['name'], '/') . '/'
+                        . $context['controller'] . '/' . $context['action'];
             }
-
-            //si se usa scaffold, buscamos en views/scaffold
-            $view = explode('/', $view);
-            $view = basename(end($view), '.twig');
-            $view = '/scaffolds/' . $variables['scaffold'] . '/' . $view;
 
             if (isset($params['response'])) {
                 $view .= $params['response'];
             }
 
             $view .= '.twig';
+            try {
+                $content = $this->twig->render($view, $variables);
+            } catch (\Twig_Error_Loader $e) {
+                if (!isset($variables['scaffold'])) {
+                    throw $e;
+                }
 
-            $content = $this->twig->render($view, $variables);
+                //si se usa scaffold, buscamos en views/scaffold
+                $view = explode('/', $view);
+                $view = basename(end($view), '.twig');
+                $view = '/scaffolds/' . $variables['scaffold'] . '/' . $view;
+
+                if (isset($params['response'])) {
+                    $view .= $params['response'];
+                }
+
+                $view .= '.twig';
+
+                $content = $this->twig->render($view, $variables);
+            }
+        } else {
+            $content = null;
         }
 
         $response = new Response($content);

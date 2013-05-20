@@ -144,7 +144,6 @@ class Controller
     protected function render($view, array $params = array(), $time = null)
     {
         return App::get('view')->render($view, array(
-                    'response' => $this->getResponse(),
                     'params' => $params,
                     'time' => $time,
         ));
