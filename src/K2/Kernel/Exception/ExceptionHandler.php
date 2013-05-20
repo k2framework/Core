@@ -55,8 +55,7 @@ class ExceptionHandler
                 }
             }
         } else {
-            App::get('twig')->getLoader()->addPath(__DIR__ . '/files/', 'exception');
-            $html = App::get('twig')->render('@exception/exception.twig', array('e' => $e));
+            $html = App::get('twig')->render('@K2Core/exception/exception.twig', array('e' => $e));
         }
         return new Response($html, $code);
     }
