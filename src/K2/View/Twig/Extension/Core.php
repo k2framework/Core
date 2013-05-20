@@ -46,7 +46,7 @@ class Core extends \Twig_Extension
             return rtrim(PUBLIC_PATH, '/') . App::getRequest()->getRequestUrl();
         } elseif (false !== $url) {
             //si se envió un string, se devuelve como una url
-            return PUBLIC_PATH . ltrim($url);
+            return App::get('router')->createUrl($url);
         } else {
             //si no se envió un string, sino parametros con nombres, se crea la url
             $url = '';
