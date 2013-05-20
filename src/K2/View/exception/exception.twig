@@ -33,8 +33,10 @@
 <div class="exception_information">
 <h2>Rastro</h2>
 {% for trace in e.trace %}
-<div class="trace well"><strong>{{ trace.file }} ({{ trace.line }})</strong>
+{% if trace.file is defined %}
+<div class="trace well"><strong>{{ trace.file|default }} ({{ trace.line|default }})</strong>
 <div class="exception_trace">{{ macros.trace(trace) }}</div></div>
+{% endif %}
 {% endfor %}
 </div>
 
