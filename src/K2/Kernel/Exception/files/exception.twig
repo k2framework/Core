@@ -1,21 +1,16 @@
 <!DOCTYPE html>
 <html>
-{% macro makePrettyException(e) %}
-{% set trace = e.trace|first %}
-Exception: "{{ e.message }}" @ {% if trace.class %}{{ trace.class }}->{% endif %}{{ trace.function }}()<br/>
-{% endmacro %}
-{% macro trace(trace) %}
-{% set lines = file(trace.file) %}
-{% set start = (trace.line - 4 >= 0) ? trace.line - 4 : 0 %}
-{% set end = (trace.line + 2 > lines|length - 1) ? lines|length - 1 : trace.line + 2 %}
-{% for li in range(start, end) %}
-<li {% if li == (trace.line - 1) %}class="exception_highlight" {% endif %}>
-<strong>{{ li + 1 }}</strong> {{ lines[li] }}
-</li>
-{% endfor %}
-<?php for ($i = $start; $i <= $end; $i++): ?>
-<li <?php if ($i == $trace ['line'] - 1): ?> class="exception_highlight" <?php endif; ?>">
-<strong><?php echo ($i + 1) ?></strong> <?php echo htmlspecialchars($lines [$i], ENT_NOQUOTES, 'UTF-8') ?>
+{% macro trace(trace, back = 6, next = 4) %}
+    {% set lines = file(trace.file) %}
+    {% set start = (trace.line - back >= 0) ? trace.line - back : 0 %}
+    {% set end = (trace.line + next > lines|length - 1) ? lines|length - 1 : trace.line + next %}
+    <code style="white-space: pre-wrap">
+    {% spaceless %}
+    {% for li in range(start, end) %}
+    <div {% if li == (trace.line - 1) %} class="exception_highlight"{% endif %}>{{ lines[li] }}</div>
+    {% endfor %}
+    {% endspaceless %}
+    </code>
 {% endmacro %}
 {% import _self as macros %}
 <head>
@@ -32,52 +27,34 @@ Exception: "{{ e.message }}" @ {% if trace.class %}{{ trace.class }}->{% endif %
 </strong></p>
 <p>En el archivo <em>{{ e.file }}</em> en la línea: <em>{{ e.line }}</em></p>
 </div>
+<div class="exception_trace">{{ macros.trace(e) }}</div>
 <div class="exception_information">
 <h2>Rastro</h2>
 {% for trace in e.trace %}
-<p><strong>{{ trace.file }} ({{ trace.line }})</strong></p>
-<ul class="exception_trace">
-{{ macros.trace(trace) }}
-</ul>
-<br />
+<div class="trace"><p><strong>{{ trace.file }} ({{ trace.line }})</strong></p>
+<div class="exception_trace">{{ macros.trace(trace) }}</div>
+</div>
 {% endfor %}
-<?php endif; ?>
-<?php endforeach; ?>
-
-<table><thead><tr>
-<th>#</th><th>Fichero (línea)</th><th>Función</th>
-</tr></thead>
-<tbody>
-<?php
-$lines = explode("\n", $e->getTraceAsString());
-$files = get_included_files();
-foreach ($lines as $line) {
-$line = explode(" ", $line);
-?>
-<tr><td><?php echo $line[0] ?></td><td><?php echo $line[1] ?></td><td><?php if (isset($line[2])) echo $line[2] ?></td></tr>
-<?php } ?>
-</tbody>
-</table>
 </div>
 
 <div class="exception_information">
 <h2>Información Adicional</h2>
-<strong>En producción:</strong> <?php echo PRODUCTION ? 'Sí' : 'No' ?><br />
-<strong>Ubicación actual:</strong> <?php echo \K2\Kernel\App::requestUrl() ?><br />
-<strong>Server: </strong> <?php echo $_SERVER['SERVER_SOFTWARE'] ?><br />
-<strong>IP Server: </strong> <?php echo $_SERVER['SERVER_ADDR'] ?><br />
-<strong>IP Visitante: </strong> <?php echo $_SERVER['REMOTE_ADDR'] ?><br />
+<strong>En producción:</strong> {{ constant('PRODUCTION') ? 'Sí' : 'No' }}<br />
+<strong>Ubicación actual:</strong>{{ url() }}<br />
+<strong>Server: </strong>{{ app.request.server('SERVER_SOFTWARE') }}<br />
+<strong>IP Server: </strong>{{ app.request.server('SERVER_ADDR') }}<br />
+<strong>IP Visitante: </strong>{{ app.request.server('REMOTE_ADDR') }}<br />
 </div>
 
 <table><thead><tr>
-<th><h3><?php echo round((microtime(1)-START_TIME),4),' seg.'?></h3>Tiempo</th>
-<th><h3><?php echo number_format(memory_get_usage() / 1048576, 2), ' MB'; ?></h3>Memoria Usada</th>
-<th><h3><?php echo count($files) ?> ficheros</h3>Includes</th>
+<th><h3>{{ round((microtime(1)-constant('START_TIME')),4) }} seg.</h3>Tiempo</th>
+<th><h3>{{ number_format(memory_get_usage() / 1048576, 2) }} MB</h3>Memoria Usada</th>
+<th><h3>{{ get_included_files()|length }} ficheros</h3>Includes</th>
 </tr>
 <tr>
-<th><h3><?php echo ini_get('max_execution_time'),' seg.'?></h3>Tiempo Máximo PHP</th>
-<th><h3><?php echo ini_get('memory_limit'); ?></h3>Memoria PHP</th>
-<th><h3><?php echo PHP_VERSION ?></h3>Versión PHP</th>
+<th><h3>{{ ini_get('max_execution_time') }} seg.</h3>Tiempo Máximo PHP</th>
+<th><h3>{{ ini_get('memory_limit') }}</h3>Memoria PHP</th>
+<th><h3><{{ constant('PHP_VERSION') }}</h3>Versión PHP</th>
 </tr>
 </thead>
 </table>
