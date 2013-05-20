@@ -94,8 +94,8 @@ class File
             throw new FileException("'No existe el directorio $dir");
         }
 
-        if ($name && $preserveExtension) {
-            $name .= '.' . $this->getExtension();
+        if ($name) {
+            $name .= $preserveExtension ? '.' . $this->getExtension() : '';
         } else {
             $name = $this->name;
         }

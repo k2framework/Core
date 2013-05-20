@@ -6,6 +6,7 @@ use K2\Validation\Validatable;
 use K2\Validation\ValidationBuilder;
 use K2\Di\Container\Container;
 use K2\Validation\Validators\ValidatorBase;
+use K2\ActiveRecord\ActiveRecord;
 
 /**
  * Description of Validator
@@ -22,27 +23,28 @@ class Validator
 
     public function validate(Validatable $object, ValidationBuilder $builder = null)
     {
-        $builder || $builder = $object->getValidations();
-
-        if (!$builder instanceof ValidationBuilder) {
-            throw new \LogicException(sprintf("El método\"getValidations\" de la clase \"%s\" debe devolver un objeto ValidationBuilder", get_class($object)));
+        if (!$builder) {
+            $builder = new ValidationBuilder();
         }
 
-        return $this->execute($object, $builder->getValidations());
+        return $this->execute($object, $builder);
     }
 
     public function validateOnUpdate(Validatable $object, ValidationBuilder $builder = null)
     {
-        $builder || $builder = $object->getValidations();
-
-        if (!$builder instanceof ValidationBuilder) {
-            throw new \LogicException(sprintf("El método\"getValidations\" de la clase \"%s\" debe devolver un objeto ValidationBuilder", get_class($object)));
+        if (!$builder) {
+            $builder = new ValidationBuilder();
         }
-        return $this->execute($object, $builder->getValidations(), true);
+
+        return $this->execute($object, $builder, true);
     }
 
-    protected function execute(Validatable $object, array $validations, $update = false)
+    protected function execute(Validatable $object, ValidationBuilder $builder, $update = false)
     {
+        $object->createValidations($builder);
+
+
+        $validations = (array) $builder->getValidations();
         if (!count($validations)) {
             //si no se debe validar nada.
             return true;

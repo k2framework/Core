@@ -1,4 +1,5 @@
 <?php
+
 /**
  * KumbiaPHP web & app Framework
  *
@@ -43,7 +44,7 @@ class File extends Upload
     {
         parent::__construct($request, $name);
         // Ruta donde se guardara el archivo
-        $this->path = dirname($request->getAppContext()->getAppPath()) . '/public/files/upload/';
+        $this->path = dirname(APP_PATH) . '/public/files/upload/';
     }
 
 }

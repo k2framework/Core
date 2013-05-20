@@ -21,6 +21,7 @@
 
 namespace K2\Upload;
 
+use K2\Kernel\App;
 use K2\Kernel\Request;
 use K2\Upload\Adapter\File;
 use K2\Upload\Adapter\Image;
@@ -41,6 +42,7 @@ abstract class Upload
      * @var Request
      */
     protected $request;
+    protected $normalized = array();
 
     /**
      *
@@ -108,24 +110,23 @@ abstract class Upload
      * Constructor
      *
      * @param string|array $name nombre de archivo por método POST
-     * Si es un array, eñ ´primer valor es el form que contiene el file 
+     * Si es un array, el primer valor es el form que contiene el file 
      * y el segundo valor el indice.
      */
     public function __construct(Request $request, $name)
     {
         $this->request = $request;
-        if (is_array($name)) {
-            if (1 >= count($name)) {
-                throw new UploadException("El arreglo \$name debe tener 2 valores, nombre del form y campo con el archivo, está llegando: " . print_r($name, true));
-            }
-            $form = $name[0];
-            $name = $name[1];
-        } else {
-            $form = null;
-        }
-        if (!$this->file = $request->files->get($name, $form)) {
+
+        $names = explode('.', $name);
+
+        $name = '[' . join('][', $names) . ']';
+
+        $file = App::get('property_accesor')->getValue($this->normalize($names[0]), $name);
+
+        if (!$file) {
             throw new UploadException("No existe el archivo \"$name\" en los archivos subidos");
         }
+        $this->file = new UploadedFile($file);
     }
 
     /**
@@ -138,7 +139,7 @@ abstract class Upload
      * @param string $adapter (File, Image)
      * @return File|Image
      */
-    public static function factory(Request $request, $name, $adapter = 'File')
+    public static function factory($name, $adapter = 'File')
     {
         if (!in_array($adapter, array('File', 'Image'))) {
             throw new UploadException("No se reconoce el adapter $adapter");
@@ -146,7 +147,7 @@ abstract class Upload
 
         $class = "K2\\Upload\\Adapter\\$adapter";
 
-        return new $class($request, $name);
+        return new $class(App::getRequest(), $name);
     }
 
     /**
@@ -230,27 +231,6 @@ abstract class Upload
     }
 
     /**
-     * Acciones antes de guardar
-     *
-     * @param string $name nombre con el que se va a guardar el archivo
-     * @return boolean
-     */
-    protected function beforeSave($name)
-    {
-        
-    }
-
-    /**
-     * Acciones después de guardar
-     * 
-     * @param string $name nombre con el que se guardo el archivo
-     */
-    protected function afterSave($name)
-    {
-        
-    }
-
-    /**
      * Asigna la ruta al directorio de destino para el archivo
      * 
      * @param string $path ruta al directorio de destino (Ej: /home/usuario/data)
@@ -268,7 +248,7 @@ abstract class Upload
      */
     protected function saveFile($name)
     {
-        return $this->file->move($this->path, $name, false);
+        return $this->file->move($this->path, $name, true);
     }
 
     /**
@@ -286,8 +266,7 @@ abstract class Upload
             $name = $this->file->getName();
         }
         // Guarda el archivo
-        if (false !== $this->beforeSave($name) && $this->overwrite($name) && $this->validates() && $this->saveFile($name)) {
-            $this->afterSave($name);
+        if ($this->overwrite($name) && $this->validates() && $this->saveFile($name)) {
             $this->file->setName($name);
             return $this->file;
         }
@@ -410,6 +389,35 @@ abstract class Upload
         }
 
         return $size;
+    }
+
+    protected function normalize($index)
+    {
+        if (!isset($_FILES[$index])) {
+            return array();
+        }
+
+        if (isset($this->normalized[$index])) {
+            return $this->normalized[$index];
+        }
+
+        $data = $_FILES[$index];
+
+        if (isset($data['name']) && is_array($data['name'])) {
+            $files = array();
+            foreach ($data['name'] as $k => $name) {
+                $files[$k] = array(
+                    'name' => $name,
+                    'tmp_name' => $data['tmp_name'][$k],
+                    'size' => $data['size'][$k],
+                    'type' => $data['type'][$k],
+                    'error' => $data['error'][$k]
+                );
+            }
+            return $this->normalized[$index] = array($index => $files);
+        }
+
+        return $_FILES;
     }
 
 }

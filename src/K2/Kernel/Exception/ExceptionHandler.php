@@ -13,8 +13,11 @@ use K2\Kernel\Response;
 class ExceptionHandler
 {
 
-    static public function handle()
+    protected static $showExceptions;
+
+    public static function handle($showExceptions = false)
     {
+        static::$showExceptions = $showExceptions;
         set_exception_handler(array(__CLASS__, 'onException'));
     }
 
@@ -36,25 +39,26 @@ class ExceptionHandler
             ob_end_clean(); //vamos limpiando todos los niveles de buffer creados.
         }
 
-        ob_start();
-        if (PRODUCTION) {
+        if (PRODUCTION && !static::$showExceptions) {
             if (404 === $e->getCode()) {
                 header('HTTP/1.1 404 Not Found');
                 $code = 404;
-                include APP_PATH . '/view/errors/404.phtml';
+                $html = App::get('twig')->render('errors/404.twig');
             } else {
                 header('HTTP/1.1 500 Internal Server Error');
                 $code = 500;
-                if (is_file(APP_PATH . '/view/errors/500.phtml')) {
-                    include APP_PATH . '/view/errors/500.phtml';
+                $html = App::get('twig')->render('errors/404.twig');
+                if (is_file(APP_PATH . '/view/errors/500.twig')) {
+                    $html = App::get('twig')->render('errors/500.twig');
                 } else {
-                    include APP_PATH . '/view/errors/404.phtml';
+                    $html = App::get('twig')->render('errors/404.twig');
                 }
             }
         } else {
-            include __DIR__ . '/files/exception.php';
+            App::get('twig')->getLoader()->addPath(__DIR__ . '/files/', 'exception');
+            $html = App::get('twig')->render('@exception/exception.twig', array('e' => $e));
         }
-        return new Response(ob_get_clean(), $code);
+        return new Response($html, $code);
     }
 
 }

@@ -40,17 +40,18 @@ class Firewall
      */
     public function onKernelRequest(RequestEvent $event)
     {
-        $router = $this->container->get('router');
 
-        $url = trim($event->getRequest()->getRequestUrl(), '/');
+        $url = rtrim($event->getRequest()->getRequestUrl(), '/');
 
-        $loginUrl = $router->createUrl(Reader::get('security.security.login_url'), false);
+        $loginUrl = '/' . trim($this->container->get('router')
+                                ->createUrl(Reader::get('security.security.login_url'), false), '/');
+
         //verificamos la existencia del token en la session.
         if (!$this->container->get('security')->isLogged()) {
             if ($url === $loginUrl && !$event->getRequest()->isMethod('post')) {
                 //si no existe el token y la url es la del logueo, nos vamos.
                 return;
-            } elseif ((($this->isSecure($url) || $url === '_autenticate') && $event->getRequest()->isMethod('post')) ||
+            } elseif ((($this->isSecure($url) || $url === '/_autenticate') && $event->getRequest()->isMethod('post')) ||
                     ('http' === Reader::get('security.security.type') &&
                     $event->getRequest()->server->get('PHP_AUTH_USER') &&
                     $event->getRequest()->server->get('PHP_AUTH_PW'))
@@ -60,14 +61,15 @@ class Firewall
                 $event->setResponse($this->loginCheck());
                 return;
             }
-        } elseif ($url === $loginUrl || $url === '_autenticate') {
+        } elseif ($url === $loginUrl || $url === '/_autenticate') {
             //si ya existe el token y estamos en la url del form de logueo, mandamos al target_login
             $event->stopPropagation();
-            $event->setResponse($router->redirect(Reader::get('security.security.target_login')));
+            $event->setResponse($this->container->get('router')
+                            ->redirect(Reader::get('security.security.target_login')));
             return;
         }
 
-        if ('logout' === $url) {
+        if ('/logout' === $url) {
             //Si estoy en la pagina de logout, realizo el cierre de sesión.
             $event->stopPropagation();
             $event->setResponse($this->logout());
@@ -99,7 +101,6 @@ class Firewall
     protected function isSecure($url)
     {
         $routes = (array) Reader::get('security.routes');
-        $url = '/' . ltrim($url, '/');
         if (isset($routes[$url])) {
             return $routes[$url];
         }
@@ -109,7 +110,7 @@ class Firewall
                 return $roles;
             }
         }
-        return FALSE;
+        return false;
     }
 
     /**

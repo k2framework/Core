@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+{% macro trace(trace, back = 6, next = 4) %}
+    {% set lines = file(trace.file) %}
+    {% set start = (trace.line - back >= 0) ? trace.line - back : 0 %}
+    {% set end = (trace.line + next > lines|length - 1) ? lines|length - 1 : trace.line + next %}
+    <code style="white-space: pre-wrap">
+    {% spaceless %}
+    {% for li in range(start, end) %}
+    <div {% if li == (trace.line - 1) %} class="exception_highlight"{% endif %}>{{ lines[li] }}</div>
+    {% endfor %}
+    {% endspaceless %}
+    </code>
+{% endmacro %}
+{% import _self as macros %}
+<head>
+<meta charset="{{ _charset }}" />
+<title>Ha Ocurrido una Excepción</title>
+<link href="{{ asset('css/exception.css') }}" rel="stylesheet" type="text/css" media="screen" />
+<link href="{{ asset('css/structure.css') }}" rel="stylesheet" type="text/css" media="screen" />
+</head>
+<body>
+<div class="exception">
+<div class="error flash round">
+<p><strong>
+{{ basename(get_class(e)) }}: {{ e.message }} ({{ e.code }})
+</strong></p>
+<p>En el archivo <em>{{ e.file }}</em> en la línea: <em>{{ e.line }}</em></p>
+</div>
+<div class="exception_trace">{{ macros.trace(e) }}</div>
+<div class="exception_information">
+<h2>Rastro</h2>
+{% for trace in e.trace %}
+<div class="trace" onclick="toggleTrace(this)"><p><strong>{{ trace.file }} ({{ trace.line }})</strong></p>
+<div class="exception_trace">{{ macros.trace(trace) }}</div>
+</div>
+{% endfor %}
+</div>
+
+<div class="exception_information">
+<h2>Información Adicional</h2>
+<strong>En producción:</strong> {{ constant('PRODUCTION') ? 'Sí' : 'No' }}<br />
+<strong>Ubicación actual:</strong>{{ url() }}<br />
+<strong>Server: </strong>{{ app.request.server('SERVER_SOFTWARE') }}<br />
+<strong>IP Server: </strong>{{ app.request.server('SERVER_ADDR') }}<br />
+<strong>IP Visitante: </strong>{{ app.request.server('REMOTE_ADDR') }}<br />
+</div>
+
+<table><thead><tr>
+<th><h3>{{ round((microtime(1)-constant('START_TIME')),4) }} seg.</h3>Tiempo</th>
+<th><h3>{{ number_format(memory_get_usage() / 1048576, 2) }} MB</h3>Memoria Usada</th>
+<th><h3>{{ get_included_files()|length }} ficheros</h3>Includes</th>
+</tr>
+<tr>
+<th><h3>{{ ini_get('max_execution_time') }} seg.</h3>Tiempo Máximo PHP</th>
+<th><h3>{{ ini_get('memory_limit') }}</h3>Memoria PHP</th>
+<th><h3><{{ constant('PHP_VERSION') }}</h3>Versión PHP</th>
+</tr>
+</thead>
+</table>
+</div>
+<script type="text/javascript">
+    function toggleTrace(element){
+        var trace = element.getElementsByClassName('exception_trace')[0]
+        var display = getComputedStyle(trace).display
+        if(display === 'none'){
+            trace.style.display = 'block'
+        }else{
+            trace.style.display = 'none'            
+        }
+    }
+</script>
+</body>
+</html>

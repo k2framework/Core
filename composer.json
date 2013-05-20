@@ -10,8 +10,9 @@
             "email": "programador.manuel@gmail.com"
         }
     ],
-    "require":{
-        "twig/twig": "1.*"
+    "require": {
+        "twig/twig": "1.*",
+        "symfony/property-access": "v2.2.1"
     },
     "autoload": {
         "psr-0":{ 

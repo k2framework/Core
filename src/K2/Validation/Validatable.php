@@ -15,7 +15,7 @@ interface Validatable
      * Este metodo es llamado por el validador para obtener
      * las reglas de validación a ejecutar.
      */
-    public function getValidations();
+    public function createValidations(ValidationBuilder $builder);
 
     public function addError($index, $message);
 

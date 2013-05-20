@@ -24,6 +24,12 @@ return array(
             $loader = new \Twig_Loader_Filesystem(APP_PATH . '/view');
 
             foreach (App::modules() as $name => $module) {
+                //si existe en views una carpeta con el nombre de algun módulo
+                //se agrega a los paths de twig, esto permite reescribir templates
+                //en los proyectos :-)
+                if (is_dir($dir = APP_PATH . '/view/' . $module['name'] . '/')) {
+                    $loader->addPath($dir, $name);
+                }
                 if (is_dir($dir = rtrim($module['path'], '/') . '/View/')) {
                     $loader->addPath($dir, $name);
                 }
@@ -43,6 +49,19 @@ return array(
             }
 
             $twig->addExtension(new View\Twig\Extension\Core());
+            if (!PRODUCTION) {
+                $twig->addExtension(new \Twig_Extension_Debug());
+            }
+            $twig->addExtension(new View\Twig\Extension\Form());
+
+            //registramos un callback para cuando no se encuentre una funcion twig, busque primero
+            //si es una funcion de php y así no tire una excepción
+            $twig->registerUndefinedFunctionCallback(function($name) {
+                        if (function_exists($name)) {
+                            return new \Twig_Function_Function($name);
+                        }
+                        return false;
+                    });
 
             return $twig;
         },
@@ -60,6 +79,12 @@ return array(
         },
         'activerecord.provider' => function($c) {
             return new Security\Auth\Provider\ActiveRecord($c);
+        },
+        'property_accesor' => function($c) {
+            return new \Symfony\Component\PropertyAccess\PropertyAccessor();
+        },
+        'mapper' => function($c) {
+            return new Datamapper\DataMapper($c['property_accesor']);
         }
     ),
     'parameters' => array(),

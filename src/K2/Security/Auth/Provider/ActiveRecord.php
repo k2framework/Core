@@ -3,6 +3,7 @@
 namespace K2\Security\Auth\Provider;
 
 use K2\Kernel\App;
+use K2\Security\Config\Reader;
 use K2\Security\Auth\User\UserInterface;
 use K2\Security\Exception\AuthException;
 use K2\Security\Auth\Token\TokenInterface;
@@ -41,7 +42,7 @@ class ActiveRecord extends AbstractProvider
         /**
          * Si data es diferente de nulo, se usa data, sino se busca en request 
          */
-        $form = $data ? : $request->get('form_login', array(
+        $form = $data ? : $request->request('login', array(
                     $config['username'] => $request->server('PHP_AUTH_USER'),
                     'password' => $request->server('PHP_AUTH_PW'),
                 ));

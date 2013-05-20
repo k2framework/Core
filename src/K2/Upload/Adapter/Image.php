@@ -22,7 +22,6 @@ namespace K2\Upload\Adapter;
 
 use K2\Upload\Upload;
 use K2\Kernel\Request;
-use K2\Upload\Exception\UploadException;
 
 /**
  * Clase para guardar imagen subida
@@ -72,7 +71,7 @@ class Image extends Upload
     {
         parent::__construct($request, $name);
         // Ruta donde se guardara el archivo
-        $this->path = dirname($request->getAppContext()->getAppPath()) . '/public/img/upload/';
+        $this->path = dirname(APP_PATH) . '/public/img/upload/';
     }
 
     /**
