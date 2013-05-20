@@ -2,7 +2,6 @@
 
 namespace K2\Kernel;
 
-use K2\Kernel\AppContext;
 use K2\Kernel\Session\SessionInterface;
 
 /**
