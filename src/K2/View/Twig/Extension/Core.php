@@ -76,7 +76,11 @@ class Core extends \Twig_Extension
 
     public function render($url, array $parameters = array())
     {
-        return App::get('router')->forward(trim($url) . '/' . join('/', $parameters));
+        ob_start();
+        App::get('router')
+                ->forward(trim($url) . '/' . join('/', $parameters))
+                ->send();
+        return ob_get_clean();
     }
 
     public function asset($url, array $parameters = array())
