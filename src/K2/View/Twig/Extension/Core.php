@@ -20,11 +20,9 @@ class Core extends \Twig_Extension
     public function getFunctions()
     {
         return array(
-            'url' => new \Twig_Function_Method($this, 'url'),
-            'render' => new \Twig_Function_Method($this, 'render', array('is_safe' => array('html'))),
-            new \Twig_SimpleFunction('asset', function($file) {
-                        return PUBLIC_PATH . $file;
-                    }),
+            new \Twig_SimpleFunction('url', array($this, 'url')),
+            new \Twig_SimpleFunction('asset', array($this, 'asset')),
+            new \Twig_SimpleFunction('render', array($this, 'render'), array('is_safe' => array('html'))),
         );
     }
 
@@ -79,6 +77,21 @@ class Core extends \Twig_Extension
     public function render($url, array $parameters = array())
     {
         return App::get('router')->forward(trim($url) . '/' . join('/', $parameters));
+    }
+
+    public function asset($url, array $parameters = array())
+    {
+        if (0 === strpos($url, '@')) {
+            $url = explode('/', trim(substr($url, 1), '/'), 2);
+            $module = strtolower($url[0]); 
+            if (count($url) > 1) {
+                $url = trim($module, '/') . '/' . $url[1];
+            } else {
+                $url = trim($module, '/');
+            }
+        }
+
+        return PUBLIC_PATH . trim($url, '/');
     }
 
 }
