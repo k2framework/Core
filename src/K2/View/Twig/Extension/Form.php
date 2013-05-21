@@ -265,7 +265,13 @@ class Form extends \Twig_Extension
         }
 
         foreach ($attrs as $name => $value) {
-            $html .= ' ' . $name . '="' . $this->escape($value) . '"';
+            if (is_bool($value)) {
+                if ($value) {
+                    $html .= ' ' . $name . '="' . $name . '"';
+                }
+            } else {
+                $html .= ' ' . $name . '="' . $this->escape($value) . '"';
+            }
         }
         return $html;
     }
