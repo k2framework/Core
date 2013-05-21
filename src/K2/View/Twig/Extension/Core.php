@@ -38,39 +38,39 @@ class Core extends \Twig_Extension
         );
     }
 
-    public function url($url = false, $module = false, $controller = false, $action = false, array $parameters = array())
+    public function url($url = null, $module = null, $controller = null, $action = null, array $parameters = array())
     {
         if (0 === func_num_args()) {
             //si no se envió nada, se usa la url actual
             return rtrim(PUBLIC_PATH, '/') . App::getRequest()->getRequestUrl();
-        } elseif (false !== $url) {
+        } elseif (null !== $url) {
             //si se envió un string, se devuelve como una url
             return App::get('router')->createUrl($url);
         } else {
             //si no se envió un string, sino parametros con nombres, se crea la url
-            $url = '';
+            $url = array();
             $context = App::getContext();
 
             //solo si no se especifica el modulo podemos usar el controlador y accion actual
             //de no ser especificados estos.
             if (!$module) {
-                $controller || $controller = $context['controller'];
-                $action || $action = $context['action'];
+                null !== $controller || $controller = $context['controller'];
+                null !== $action || $action = $context['action'];
             } else {
                 //de lo contrario, se asignaran valores por defecto a controller y action
-                $controller || $controller = 'index';
-                $action || $action = 'index';
+                null !== $controller || $controller = 'index';
+                null !== $action || $action = 'index';
             }
 
             $module = $module ? str_replace('@', '', $module) : $context['module']['name'];
 
-            $url .= App::prefix($module) . '/';
+            $url[] = App::prefix($module);
 
-            $url .= $controller . '/';
-            $url .= $action . '/';
-            $url .= join('/', $parameters);
+            $url[] = $controller;
+            $url[] = $action;
+            $url = array_merge($url, $parameters);
 
-            return PUBLIC_PATH . ltrim($url, '/');
+            return PUBLIC_PATH . ltrim(join('/', $url), '/');
         }
     }
 
@@ -83,7 +83,7 @@ class Core extends \Twig_Extension
     {
         if (0 === strpos($url, '@')) {
             $url = explode('/', trim(substr($url, 1), '/'), 2);
-            $module = strtolower($url[0]); 
+            $module = strtolower($url[0]);
             if (count($url) > 1) {
                 $url = trim($module, '/') . '/' . $url[1];
             } else {
