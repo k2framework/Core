@@ -66,7 +66,7 @@ class Router implements RouterInterface
             throw new \LogicException("Se ha detectado un ciclo de redirección Infinito...!!!");
         }
 
-        $url = $this->createUrl($url, false);
+        $url = '/' . trim($this->createUrl($url, false), '/');
 
         //retorno la respuesta del kernel.
         return App::get('app.kernel')->execute(new \K2\Kernel\Request($url), Kernel::SUB_REQUEST);

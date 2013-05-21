@@ -36,7 +36,7 @@ class Core extends \Twig_Extension
                 'messages' => array(),
             ),
         );
-
+        
         if (App::get('container')->hasInstance('flash')) {
             $globals['app']['messages'] = App::get('flash')->getAll();
         }

@@ -6,7 +6,6 @@ use K2\Validation\Validatable;
 use K2\Validation\ValidationBuilder;
 use K2\Di\Container\Container;
 use K2\Validation\Validators\ValidatorBase;
-use K2\ActiveRecord\ActiveRecord;
 
 /**
  * Description of Validator

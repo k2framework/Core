@@ -65,8 +65,9 @@ class Kernel
         $request->setType($type);
         try {
             App::setRequest($request);
-            return $this->_execute($request, $type);
+            $response = $this->_execute($request, $type);
             App::terminate();
+            return $response;
         } catch (\Exception $e) {
             return $this->exception($e);
         }
