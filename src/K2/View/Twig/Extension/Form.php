@@ -57,7 +57,9 @@ class Form extends \Twig_Extension
         $attrs['name'] = resolveName($field);
         $attrs['id'] = strtr($field, '.', '_');
 
-        return "<input {$this->attrsToString($attrs, $this->getValue($context, $field))} />";
+        $val = $this->getValue($context, $field);
+
+        return "<input {$this->attrsToString($attrs, null !== $val ? $val : $value )} />";
     }
 
     /**
@@ -73,7 +75,9 @@ class Form extends \Twig_Extension
         $attrs['name'] = resolveName($field);
         $attrs['id'] = strtr($field, '.', '_');
 
-        return "<textarea {$this->attrsToString($attrs)}>{$this->escape($this->getValue($context, $field))}</textarea>";
+        $val = $this->getValue($context, $field);
+
+        return "<textarea {$this->attrsToString($attrs)}>{$this->escape(null !== $val ? $val : $value)}</textarea>";
     }
 
     /**
@@ -139,7 +143,9 @@ class Form extends \Twig_Extension
         $attrs['name'] = resolveName($field) . (isset($attrs['multiple']) ? '[]' : '');
         $attrs['id'] = strtr($field, '.', '_');
 
-        $options = $this->createOptions($options, $this->getValue($context, $field), $empty);
+        $val = $this->getValue($context, $field);
+
+        $options = $this->createOptions($options, null !== $val ? $val : $value, $empty);
 
         return "<select {$this->attrsToString($attrs)}>{$options}</select>";
     }
