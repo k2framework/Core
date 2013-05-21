@@ -13,7 +13,8 @@
     "require": {
         "twig/twig": "1.*",
         "symfony/property-access": "v2.2.1",
-        "symfony/console": "v2.2.1"
+        "symfony/console": "v2.2.1",
+        "symfony/filesystem": "v2.1.10"
     },
     "autoload": {
         "psr-0":{ 
