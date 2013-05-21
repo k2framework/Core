@@ -39,7 +39,7 @@ class AssetInstall extends Command
 
                 $filesystem->symlink($from, $target);
 
-                $output->writeln("Copiada el modulo {$module['name']}");
+                $output->writeln("Copiado el modulo {$module['name']}");
             }
         }
         $output->writeln("Se instalaron todos los assets correctamente!!!");
