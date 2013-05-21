@@ -136,7 +136,7 @@ class Form extends \Twig_Extension
      */
     public function select($context, $field, array $options = array(), array $attrs = array(), $value = null, $empty = 'Seleccione')
     {
-        $attrs['name'] = resolveName($field);
+        $attrs['name'] = resolveName($field) . (isset($attrs['multiple']) ? '[]' : '');
         $attrs['id'] = strtr($field, '.', '_');
 
         $options = $this->createOptions($options, $this->getValue($context, $field), $empty);
