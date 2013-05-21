@@ -21,6 +21,7 @@ class Core extends \Twig_Extension
     {
         return array(
             'url' => new \Twig_Function_Method($this, 'url'),
+            'render' => new \Twig_Function_Method($this, 'render', array('is_safe' => array('html'))),
             new \Twig_SimpleFunction('asset', function($file) {
                         return PUBLIC_PATH . $file;
                     }),
@@ -73,6 +74,11 @@ class Core extends \Twig_Extension
 
             return PUBLIC_PATH . ltrim($url, '/');
         }
+    }
+
+    public function render($url, array $parameters = array())
+    {
+        return App::get('router')->forward(trim($url) . '/' . join('/', $parameters));
     }
 
 }
