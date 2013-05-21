@@ -123,7 +123,7 @@ class Kernel
             return $this->response($event->getResponse());
         }
 
-        if ($this->production) {
+        if (PRODUCTION) {
             return ExceptionHandler::createException($e);
         }
 
