@@ -156,7 +156,7 @@ class Form extends \Twig_Extension
      */
     public function choice($context, $field, array $options = array(), $multiple = true, array $attrs = array(), $value = null)
     {
-        $html = '<div class"form-choices">';
+        $html = '<div class="form-choices">';
         $i = 0;
         foreach ($options as $value => $label) {
             $attrs['id'] = strtr($field, '.', '_') . '_' . $i;
