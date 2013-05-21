@@ -81,6 +81,11 @@ class App
      */
     public static function setRequest(Request $request)
     {
+        //si ya estaba creada la instancia de twig, la eliminamos, para que se cree con los
+        //nuevos valores del nuevo request yel contexto.
+        static::$container->removeInstance('twig');
+        //con esto nos aseguramos de que si una petición maneja sub request, la instancia
+        //de twig siempre tiene los valores del request actual.
         return static::$request[] = $request;
     }
 

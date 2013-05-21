@@ -83,6 +83,13 @@ class Container implements \ArrayAccess
         }
     }
 
+    public function removeInstance($id)
+    {
+        if ($this->hasInstance($id)) {
+            unset($this->services[$id]);
+        }
+    }
+
     public function getParameter($id)
     {
         if ($this->hasParameter($id)) {
