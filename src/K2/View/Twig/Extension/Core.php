@@ -23,6 +23,7 @@ class Core extends \Twig_Extension
             new \Twig_SimpleFunction('url', array($this, 'url')),
             new \Twig_SimpleFunction('asset', array($this, 'asset')),
             new \Twig_SimpleFunction('render', array($this, 'render'), array('is_safe' => array('html'))),
+            new \Twig_SimpleFunction('isLogged', array($this, 'isLogged')),
         );
     }
 
@@ -96,6 +97,11 @@ class Core extends \Twig_Extension
         }
 
         return PUBLIC_PATH . trim($url, '/');
+    }
+
+    public function isLogged($rol = null)
+    {
+        return App::get('security')->isLogged($rol);
     }
 
 }
