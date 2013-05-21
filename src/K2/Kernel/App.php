@@ -26,6 +26,8 @@ class App
     protected static $routes;
     protected static $request = array();
     protected static $context = array();
+    protected static $services = array();
+    protected static $checkServices = array('twig');
 
     /**
      * 
@@ -81,11 +83,18 @@ class App
      */
     public static function setRequest(Request $request)
     {
-        //si ya estaba creada la instancia de twig, la eliminamos, para que se cree con los
-        //nuevos valores del nuevo request yel contexto.
-        static::$container->removeInstance('twig');
-        //con esto nos aseguramos de que si una petición maneja sub request, la instancia
-        //de twig siempre tiene los valores del request actual.
+        //algunos servicios deben ser instancias distintas dependiendo de la petición,
+        //ya que contienen datos referentes a la petición en curso, por lo tanto
+        //se debe crear una instancia por cadá subpetición hecha al kernel.
+        if ($request->getType() == Kernel::SUB_REQUEST) {
+            foreach (static::$checkServices as $key) {
+                if (static::$container->hasInstance($key)) {
+                    static::$services[$key][] = self::$container[$key];
+                    static::$container->removeInstance($key);
+                }
+            }
+        }
+
         return static::$request[] = $request;
     }
 
@@ -105,6 +114,11 @@ class App
     {
         unset(static::$context[static::getRequest()->getRequestUrl()]);
         array_pop(static::$request);
+        //por cada servicio agregado a la cola en una subpetición, 
+        //debemos sacarlo de la cola al final, y pasarlo al container
+        foreach (static::$services as $key => $instances) {
+            self::$container->setInstance($key, array_pop(static::$services[$key]));
+        }
     }
 
     public static function setContext(array $data)

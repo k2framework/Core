@@ -30,6 +30,7 @@ class Request
      */
     protected $locale;
     protected $uri;
+    protected $type;
 
     /**
      * Constructor de la clase. 
@@ -186,6 +187,20 @@ class Request
     public function server($key, $default = null)
     {
         return array_key_exists($key, $_SERVER) ? $_SERVER[$key] : $default;
+    }
+
+    /**
+     * Devuelve el tipo de petición,  MASTER_REQUEST = 1, SUB_REQUEST = 2
+     * @return int
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    public function setType($type)
+    {
+        $this->type = $type;
     }
 
 }

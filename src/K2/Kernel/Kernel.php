@@ -62,6 +62,7 @@ class Kernel
      */
     public function execute(Request $request, $type = self::MASTER_REQUEST)
     {
+        $request->setType($type);
         try {
             App::setRequest($request);
             return $this->_execute($request, $type);
