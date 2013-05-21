@@ -31,11 +31,16 @@ class AssetInstall extends Command
         $filesystem = new Filesystem();
 
         foreach (App::modules() as $name => $module) {
-            if (is_dir($from = rtrim($module['path'], '/') . '/public/')) {
 
-                $target = $this->publicDir . strtolower($module['name']);
+            if (is_dir($target = $this->publicDir . strtolower($module['name']))) {
 
                 $filesystem->remove($target);
+
+                $output->writeln("Removiendo la carpeta {$target}");
+            }
+
+            if (is_dir($from = rtrim($module['path'], '/') . '/public/')) {
+                $output->writeln("Copiado el modulo {$module['name']}");
 
                 $filesystem->symlink($from, $target);
 
