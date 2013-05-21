@@ -63,19 +63,10 @@ abstract class ValidatorBase
 
     protected static function getValue(Validatable $object, $column)
     {
-        if ($object instanceof \K2\Form\Form) {//para trabajar la Lib Form de K2
-            if (isset($object[$column])) {
-                return $object[$column]->getValue();
-            } else {
-                return null;
-            }
-        }
-        $reflection = new \ReflectionObject($object);
-        if ($reflection->hasProperty($column)) {
-            $attribute = $reflection->getProperty($column);
-            $attribute->setAccessible(true);
-            return $attribute->getValue($object);
-        } else {
+        try {
+            return static::$container['property_accesor']->getValue($object, $column);
+        } catch (\Symfony\Component\PropertyAccess\Exception\RuntimeException $e) {
+            //por ahora solo retornamos null
             return null;
         }
     }

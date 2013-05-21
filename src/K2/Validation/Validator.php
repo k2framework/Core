@@ -42,7 +42,6 @@ class Validator
     {
         $object->createValidations($builder);
 
-
         $validations = (array) $builder->getValidations();
         if (!count($validations)) {
             //si no se debe validar nada.
