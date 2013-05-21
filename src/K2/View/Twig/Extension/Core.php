@@ -28,20 +28,14 @@ class Core extends \Twig_Extension
 
     public function getGlobals()
     {
-        $globals = array(
+        return array(
             'app' => array(
                 'context' => \K2\Kernel\App::getContext(),
                 'request' => \K2\Kernel\App::getRequest(),
                 'user' => \K2\Kernel\App::getUser(),
-                'messages' => array(),
+                'messages' => App::get('flash')->getAll(),
             ),
         );
-        
-        if (App::get('container')->hasInstance('flash')) {
-            $globals['app']['messages'] = App::get('flash')->getAll();
-        }
-
-        return $globals;
     }
 
     public function url($url = null, $module = null, $controller = null, $action = null, array $parameters = array())
