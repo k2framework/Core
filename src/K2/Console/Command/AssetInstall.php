@@ -42,6 +42,7 @@ class AssetInstall extends Command
                 $output->writeln("Copiada el modulo {$module['name']}");
             }
         }
+        $output->writeln("Se instalaron todos los assets correctamente!!!");
     }
 
 }
