@@ -65,9 +65,9 @@ class Router implements RouterInterface
         if ($this->forwards++ > 10) {
             throw new \LogicException("Se ha detectado un ciclo de redirección Infinito...!!!");
         }
-        
-        $url = $this->createUrl($url);
-        
+
+        $url = $this->createUrl($url, false);
+
         //retorno la respuesta del kernel.
         return App::get('app.kernel')->execute(new \K2\Kernel\Request($url), Kernel::SUB_REQUEST);
     }
@@ -158,15 +158,18 @@ class Router implements RouterInterface
 
     public function createUrl($url, $baseUrl = true)
     {
-        $url = explode(':', $url);
-        if (count($url) > 1) {
+        if (0 === strpos($url, '@')) {
+            $url = explode('/', trim(substr($url, 1), '/'), 2);
             if (!$route = array_search($url[0], App::routes())) {
                 throw new NotFoundException("No Existe el módulo {$url[0]}, no se pudo crear la url");
             }
-            $url = ltrim(trim($route, '/') . '/' . $url[1], '/');
-        } else {
-            $url = ltrim($url[0], '/');
+            if (count($url) > 1) {
+                $url = trim($route, '/') . '/' . $url[1];
+            } else {
+                $url = trim($route, '/');
+            }
         }
+        $url = trim($url, '/');
         //si se usa locale, lo añadimos a la url.
         App::getRequest()->getLocale() && $url = App::getRequest()->getLocale() . '/' . $url;
         return $baseUrl ? PUBLIC_PATH . $url : $url;

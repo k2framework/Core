@@ -63,7 +63,7 @@ class Core extends \Twig_Extension
                 $action || $action = 'index';
             }
 
-            $module = $module ? : $context['module']['name'];
+            $module = $module ? str_replace('@', '', $module) : $context['module']['name'];
 
             $url .= App::prefix($module) . '/';
 
