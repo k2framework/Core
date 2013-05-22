@@ -66,7 +66,7 @@ return array(
             return $twig;
         },
         'cache' => function() {
-            return Cache\Cache::factory(\Kernel\App::appPath());
+            return Cache\Cache::factory(APP_PATH);
         },
         'flash' => function($c) {
             return new Flash\Flash($c->get('session'));
