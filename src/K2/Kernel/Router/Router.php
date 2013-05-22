@@ -57,7 +57,7 @@ class Router implements RouterInterface
      * Redirije la petición a otro modulo/controlador/accion de la aplicación internamente,
      * es decir, la url del navegador no va a cambiar para el usuario.
      * @param type $url
-     * @return type
+     * @return \K2\Kernel\Response
      * @throws \LogicException 
      */
     public function forward($url)
