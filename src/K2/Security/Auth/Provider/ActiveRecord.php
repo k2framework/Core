@@ -25,7 +25,7 @@ class ActiveRecord extends AbstractProvider
     public function loadUser(TokenInterface $token)
     {
         $user = $token->getUser();
-        $user = $user::findBy($this->config['username'], $token->getUsername());
+        $user = $user::findBy(array($this->config['username'] => $token->getUsername()));
 
         if (!$user instanceof UserInterface) {
             throw new UserNotFoundException("No existe el Usuario {$token->getUsername()} en la Base de Datos");
@@ -45,7 +45,7 @@ class ActiveRecord extends AbstractProvider
         $form = $data ? : $request->request('login', array(
                     $config['username'] => $request->server('PHP_AUTH_USER'),
                     'password' => $request->server('PHP_AUTH_PW'),
-                ));
+        ));
 
         if (!isset($config['class'])) {
             throw new AuthException("Debe definir un valor para el índice user[class] en el security.ini");
