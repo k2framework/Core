@@ -1,13 +1,8 @@
 <?php
 
-namespace KumbiaPHP\ActiveRecord;
+namespace K2\ActiveRecord;
 
 use \PDOStatement as Base;
-use KumbiaPHP\Kernel\Kernel;
-use KumbiaPHP\ActiveRecord\Event\Events;
-use KumbiaPHP\ActiveRecord\Event\BeforeQueryEvent;
-use KumbiaPHP\ActiveRecord\Event\AfterQueryEvent;
-use KumbiaPHP\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Description of PDOStatement
@@ -17,42 +12,23 @@ use KumbiaPHP\EventDispatcher\EventDispatcherInterface;
 class PDOStatement extends Base
 {
 
-    /**
-     * 
-     * @var EventDispatcherInterface 
-     */
-    protected static $dispatcher;
-    protected $result = NULL;
+    protected $parameters;
 
     public function execute($input_parameters = null)
     {
-        //creamos el evento before_query
-        $event = new BeforeQueryEvent($this->queryString, (array) $input_parameters);
+        $this->parameters = $input_parameters;
 
-        //despachamos los eventos que están escuchando
-        self::$dispatcher->dispatch(Events::BEFORE_QUERY, $event);
-
-        $this->result = parent::execute($event->getParameters());
-
-        //creamos el evento after_query
-        $event = new AfterQueryEvent($this, $event);
-
-        //despachamos los eventos que están escuchando
-        self::$dispatcher->dispatch(Events::AFTER_QUERY, $event);
+        $this->result = parent::execute($input_parameters);
 
         return $this;
     }
 
-    public function getResult()
+    /**
+     * Devuelve el sql como se ejecutaria en el servidor de base de datos
+     */
+    public function getSqlQuery()
     {
-        return $this->result;
-    }
-
-    public static function setDispatcher(EventDispatcherInterface $dispatcher)
-    {
-        self::$dispatcher = $dispatcher;
+        
     }
 
 }
-
-PDOStatement::setDispatcher(Kernel::get('event.dispatcher'));
