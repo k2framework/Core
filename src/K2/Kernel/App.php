@@ -27,7 +27,7 @@ class App
     protected static $request = array();
     protected static $context = array();
     protected static $services = array();
-    protected static $checkServices = array('twig');
+    protected static $requestServices = array();
 
     /**
      * 
@@ -87,7 +87,7 @@ class App
         //ya que contienen datos referentes a la petición en curso, por lo tanto
         //se debe crear una instancia por cadá subpetición hecha al kernel.
         if ($request->getType() == Kernel::SUB_REQUEST) {
-            foreach (static::$checkServices as $key) {
+            foreach (static::$requestServices as $key) {
                 if (static::$container->hasInstance($key)) {
                     static::$services[$key][] = self::$container[$key];
                     static::$container->removeInstance($key);
@@ -231,6 +231,16 @@ class App
         }
 
         return array_search($module, static::$routes);
+    }
+
+    /**
+     * Añade un servicio para que su instancia sea creada por acada request hecho 
+     * al kernel en una petición
+     * @param string $idService nombre del servicio
+     */
+    public static function addSerciveToRequest($idService)
+    {
+        self::$requestServices[$idService] = $idService;
     }
 
 }
