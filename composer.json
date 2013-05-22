@@ -11,6 +11,7 @@
         }
     ],
     "require": {
+        "k2/debug": "dev-master",
         "twig/twig": "1.*",
         "symfony/property-access": "v2.2.1",
         "symfony/console": "v2.2.1",
