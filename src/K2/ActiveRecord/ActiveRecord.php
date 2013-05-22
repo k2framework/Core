@@ -111,7 +111,4 @@ if (!Config::initialized()) {
     Reader::readDatabases();
     //le pasamos la instancia del EventDispatcher al Adapter del ActiveRecord
     Adapter::setEventDispatcher(App::get('event.dispatcher'));
-    \ActiveRecord\DbPool\DbPool::setAttributes(array(
-        \PDO::ATTR_STATEMENT_CLASS => array('K2\\ActiveRecord\\PDOStatement'),
-    ));
 }
