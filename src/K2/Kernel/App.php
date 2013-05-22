@@ -240,7 +240,7 @@ class App
      */
     public static function addSerciveToRequest($idService)
     {
-        self::$requestServices[$idService] = $idService;
+        static::$requestServices[$idService] = $idService;
     }
 
 }
