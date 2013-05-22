@@ -32,6 +32,8 @@ class ListServices extends Command
         $services = array_keys($definitions['services']);
 
         unset($definitions);
+        
+        $output->writeln('');
 
         foreach ($services as $id) {
             $output->writeln(str_pad("<info>$id</info>", 45, ' ') . ' => ' . get_class(App::get($id)));
