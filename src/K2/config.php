@@ -21,6 +21,8 @@ return array(
             return new View\View($c['twig']);
         },
         'twig' => function() {
+            App::addSerciveToRequest('twig');
+
             $loader = new \Twig_Loader_Filesystem(APP_PATH . '/view');
 
             foreach (App::modules() as $name => $module) {
