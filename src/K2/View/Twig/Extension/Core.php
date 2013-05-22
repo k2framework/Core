@@ -35,6 +35,7 @@ class Core extends \Twig_Extension
                 'request' => \K2\Kernel\App::getRequest(),
                 'user' => \K2\Kernel\App::getUser(),
                 'messages' => App::get('flash')->getAll(),
+                'parameters' => App::getParameter('config'),
             ),
         );
     }

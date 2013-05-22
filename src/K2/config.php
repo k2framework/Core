@@ -35,13 +35,13 @@ return array(
                 }
             }
 
-            $charset = App::getParameter('config.charset');
+            $config = App::getParameter('config');
 
             $twig = new \Twig_Environment($loader, array(
                 'cache' => APP_PATH . '/temp/cache/twig/',
                 'debug' => !PRODUCTION,
                 'strict_variables' => true,
-                'charset' => $charset ? : 'UTF-8',
+                'charset' => isset($config['charset']) ? $config['charset'] : 'UTF-8',
             ));
 
             if (!PRODUCTION) {
