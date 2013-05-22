@@ -35,13 +35,13 @@ return array(
                 }
             }
 
-            $config = App::getParameter('config');
+            $charset = App::getParameter('config.charset');
 
             $twig = new \Twig_Environment($loader, array(
                 'cache' => APP_PATH . '/temp/cache/twig/',
                 'debug' => !PRODUCTION,
                 'strict_variables' => true,
-                'charset' => isset($config['charset']) ? $config['charset'] : 'UTF-8',
+                'charset' => $charset ? : 'UTF-8',
             ));
 
             if (!PRODUCTION) {
@@ -69,13 +69,13 @@ return array(
             return Cache\Cache::factory(APP_PATH);
         },
         'flash' => function($c) {
-            return new Flash\Flash($c->get('session'));
+            return new Flash\Flash($c['session']);
         },
         'validator' => function($c) {
             return new Validation\Validator($c);
         },
         'security' => function($c) {
-            return new Security\Security($c->get('session'));
+            return new Security\Security($c['session']);
         },
         'activerecord.provider' => function($c) {
             return new Security\Auth\Provider\ActiveRecord($c);
@@ -94,14 +94,10 @@ return array(
         ),
     ),
     'init' => function(Container $c) {
-        $c->setParameter('security', array(
-            'provider' => array(
-                'active_record' => 'K2\\Security\\Auth\\Provider\\ActiveRecord',
-                'memory' => 'K2\\Security\\Auth\\Provider\\Memory',
-            ),
+        $c->setParameter('security.provider', array(
+            'active_record' => 'K2\\Security\\Auth\\Provider\\ActiveRecord',
+            'memory' => 'K2\\Security\\Auth\\Provider\\Memory',
         ));
-        $c->setParameter('translator', array(
-            'provider' => 'arrays'
-        ));
+        $c->setParameter('translator.provider', 'arrays');
     },
 );

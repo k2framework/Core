@@ -24,7 +24,7 @@
 <h2 style="margin-top: -5px;padding: 10px 5px">Ha ocurrido una Excepción ({{ eType }})</h2>
 <div class="message well">
 <p><strong>
-{{ e.message }} ({{ e.code }})
+{{ e.message|raw }} ({{ e.code }})
 </strong></p>
 <p>En el archivo <em>{{ e.file }}</em> en la línea: <em>{{ e.line }}</em></p>
 </div>

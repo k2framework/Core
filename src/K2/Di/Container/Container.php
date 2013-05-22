@@ -92,16 +92,25 @@ class Container implements \ArrayAccess
 
     public function getParameter($id)
     {
-        if ($this->hasParameter($id)) {
-            return $this->definitions['parameters'][$id];
-        } else {
-            return NULL;
+        try {
+            $id = '[' . str_replace('.', '][', $id) . ']';
+            return $this->get('property_accesor')
+                            ->getValue($this->definitions['parameters'], $id);
+        } catch (\RuntimeException $e) {
+            return null;
         }
     }
 
     public function hasParameter($id)
     {
-        return array_key_exists($id, $this->definitions['parameters']);
+        try {
+            $id = '[' . str_replace('.', '][', $id) . ']';
+            $this->get('property_accesor')
+                    ->getValue($this->definitions['parameters'], $id);
+            return true;
+        } catch (\RuntimeException $e) {
+            return false;
+        }
     }
 
     public function getDefinitions()
@@ -111,7 +120,17 @@ class Container implements \ArrayAccess
 
     public function setParameter($id, $value)
     {
-        $this->definitions['parameters'][$id] = $value;
+        try {
+            if (is_array($value) and is_array($original = $this->getParameter($id))) {
+                $value = $this->merge($original, $value);
+            }
+            $id = '[' . str_replace('.', '][', $id) . ']';
+            return $this->get('property_accesor')
+                            ->setValue($this->definitions['parameters'], $id, $value);
+        } catch (\RuntimeException $e) {
+            
+        }
+
         return $this;
     }
 
@@ -218,6 +237,21 @@ class Container implements \ArrayAccess
         }
 
         throw new DiException("No se reconoce el valor para la definición del servicio $id");
+    }
+
+    protected function merge(array &$original, array &$data)
+    {
+        $merged = $original;
+
+        foreach ($data as $key => &$value) {
+            if (is_array($value) && isset($merged [$key]) && is_array($merged [$key])) {
+                $merged [$key] = $this->merge($merged [$key], $value);
+            } else {
+                $merged [$key] = $value;
+            }
+        }
+
+        return $merged;
     }
 
 }

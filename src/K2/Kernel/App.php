@@ -171,9 +171,6 @@ class App
         } else {
             foreach ($modules as $index => $module) {
                 static::$modules[$module['name']] = $module + array(
-                    'parameters' => array(),
-                    'services' => array(),
-                    'listeners' => array(),
                     'init' => null,
                 );
                 //si el indice no es numerico, agregamos el mismo a las rutas

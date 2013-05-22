@@ -51,6 +51,9 @@ class Kernel
         $this->initDispatcher();
 
         $this->initModules();
+        
+        $this->readConfig();
+        
     }
 
     /**
@@ -147,21 +150,29 @@ class Kernel
         App::setContainer($container = new Container());
 
         $container->setInstance('app.kernel', $this);
-
-        $this->readConfig();
     }
 
     protected function initModules()
     {
         $container = App::get('container');
         foreach (App::modules() as $name => $config) {
-            $container->setFromArray($config['services']);
-            foreach ($config['listeners'] as $event => $listeners) {
-                foreach ($listeners as $priority => $listener) {
-                    $this->dispatcher->addListener($event, $listener, $priority);
+            if (isset($config['services'])) {
+                $container->setFromArray($config['services']);
+            }
+
+            if (isset($config['listeners'])) {
+                foreach ($config['listeners'] as $event => $listeners) {
+                    foreach ($listeners as $priority => $listener) {
+                        $this->dispatcher->addListener($event, $listener, $priority);
+                    }
                 }
             }
+
+            if (isset($config['parameters'])) {
+                $container->setParameter($name, $config['parameters']);
+            }
         }
+        //esto es aparte para que se cargen todos los servicios y parametros
         foreach (App::modules() as $name => $config) {
             if (is_callable($config['init'])) {
                 call_user_func($config['init'], $container);
