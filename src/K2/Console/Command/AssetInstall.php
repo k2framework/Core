@@ -40,7 +40,6 @@ class AssetInstall extends Command
             }
 
             if (is_dir($from = rtrim($module['path'], '/') . '/public/')) {
-                $output->writeln("Copiado el modulo {$module['name']}");
 
                 $filesystem->mirror($from, $target);
 
