@@ -3,7 +3,10 @@
 namespace K2\View\Twig\Extension;
 
 use K2\Kernel\App;
+use K2\Kernel\Request;
+use K2\Kernel\Response;
 use K2\Kernel\Config\Reader;
+use K2\Kernel\Controller\ControllerResolver;
 
 class Core extends \Twig_Extension
 {
@@ -79,8 +82,25 @@ class Core extends \Twig_Extension
 
     public function render($url, array $parameters = array())
     {
-        $response = App::get('router')
-                ->forward(trim($url) . '/' . join('/', $parameters));
+        $url = App::get('router')->createUrl($url, false);
+
+        App::setRequest(new Request($url));
+
+        $resolver = new ControllerResolver(App::get('container'));
+
+        $controller = $resolver->getController();
+
+        $resolver->validateAction(new \ReflectionObject($controller), $parameters);
+
+        $response = $response = call_user_func_array(array(
+            $controller, $resolver->getAction()), $parameters);
+
+        if (!$response instanceof Response) {
+            $response = App::get('app.kernel')->createResponse($resolver);
+        }
+
+        App::terminate();
+
         return $response->getContent();
     }
 
