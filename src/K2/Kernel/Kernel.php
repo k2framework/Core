@@ -101,7 +101,7 @@ class Kernel
      * @param ControllerResolver $resolver
      * @return Response
      */
-    private function createResponse(ControllerResolver $resolver)
+    public function createResponse(ControllerResolver $resolver)
     {
         $controller = $resolver->getController();
         //como la acción no devolvió respuesta, debemos
