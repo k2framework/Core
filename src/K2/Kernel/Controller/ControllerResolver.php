@@ -108,14 +108,17 @@ class ControllerResolver
 
     /**
      * Ejecuta la acción en el controlador, y los filtros.
+     * los filtros solo son ejecutados si el parametro $filters es igual a true
+     * @param boolean $filters indica si se ejecutan los filtros ó no (por defecto lo hace)
+     * @return mixed
      */
-    public function executeAction()
+    public function executeAction($filters = true)
     {
         $this->getController();
 
         $controller = new ReflectionObject($this->controller);
 
-        if (($response = $this->executeBeforeFilter($controller)) instanceof Response) {
+        if ($filters && (($response = $this->executeBeforeFilter($controller)) instanceof Response)) {
             return $response;
         }
 
@@ -126,7 +129,7 @@ class ControllerResolver
 
         $response = call_user_func_array(array($this->controller, $this->action), $this->parameters);
 
-        $this->executeAfterFilter($controller);
+        $filters && $this->executeAfterFilter($controller);
 
         return $response;
     }
