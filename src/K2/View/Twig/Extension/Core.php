@@ -3,6 +3,7 @@
 namespace K2\View\Twig\Extension;
 
 use K2\Kernel\App;
+use K2\Kernel\Config\Reader;
 
 class Core extends \Twig_Extension
 {
@@ -24,6 +25,7 @@ class Core extends \Twig_Extension
             new \Twig_SimpleFunction('asset', array($this, 'asset')),
             new \Twig_SimpleFunction('render', array($this, 'render'), array('is_safe' => array('html'))),
             new \Twig_SimpleFunction('isLogged', array($this, 'isLogged')),
+            new \Twig_SimpleFunction('config', array($this, 'config')),
         );
     }
 
@@ -35,7 +37,6 @@ class Core extends \Twig_Extension
                 'request' => \K2\Kernel\App::getRequest(),
                 'user' => \K2\Kernel\App::getUser(),
                 'messages' => App::get('flash')->getAll(),
-                'parameters' => App::getParameter('config'),
             ),
         );
     }
@@ -101,6 +102,11 @@ class Core extends \Twig_Extension
     public function isLogged($rol = null)
     {
         return App::get('security')->isLogged($rol);
+    }
+
+    public function config($key)
+    {
+        return Reader::get("config.{$key}");
     }
 
 }
