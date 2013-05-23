@@ -2,13 +2,6 @@
 
 namespace K2\Kernel\Config;
 
-use K2\Kernel\AppContext;
-
-/**
- * Description of ConfigContainer
- *
- * @author manuel
- */
 class ConfigReader
 {
 

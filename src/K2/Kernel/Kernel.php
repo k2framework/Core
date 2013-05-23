@@ -51,9 +51,8 @@ class Kernel
         $this->initDispatcher();
 
         $this->initModules();
-        
+
         $this->readConfig();
-        
     }
 
     /**
@@ -192,7 +191,7 @@ class Kernel
     protected function readConfig()
     {
         $config = Config\Reader::read('config');
-
+        
         foreach ($config as $section => $values) {
             App::get('container')->setParameter($section, $values);
         }

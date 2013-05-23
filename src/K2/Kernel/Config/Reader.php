@@ -27,27 +27,14 @@ abstract class Reader
         return self::$config[$file];
     }
 
-    public static function get($name = null)
+    public static function get($name)
     {
-        $namespaces = explode('.', $name);
-        switch (count($namespaces)) {
-            case 3:
-                if (isset(self::$config[$namespaces[0]][$namespaces[1]][$namespaces[2]])) {
-                    return self::$config[$namespaces[0]][$namespaces[1]][$namespaces[2]];
-                }
-                break;
-            case 2:
-                if (isset(self::$config[$namespaces[0]][$namespaces[1]])) {
-                    return self::$config[$namespaces[0]][$namespaces[1]];
-                }
-                break;
-            case 1:
-                if (isset(self::$config[$namespaces[0]])) {
-                    return self::$config[$namespaces[0]];
-                }
-                break;
+        try {
+            $name = '['. str_replace('.', '][', $name) . ']';
+            return App::get('property_accesor')->getValue(self::$config, $name);
+        } catch (\RuntimeException $e) {
+            return null;
         }
-        return null;
     }
 
 }
