@@ -141,7 +141,7 @@ class ControllerResolver
      * @param array $params Parametros a pasar al método
      * @throws NotFoundException si no se cumplen las condiciones para llamar a la acción.
      */
-    protected function validateAction(\ReflectionObject $controller, array $params)
+    public function validateAction(\ReflectionObject $controller, array $params)
     {
         if ($controller->hasProperty('limitParams')) {
             $limitParams = $controller->getProperty('limitParams');
@@ -236,27 +236,12 @@ class ControllerResolver
     }
 
     /**
-     * Permite llamar a métodos protegidos del controlador.
-     * @param string $method nombre del método
-     * @return mixed resultado de la invocación. 
+     * 
+     * @return string
      */
-    public function callMethod($method)
+    public function getAction()
     {
-        $reflection = new \ReflectionClass($this->controller);
-
-        if ($reflection->hasMethod($method)) {
-
-            //obtengo el parametro del controlador.
-            $method = $reflection->getMethod($method);
-
-            //lo hago accesible para poderlo leer
-            $method->setAccessible(true);
-
-            //y retorno su valor
-            return $method->invoke($this->controller);
-        } else {
-            return null;
-        }
+        return $this->action;
     }
 
 }
