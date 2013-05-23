@@ -55,9 +55,6 @@ abstract class AbstractToken implements TokenInterface
     public function unserialize($serialized)
     {
         list($this->user, $this->valid) = unserialize($serialized);
-        if (($this->user instanceof UserInterface) && method_exists($this->user, '__construct')) {
-            $this->user->__construct();
-        }
     }
 
     public function setAutenticated($autenticate)
