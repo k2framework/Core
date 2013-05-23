@@ -1,7 +1,7 @@
 {
     "name": "k2/core",
     "type": "library",
-    "description": "Core de KumbiaPHP versión K2 framework, trabaja con php 5.3 ó superior.",
+    "description": "Core de K2Framework, trabaja con php 5.3 ó superior.",
     "license": "BSD",
     "keywords": ["framework"],
     "authors": [
