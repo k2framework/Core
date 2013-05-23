@@ -89,12 +89,8 @@ return array(
             return new Datamapper\DataMapper($c['property_accesor']);
         }
     ),
-    'parameters' => array(),
-    'listeners' => array(
-        K2Events::REQUEST => array(
-            10000 => array('router', 'parseUrl'),
-        ),
-    ),
+    //'parameters' => array(),
+    //'listeners' => array(),
     'init' => function(Container $c) {
         $c->setParameter('security.provider', array(
             'active_record' => 'K2\\Security\\Auth\\Provider\\ActiveRecord',

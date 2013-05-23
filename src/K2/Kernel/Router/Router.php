@@ -106,55 +106,7 @@ class Router implements RouterInterface
         }
     }
 
-    /**
-     * Lee la Url de la petición actual, extrae el módulo/controlador/acción/parametros
-     * y los almacena en los atributos de la clase.
-     * 
-     * Es llamado en el evento kumbia.request
-     * 
-     * @throws NotFoundException 
-     */
-    public function parseUrl()
-    {
-        $controller = 'index'; //controlador por defecto si no se especifica.
-        $action = 'index'; //accion por defecto si no se especifica.
-        $moduleUrl = '/';
-        $params = array(); //parametros de la url, de existir.
-        //obtenemos la url actual de la petición.
-        $currentUrl = '/' . trim(App::getRequest()->getRequestUrl(), '/');
-
-        list($moduleUrl, $module, $currentUrl) = App::get('app.kernel')->getModule($currentUrl);
-
-        if (!$moduleUrl || !$module) {
-            throw new NotFoundException(sprintf("La ruta \"%s\" no concuerda con ningún módulo ni controlador en la App", $currentUrl), 404);
-        }
-
-        if ($url = explode('/', trim(substr($currentUrl, strlen($moduleUrl)), '/'))) {
-
-            //ahora obtengo el controlador
-            if (current($url)) {
-                //si no es un controlador lanzo la excepcion
-                $controller = current($url);
-                next($url);
-            }
-            //luego obtenemos la acción
-            if (current($url)) {
-                $action = current($url);
-                next($url);
-            }
-            //por ultimo los parametros
-            if (current($url)) {
-                $params = array_slice($url, key($url));
-            }
-        }
-        App::setContext(array(
-            'module' => $module,
-            'module_url' => $moduleUrl,
-            'controller' => $controller,
-            'action' => $action,
-            'parameters' => $params,
-        ));
-    }
+    
 
     public function createUrl($url, $baseUrl = true)
     {

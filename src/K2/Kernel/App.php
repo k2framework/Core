@@ -3,9 +3,9 @@
 namespace K2\Kernel;
 
 use K2\Kernel\Request;
-use K2\Kernel\AppContext;
-use Composer\Autoload\ClassLoader;
 use K2\Di\Container\Container;
+use Exception\NotFoundException;
+use Composer\Autoload\ClassLoader;
 use K2\Security\Auth\User\UserInterface;
 
 class App
@@ -95,7 +95,11 @@ class App
             }
         }
 
-        return static::$request[] = $request;
+        static::$request[] = $request;
+
+        static::parseUrl($request->getRequestUrl());
+
+        return $request;
     }
 
     /**
@@ -119,6 +123,54 @@ class App
         foreach (static::$services as $key => $instances) {
             self::$container->setInstance($key, array_pop(static::$services[$key]));
         }
+    }
+
+    /**
+     * Lee la Url de la petición actual, extrae el módulo/controlador/acción/parametros
+     * y los almacena en los atributos de la clase.
+     * @param \K2\Kernel\Request $request
+     * @throws NotFoundException
+     */
+    protected static function parseUrl($url)
+    {
+        $controller = 'index'; //controlador por defecto si no se especifica.
+        $action = 'index'; //accion por defecto si no se especifica.
+        $moduleUrl = '/';
+        $params = array(); //parametros de la url, de existir.
+        //obtenemos la url actual de la petición.
+        $currentUrl = '/' . trim($url, '/');
+
+        list($moduleUrl, $module, $currentUrl) = static::get('app.kernel')->getModule($currentUrl);
+
+        if (!$moduleUrl || !$module) {
+            throw new NotFoundException(sprintf("La ruta \"%s\" no concuerda con ningún módulo ni controlador en la App", $currentUrl), 404);
+        }
+
+        if ($url = explode('/', trim(substr($currentUrl, strlen($moduleUrl)), '/'))) {
+
+            //ahora obtengo el controlador
+            if (current($url)) {
+                //si no es un controlador lanzo la excepcion
+                $controller = current($url);
+                next($url);
+            }
+            //luego obtenemos la acción
+            if (current($url)) {
+                $action = current($url);
+                next($url);
+            }
+            //por ultimo los parametros
+            if (current($url)) {
+                $params = array_slice($url, key($url));
+            }
+        }
+        static::setContext(array(
+            'module' => $module,
+            'module_url' => $moduleUrl,
+            'controller' => $controller,
+            'action' => $action,
+            'parameters' => $params,
+        ));
     }
 
     public static function setContext(array $data)
@@ -170,9 +222,7 @@ class App
             return static::$modules;
         } else {
             foreach ($modules as $index => $module) {
-                static::$modules[$module['name']] = $module + array(
-                    'init' => null,
-                );
+                static::$modules[$module['name']] = $module + array('init' => null);
                 //si el indice no es numerico, agregamos el mismo a las rutas
                 if (!is_numeric($index)) {
                     static::$routes[$index] = $module['name'];
