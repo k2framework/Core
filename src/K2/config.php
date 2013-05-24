@@ -82,9 +82,6 @@ return array(
         'activerecord.provider' => function($c) {
             return new Security\Auth\Provider\ActiveRecord($c);
         },
-        'property_accesor' => function($c) {
-            return new \Symfony\Component\PropertyAccess\PropertyAccessor();
-        },
         'mapper' => function($c) {
             return new Datamapper\DataMapper($c['property_accesor']);
         }
