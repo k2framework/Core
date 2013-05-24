@@ -11,12 +11,16 @@
         }
     ],
     "require": {
-        "k2/debug": "dev-master",
         "twig/twig": "1.*",
         "symfony/property-access": "v2.2.1",
         "symfony/console": "v2.2.1",
         "symfony/filesystem": "v2.1.10"
     },
+    "replace": {
+        "k2/container": "dev-master",
+        "k2/event-dispatcher": "dev-master",
+        "k2/debug": "dev-master"
+    }
     "autoload": {
         "psr-0":{ 
             "K2\\": "src/"
