@@ -1,0 +1,22 @@
+{
+    "name": "k2/container",
+    "type": "library",
+    "description": "Event Dispatcher de K2Framework",
+    "license": "BSD",
+    "keywords": ["library event dispatcher"],
+    "authors": [
+        {
+            "name": "Manuel Aguirre",
+            "email": "programador.manuel@gmail.com"
+        }
+    ],
+    "require": {
+        "symfony/property-access": "v2.2.1"
+    },
+    "autoload": {
+        "psr-0": {
+            "K2\\Di\\": ""
+        }
+    },
+    "target-dir": "K2/Di"
+}
