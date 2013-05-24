@@ -20,7 +20,7 @@
         "k2/container": "dev-master",
         "k2/event-dispatcher": "dev-master",
         "k2/debug": "dev-master"
-    }
+    },
     "autoload": {
         "psr-0":{ 
             "K2\\": "src/"
