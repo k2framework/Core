@@ -34,6 +34,8 @@ class Kernel
      * @var array 
      */
     protected $locales;
+    
+    protected $hasException = false;
 
     /**
      * Constructor de la clase. 
@@ -71,6 +73,7 @@ class Kernel
             App::terminate();
             return $response;
         } catch (\Exception $e) {
+            $this->hasException = true;
             return $this->exception($e);
         }
     }
@@ -237,6 +240,11 @@ class Kernel
             }
         }
         return false;
+    }
+    
+    public function hasException()
+    {
+        return $this->hasException;
     }
 
 }
