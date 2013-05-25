@@ -34,7 +34,6 @@ class Kernel
      * @var array 
      */
     protected $locales;
-    
     protected $hasException = false;
 
     /**
@@ -42,9 +41,9 @@ class Kernel
      * 
      * La instancia del kernel se crea en proyecto/public/index.php
      * 
-     * @param boolean $production indica si estamos en producción ó no.
+     * @param boolean $showExceptions indica si se muestran las excepciones en producción ó no
      */
-    public function __construct()
+    public function __construct($showExceptions = false)
     {
         App::getLoader()->add(null, APP_PATH . '/modules/');
 
@@ -55,6 +54,8 @@ class Kernel
         $this->initModules();
 
         $this->readConfig();
+
+        App::get('container')->setParameter('show_exceptions', $showExceptions);
     }
 
     /**
@@ -128,9 +129,9 @@ class Kernel
             return $this->response($event->getResponse());
         }
 
-        if (PRODUCTION) {
-            return ExceptionHandler::createException($e);
-        }
+//        if (PRODUCTION) {
+//            return ExceptionHandler::createException($e);
+//        }
 
         throw $e;
     }
@@ -194,7 +195,7 @@ class Kernel
     protected function readConfig()
     {
         $config = Config\Reader::read('config');
-        
+
         foreach ($config as $section => $values) {
             App::get('container')->setParameter($section, $values);
         }
@@ -241,7 +242,7 @@ class Kernel
         }
         return false;
     }
-    
+
     public function hasException()
     {
         return $this->hasException;

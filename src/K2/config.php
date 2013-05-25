@@ -3,7 +3,10 @@
 namespace K2;
 
 use K2\Kernel\App;
+use K2\Kernel\Event\K2Events;
 use K2\Di\Container\Container;
+use K2\Kernel\Event\ExceptionEvent;
+use K2\Kernel\Exception\ExceptionHandler;
 
 return array(
     'name' => 'K2Core',
@@ -56,7 +59,7 @@ return array(
                         try {
                             $twig->addExtension($c->get($ext));
                         } catch (\Exception $e) {
-                            if($throw){//solo si no se ha lanzado una excepción la lanzamos
+                            if ($throw) {//solo si no se ha lanzado una excepción la lanzamos
                                 throw $e;
                             }
                         }
@@ -109,4 +112,13 @@ return array(
         ));
         $c->setParameter('translator.provider', 'arrays');
     },
+    'listeners' => array(
+        K2Events::EXCEPTION => array(
+            //si ningun evento crea una respuesta para la excepción, retornamos
+            //la excepción del fw
+            -1 => function(ExceptionEvent $e) {
+                $e->setResponse(ExceptionHandler::createException($e->getException()));
+            },
+        )
+    ),
 );

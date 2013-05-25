@@ -13,19 +13,6 @@ use K2\Kernel\Response;
 class ExceptionHandler
 {
 
-    protected static $showExceptions;
-
-    public static function handle($showExceptions = false)
-    {
-        static::$showExceptions = $showExceptions;
-        set_exception_handler(array(__CLASS__, 'onException'));
-    }
-
-    public static function onException(\Exception $e)
-    {
-        self::createException($e)->send();
-    }
-
     /**
      *
      * @param \Exception $e
@@ -39,7 +26,7 @@ class ExceptionHandler
             ob_end_clean(); //vamos limpiando todos los niveles de buffer creados.
         }
 
-        if (PRODUCTION && !static::$showExceptions) {
+        if (PRODUCTION && !App::getParameter('show_exceptions')) {
             if (404 === $e->getCode()) {
                 header('HTTP/1.1 404 Not Found');
                 $code = 404;
