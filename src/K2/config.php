@@ -4,7 +4,6 @@ namespace K2;
 
 use K2\Kernel\App;
 use K2\Di\Container\Container;
-use K2\Kernel\Event\K2Events;
 
 return array(
     'name' => 'K2Core',
@@ -20,22 +19,10 @@ return array(
         'view' => function($c) {
             return new View\View($c['twig']);
         },
-        'twig' => function() {
+        'twig' => function(Container $c) {
             App::addSerciveToRequest('twig');
 
             $loader = new \Twig_Loader_Filesystem(APP_PATH . '/view');
-
-            foreach (App::modules() as $name => $module) {
-                //si existe en views una carpeta con el nombre de algun módulo
-                //se agrega a los paths de twig, esto permite reescribir templates
-                //en los proyectos :-)
-                if (is_dir($dir = APP_PATH . '/view/' . $module['name'] . '/')) {
-                    $loader->addPath($dir, $name);
-                }
-                if (is_dir($dir = rtrim($module['path'], '/') . '/View/')) {
-                    $loader->addPath($dir, $name);
-                }
-            }
 
             $config = App::getParameter('config');
 
@@ -50,11 +37,30 @@ return array(
                 $twig->addExtension(new \Twig_Extension_Debug());
             }
 
-            $twig->addExtension(new View\Twig\Extension\Core());
+            foreach (App::modules() as $name => $module) {
+                //si existe en views una carpeta con el nombre de algun módulo
+                //se agrega a los paths de twig, esto permite reescribir templates
+                //en los proyectos :-)
+                if (is_dir($dir = APP_PATH . '/view/' . $module['name'] . '/')) {
+                    $loader->addPath($dir, $name);
+                }
+                if (is_dir($dir = rtrim($module['path'], '/') . '/View/')) {
+                    $loader->addPath($dir, $name);
+                }
+                //si el módulo tiene extensiones twig las agregamos a Twig_Environment
+                if (isset($module['twig_extensions'])) {
+                    $module['twig_extensions'] = (array) $module['twig_extensions'];
+                    //las extensiones son servicios, por lo tango los cargamos y los vamos pasando
+                    //a twig
+                    array_walk($module['twig_extensions'], function($e)use($c, $twig) {
+                                $twig->addExtension($c->get($e));
+                            });
+                }
+            }
+
             if (!PRODUCTION) {
                 $twig->addExtension(new \Twig_Extension_Debug());
             }
-            $twig->addExtension(new View\Twig\Extension\Form());
 
             //registramos un callback para cuando no se encuentre una funcion twig, busque primero
             //si es una funcion de php y así no tire una excepción
@@ -82,12 +88,14 @@ return array(
         'activerecord.provider' => function($c) {
             return new Security\Auth\Provider\ActiveRecord($c);
         },
-        'mapper' => function($c) {
-            return new Datamapper\DataMapper($c['property_accesor']);
-        }
+        'twig_core' => function() {
+            return new View\Twig\Extension\Core();
+        },
+        'twig_form' => function() {
+            return new View\Twig\Extension\Form();
+        },
     ),
-    //'parameters' => array(),
-    //'listeners' => array(),
+    'twig_extensions' => array('twig_core', 'twig_form'),
     'init' => function(Container $c) {
         $c->setParameter('security.provider', array(
             'active_record' => 'K2\\Security\\Auth\\Provider\\ActiveRecord',
