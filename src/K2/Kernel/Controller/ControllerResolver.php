@@ -53,7 +53,7 @@ class ControllerResolver
      */
     protected $parameters;
 
-    public function __construct(Container $con)
+    public function __construct(Container $con, $actionSuffix = '_action')
     {
         $this->container = $con;
 
@@ -61,7 +61,7 @@ class ControllerResolver
 
         $this->module = $context['module'];
         $this->controllerUrl = $context['controller'];
-        $this->action = $context['action'] . '_action';
+        $this->action = $context['action'] . $actionSuffix;
         $this->parameters = $context['parameters'];
         if ('/logout' === App::getRequest()->getRequestUrl()) {
             throw new NotFoundException("La ruta \"/logout\" no concuerda con ningún módulo ni controlador en la App");
