@@ -86,7 +86,7 @@ class Core extends \Twig_Extension
 
         App::setRequest(new Request($url));
 
-        $resolver = new ControllerResolver(App::get('container'));
+        $resolver = new ControllerResolver(App::get('container'), null);//la acción no tendrá el sufijo _action
 
         $controller = $resolver->getController();
 
