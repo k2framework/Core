@@ -71,7 +71,7 @@ class Image extends Upload
     {
         parent::__construct($request, $name);
         // Ruta donde se guardara el archivo
-        $this->path = dirname(APP_PATH) . '/public/img/upload/';
+        $this->path = dirname(APP_PATH) . 'public/img/upload/';
     }
 
     /**

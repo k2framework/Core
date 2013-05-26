@@ -45,7 +45,7 @@ class Kernel
      */
     public function __construct($showExceptions = false)
     {
-        App::getLoader()->add(null, APP_PATH . '/modules/');
+        App::getLoader()->add(null, APP_PATH . 'modules/');
 
         $this->initContainer();
 

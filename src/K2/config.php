@@ -25,12 +25,12 @@ return array(
         'twig' => function(Container $c) {
             App::addSerciveToRequest('twig');
 
-            $loader = new \Twig_Loader_Filesystem(APP_PATH . '/view');
+            $loader = new \Twig_Loader_Filesystem(APP_PATH . 'view');
 
             $config = App::getParameter('config');
 
             $twig = new \Twig_Environment($loader, array(
-                'cache' => APP_PATH . '/temp/cache/twig/',
+                'cache' => APP_PATH . 'temp/cache/twig/',
                 'debug' => !PRODUCTION,
                 'strict_variables' => true,
                 'charset' => isset($config['charset']) ? $config['charset'] : 'UTF-8',
@@ -44,7 +44,7 @@ return array(
                 //si existe en views una carpeta con el nombre de algun módulo
                 //se agrega a los paths de twig, esto permite reescribir templates
                 //en los proyectos :-)
-                if (is_dir($dir = APP_PATH . '/view/' . $module['name'] . '/')) {
+                if (is_dir($dir = APP_PATH . 'view/' . $module['name'] . '/')) {
                     $loader->addPath($dir, $name);
                 }
                 if (is_dir($dir = rtrim($module['path'], '/') . '/View/')) {

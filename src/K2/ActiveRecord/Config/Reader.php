@@ -16,7 +16,7 @@ class Reader
 
     public static function readDatabases()
     {
-        $ini = APP_PATH . '/config/databases.ini';
+        $ini = APP_PATH . 'config/databases.ini';
         foreach (parse_ini_file($ini, true) as $configName => $params) {
             Config::add($parameter = new Parameters($configName, $params));
             if ('sqlite' === $parameter->getType()) {

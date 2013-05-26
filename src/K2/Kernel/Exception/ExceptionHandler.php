@@ -35,7 +35,7 @@ class ExceptionHandler
                 header('HTTP/1.1 500 Internal Server Error');
                 $code = 500;
                 $html = App::get('twig')->render('errors/404.twig');
-                if (is_file(APP_PATH . '/view/errors/500.twig')) {
+                if (is_file(APP_PATH . 'view/errors/500.twig')) {
                     $html = App::get('twig')->render('errors/500.twig');
                 } else {
                     $html = App::get('twig')->render('errors/404.twig');
