@@ -41,19 +41,19 @@ return array(
             }
 
             foreach (App::modules() as $name => $module) {
-//si existe en views una carpeta con el nombre de algun módulo
-//se agrega a los paths de twig, esto permite reescribir templates
-//en los proyectos :-)
+                //si existe en views una carpeta con el nombre de algun módulo
+                //se agrega a los paths de twig, esto permite reescribir templates
+                //en los proyectos :-)
                 if (is_dir($dir = APP_PATH . '/view/' . $module['name'] . '/')) {
                     $loader->addPath($dir, $name);
                 }
                 if (is_dir($dir = rtrim($module['path'], '/') . '/View/')) {
                     $loader->addPath($dir, $name);
                 }
-//si el módulo tiene extensiones twig las agregamos a Twig_Environment
+                //si el módulo tiene extensiones twig las agregamos a Twig_Environment
                 if (isset($module['twig_extensions'])) {
-//las extensiones son servicios, por lo tango los cargamos y los vamos pasando
-//a twig
+                    //las extensiones son servicios, por lo tango los cargamos y los vamos pasando
+                    //a twig
                     foreach ((array) $module['twig_extensions'] as $ext) {
                         $throw = !$c->get('app.kernel')->hasException();
                         try {
@@ -71,8 +71,8 @@ return array(
                 $twig->addExtension(new \Twig_Extension_Debug());
             }
 
-//registramos un callback para cuando no se encuentre una funcion twig, busque primero
-//si es una funcion de php y así no tire una excepción
+            //registramos un callback para cuando no se encuentre una funcion twig, busque primero
+            //si es una funcion de php y así no tire una excepción
             $twig->registerUndefinedFunctionCallback(function($name) {
                         if (function_exists($name)) {
                             return new \Twig_Function_Function($name);
@@ -102,6 +102,9 @@ return array(
         },
         'twig_form' => function() {
             return new View\Twig\Extension\Form();
+        },
+        'mapper' => function($c) {
+            return new Datamapper\DataMapper($c['property_accesor']);
         },
     ),
     'twig_extensions' => array('twig_core', 'twig_form'),

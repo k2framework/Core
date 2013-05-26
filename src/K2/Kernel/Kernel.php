@@ -128,11 +128,7 @@ class Kernel
         if ($event->hasResponse()) {
             return $this->response($event->getResponse());
         }
-
-//        if (PRODUCTION) {
-//            return ExceptionHandler::createException($e);
-//        }
-
+        
         throw $e;
     }
 
