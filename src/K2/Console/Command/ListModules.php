@@ -21,7 +21,7 @@ class ListModules extends Command
         $this->setName('module:list')
                 ->setDescription("Devuelve un listados con los módulos instalador en la App")
                 ->addOption('path', null, InputOption::VALUE_NONE
-                        , 'Traer los path de los modulos en vez de los refijos de url');
+                        , 'Traer los path de los modulos en vez de los prefijos de url');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
