@@ -51,6 +51,7 @@ class FlashTest extends PHPUnit_Framework_TestCase
         $session = new Session(__DIR__);
 
         $session->destroy();
+        $session->start();
 
         $flash = new Flash($session);
 
