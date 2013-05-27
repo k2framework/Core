@@ -23,62 +23,10 @@ return array(
             return new View\View($c['twig']);
         },
         'twig' => function(Container $c) {
-            App::addSerciveToRequest('twig');
-
-            $loader = new \Twig_Loader_Filesystem(APP_PATH . 'view');
-
-            $config = App::getParameter('config');
-
-            $twig = new \Twig_Environment($loader, array(
-                'cache' => APP_PATH . 'temp/cache/twig/',
-                'debug' => !PRODUCTION,
-                'strict_variables' => true,
-                'charset' => isset($config['charset']) ? $config['charset'] : 'UTF-8',
-            ));
-
-            if (!PRODUCTION) {
-                $twig->addExtension(new \Twig_Extension_Debug());
-            }
-
-            foreach (App::modules() as $name => $module) {
-                //si existe en views una carpeta con el nombre de algun módulo
-                //se agrega a los paths de twig, esto permite reescribir templates
-                //en los proyectos :-)
-                if (is_dir($dir = APP_PATH . 'view/' . $module['name'] . '/')) {
-                    $loader->addPath($dir, $name);
-                }
-                if (is_dir($dir = rtrim($module['path'], '/') . '/View/')) {
-                    $loader->addPath($dir, $name);
-                }
-            }
-
-            $throw = !$c->get('app.kernel')->hasException();
-            foreach (App::definitions('twig_extensions') as $name) {
-                //las extensiones son servicios, por lo tango los cargamos y 
-                //los vamos pasando a twig
-                try {
-                    $twig->addExtension($c->get($name));
-                } catch (\Exception $e) {
-                    if ($throw) {//solo si no se ha lanzado una excepción la lanzamos
-                        throw $e;
-                    }
-                }
-            }
-
-            if (!PRODUCTION) {
-                $twig->addExtension(new \Twig_Extension_Debug());
-            }
-
-            //registramos un callback para cuando no se encuentre una funcion twig, busque primero
-            //si es una funcion de php y así no tire una excepción
-            $twig->registerUndefinedFunctionCallback(function($name) {
-                        if (function_exists($name)) {
-                            return new \Twig_Function_Function($name);
-                        }
-                        return false;
-                    });
-
-            return $twig;
+            return createTwigEnviroment($c);
+        },
+        'twig_string' => function(Container $c) {
+            return createTwigEnviromentString($c);
         },
         'cache' => function() {
             return Cache\Cache::factory(APP_PATH);
@@ -123,3 +71,111 @@ return array(
         )
     ),
 );
+
+function createTwigEnviroment(Container $c)
+{
+    App::addSerciveToRequest('twig');
+
+    $loader = new \Twig_Loader_Filesystem(APP_PATH . 'view');
+
+    $config = App::getParameter('config');
+
+    $twig = new \Twig_Environment($loader, array(
+        'cache' => APP_PATH . 'temp/cache/twig/',
+        'debug' => !PRODUCTION,
+        'strict_variables' => true,
+        'charset' => isset($config['charset']) ? $config['charset'] : 'UTF-8',
+    ));
+
+    if (!PRODUCTION) {
+        $twig->addExtension(new \Twig_Extension_Debug());
+    }
+
+    foreach (App::modules() as $name => $module) {
+        //si existe en views una carpeta con el nombre de algun módulo
+        //se agrega a los paths de twig, esto permite reescribir templates
+        //en los proyectos :-)
+        if (is_dir($dir = APP_PATH . 'view/' . $module['name'] . '/')) {
+            $loader->addPath($dir, $name);
+        }
+        if (is_dir($dir = rtrim($module['path'], '/') . '/View/')) {
+            $loader->addPath($dir, $name);
+        }
+    }
+
+    $throw = !$c->get('app.kernel')->hasException();
+    foreach (App::definitions('twig_extensions') as $name) {
+        //las extensiones son servicios, por lo tango los cargamos y 
+        //los vamos pasando a twig
+        try {
+            $twig->addExtension($c->get($name));
+        } catch (\Exception $e) {
+            if ($throw) {//solo si no se ha lanzado una excepción la lanzamos
+                throw $e;
+            }
+        }
+    }
+
+    if (!PRODUCTION) {
+        $twig->addExtension(new \Twig_Extension_Debug());
+    }
+
+    //registramos un callback para cuando no se encuentre una funcion twig, busque primero
+    //si es una funcion de php y así no tire una excepción
+    $twig->registerUndefinedFunctionCallback(function($name) {
+                if (function_exists($name)) {
+                    return new \Twig_Function_Function($name);
+                }
+                return false;
+            });
+
+    return $twig;
+}
+
+function createTwigEnviromentString(Container $c)
+{
+    App::addSerciveToRequest('twig_string');
+
+    $loader = new \Twig_Loader_String();
+
+    $config = App::getParameter('config');
+
+    $twig = new \Twig_Environment($loader, array(
+        'cache' => APP_PATH . 'temp/cache/twig/',
+        'debug' => !PRODUCTION,
+        'strict_variables' => true,
+        'charset' => isset($config['charset']) ? $config['charset'] : 'UTF-8',
+    ));
+
+    if (!PRODUCTION) {
+        $twig->addExtension(new \Twig_Extension_Debug());
+    }
+
+    $throw = !$c->get('app.kernel')->hasException();
+    foreach (App::definitions('twig_extensions') as $name) {
+        //las extensiones son servicios, por lo tango los cargamos y 
+        //los vamos pasando a twig
+        try {
+            $twig->addExtension($c->get($name));
+        } catch (\Exception $e) {
+            if ($throw) {//solo si no se ha lanzado una excepción la lanzamos
+                throw $e;
+            }
+        }
+    }
+
+    if (!PRODUCTION) {
+        $twig->addExtension(new \Twig_Extension_Debug());
+    }
+
+    //registramos un callback para cuando no se encuentre una funcion twig, busque primero
+    //si es una funcion de php y así no tire una excepción
+    $twig->registerUndefinedFunctionCallback(function($name) {
+                if (function_exists($name)) {
+                    return new \Twig_Function_Function($name);
+                }
+                return false;
+            });
+
+    return $twig;
+}
