@@ -31,12 +31,24 @@ class ConfigReader
      */
     public static function compile()
     {
-        if (PRODUCTION && !is_file(static::$file)) {
-            $data['definitions'] = App::definitions();
-            $data['modules'] = App::modules();
-            $config = PHP_EOL . 'return ' . var_export($data, true);
-            file_put_contents(static::$file, "<?php$config;");
+        $modules = App::modules();
+        echo "<pre>";
+        $code = "<?php" . PHP_EOL;
+        foreach ($modules as $name => $congif) {
+            $file = file_get_contents($congif['file']);
+            
+            $file = preg_replace(array('/<\?php/','/\?>/'), '', $file);
+            
+            $file = preg_match_all('/return(\s+)array(\s.)\((.+)\)/m', $file, $matchs);
+            
+            var_dump($matchs);
+            
+            $code .= $file . PHP_EOL;
         }
+        //$config = PHP_EOL . 'return ' . var_export($data, true);
+        echo $code;
+        file_put_contents(static::$file, $code);
+        die;
     }
 
     public static function isCompiled()

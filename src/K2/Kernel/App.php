@@ -243,12 +243,16 @@ class App
         if (null === $modules) {
             return static::$modules;
         } else {
-            foreach ($modules as $index => $module) {
-
+            foreach ($modules as $index => $file) {
+                
+                $module = require $file;
+                
                 static::addDefinitions('services', $module);
                 static::addDefinitions('parameters', $module);
                 static::addDefinitions('listeners', $module);
                 static::addDefinitions('twig_extensions', $module);
+                
+                //$module['file'] = $file;
 
                 static::$modules[$module['name']] = $module + array('init' => null);
                 //si el indice no es numerico, agregamos el mismo a las rutas
@@ -325,7 +329,7 @@ class App
     {
         if (null !== $key) {
             if (isset($data[$key])) {
-                static::$definitions[$key] = array_merge(static::$definitions[$key], $data[$key]);
+                static::$definitions[$key] = array_merge_recursive(static::$definitions[$key], $data[$key]);
                 unset($data[$key]);
             }
         } else {
