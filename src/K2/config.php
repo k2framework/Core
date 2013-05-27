@@ -52,19 +52,17 @@ return array(
                 if (is_dir($dir = rtrim($module['path'], '/') . '/View/')) {
                     $loaderFiles->addPath($dir, $name);
                 }
-                //si el módulo tiene extensiones twig las agregamos a Twig_Environment
-                if (isset($module['twig_extensions'])) {
-                    //las extensiones son servicios, por lo tango los cargamos y los vamos pasando
-                    //a twig
-                    foreach ((array) $module['twig_extensions'] as $ext) {
-                        $throw = !$c->get('app.kernel')->hasException();
-                        try {
-                            $twig->addExtension($c->get($ext));
-                        } catch (\Exception $e) {
-                            if ($throw) {//solo si no se ha lanzado una excepción la lanzamos
-                                throw $e;
-                            }
-                        }
+            }
+
+            $throw = !$c->get('app.kernel')->hasException();
+            foreach (App::definitions('twig_extensions') as $name) {
+                //las extensiones son servicios, por lo tango los cargamos y 
+                //los vamos pasando a twig
+                try {
+                    $twig->addExtension($c->get($name));
+                } catch (\Exception $e) {
+                    if ($throw) {//solo si no se ha lanzado una excepción la lanzamos
+                        throw $e;
                     }
                 }
             }

@@ -128,7 +128,7 @@ class Kernel
         if ($event->hasResponse()) {
             return $this->response($event->getResponse());
         }
-        
+
         throw $e;
     }
 
@@ -149,29 +149,17 @@ class Kernel
         App::setContainer($container = new Container());
 
         $container->setInstance('app.kernel', $this);
+        $container->setFromArray(App::definitions('services', true));
+
+        foreach (App::definitions('parameters', true) as $name => $value) {
+            $container->setParameter($name, $value);
+        }
     }
 
     protected function initModules()
     {
         $container = App::get('container');
-        foreach (App::modules() as $name => $config) {
-            if (isset($config['services'])) {
-                $container->setFromArray($config['services']);
-            }
 
-            if (isset($config['listeners'])) {
-                foreach ($config['listeners'] as $event => $listeners) {
-                    foreach ($listeners as $priority => $listener) {
-                        $this->dispatcher->addListener($event, $listener, $priority);
-                    }
-                }
-            }
-
-            if (isset($config['parameters'])) {
-                $container->setParameter($name, $config['parameters']);
-            }
-        }
-        //esto es aparte para que se cargen todos los servicios y parametros
         foreach (App::modules() as $name => $config) {
             if (is_callable($config['init'])) {
                 call_user_func($config['init'], $container);
@@ -186,6 +174,12 @@ class Kernel
     {
         $this->dispatcher = new EventDispatcher(App::get('container'));
         App::get('container')->setInstance('event.dispatcher', $this->dispatcher);
+
+        foreach (App::definitions('listeners', true) as $event => $listeners) {
+            foreach ($listeners as $priority => $listener) {
+                $this->dispatcher->addListener($event, $listener, $priority);
+            }
+        }
     }
 
     protected function readConfig()

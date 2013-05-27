@@ -26,8 +26,30 @@ class App
     protected static $routes;
     protected static $request = array();
     protected static $context = array();
+
+    /**
+     * Contiene instancias de servicios que están atados a un request especifico
+     * @var array
+     */
     protected static $services = array();
+
+    /**
+     * Contiene los nombres de los servicios que se crearán por cada request creado
+     * @var array 
+     */
     protected static $requestServices = array();
+
+    /**
+     * Contiene las definiciones de los servicios, parametros y escuchas de 
+     * eventos de los modulos de la app.
+     * @var array 
+     */
+    protected static $definitions = array(
+        'services' => array(),
+        'parameters' => array(),
+        'listeners' => array(),
+        'twig_extensions' => array(),
+    );
 
     /**
      * 
@@ -222,6 +244,12 @@ class App
             return static::$modules;
         } else {
             foreach ($modules as $index => $module) {
+
+                static::addDefinitions('services', $module);
+                static::addDefinitions('parameters', $module);
+                static::addDefinitions('listeners', $module);
+                static::addDefinitions('twig_extensions', $module);
+
                 static::$modules[$module['name']] = $module + array('init' => null);
                 //si el indice no es numerico, agregamos el mismo a las rutas
                 if (!is_numeric($index)) {
@@ -291,6 +319,39 @@ class App
     public static function addSerciveToRequest($idService)
     {
         static::$requestServices[$idService] = $idService;
+    }
+
+    protected static function addDefinitions($key, array &$data = array())
+    {
+        if (isset($data[$key])) {
+            static::$definitions[$key] = array_merge(static::$definitions[$key], $data[$key]);
+            unset($data[$key]);
+        }
+    }
+
+    public static function definitions($key = null, $unset = false)
+    {
+        if (null == $key) {
+            if (!$unset) {
+                return static::$definitions;
+            }
+            $def = static::$definitions;
+            static::$definitions = array(
+                'services' => array(),
+                'parameters' => array(),
+                'listeners' => array(),
+                'twig_extensions' => array(),
+            );
+            return $def;
+        }
+
+        if (isset(static::$definitions[$key])) {
+            $def = static::$definitions[$key];
+            if($unset){
+                static::$definitions[$key] = array();
+            }
+            return $def;
+        }
     }
 
 }
