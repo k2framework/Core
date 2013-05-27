@@ -325,7 +325,7 @@ class Form extends \Twig_Extension
      * @param type $empty
      * @return string
      */
-    protected function createOptions(array $options, $value = null, $empty)
+    protected function createOptions(array $options, $value = null, $empty = null)
     {
         $html = $empty ? "<option value=\"\">{$this->escape($empty)}</option>" : '';
 
