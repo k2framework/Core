@@ -158,26 +158,21 @@ class Form extends \Twig_Extension
      * @param boolean $multiple si es true, se crearán checboxs sino radios
      * @param array $attrs atributos adicionales para la etiqueta html
      * @param string $value valor por defecto del campo
-     * @return string
+     * @return array
      */
     public function choice($context, $field, array $options = array(), $multiple = true, array $attrs = array(), $value = null)
     {
-        $html = '<div class="form-choices">';
+        $choices = array();
         $i = 0;
+        $method = $multiple ? 'check' : 'radio';
         foreach ($options as $value => $label) {
             $attrs['id'] = strtr($field, '.', '_') . '_' . $i;
-            if ($multiple) {
-                $html .= "<label>" . $this->check($context, $field . '.' . $i, $value, $attrs)
-                        . $this->escape($label) . "</label>";
-            } else {
-                $html .= "<label>" . $this->radio($context, $field, $value, $attrs)
-                        . $this->escape($label) . "</label>";
-            }
+            $choices[] = "<label>" . $this->{$method}($context, $field . '.' . $i, $value, $attrs)
+                    . ' ' . $this->escape($label) . "</label>";
             ++$i;
         }
-        $html .= '</div>';
 
-        return $html;
+        return $choices;
     }
 
     /**
