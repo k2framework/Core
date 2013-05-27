@@ -77,12 +77,11 @@ class Flash
      * Devuelve todos los mensajes guardados previamente y los borra
      * de la session.
      * 
-     * @return array arreglo donde los indices son el tipo de mensaje y el valor
-     * es el contenido del mensaje. 
+     * @return FlashCollection colección de mensajes
      */
     public function getAll()
     {
-        return $this->messages->all();
+        return $this->messages;
     }
 
     /**
