@@ -5,6 +5,7 @@ namespace K2\View\Twig\Extension;
 use K2\Kernel\App;
 use K2\Kernel\Request;
 use K2\Kernel\Response;
+use K2\View\Twig\Globals;
 use K2\Kernel\Config\Reader;
 use K2\Kernel\Controller\ControllerResolver;
 
@@ -35,12 +36,7 @@ class Core extends \Twig_Extension
     public function getGlobals()
     {
         return array(
-            'app' => array(
-                'context' => \K2\Kernel\App::getContext(),
-                'request' => \K2\Kernel\App::getRequest(),
-                'user' => \K2\Kernel\App::getUser(),
-                'messages' => App::get('flash')->getAll(),
-            ),
+            'app' => new Globals(),
         );
     }
 
@@ -86,7 +82,7 @@ class Core extends \Twig_Extension
 
         App::setRequest(new Request($url));
 
-        $resolver = new ControllerResolver(App::get('container'), null);//la acción no tendrá el sufijo _action
+        $resolver = new ControllerResolver(App::get('container'), null); //la acción no tendrá el sufijo _action
 
         $controller = $resolver->getController();
 

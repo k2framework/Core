@@ -2,11 +2,33 @@
 
 namespace K2\View\Twig\Extension;
 
-use K2\Kernel\App;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyAccess\Exception\RuntimeException;
 
 class Form extends \Twig_Extension
 {
+
+    /**
+     *
+     * @var PropertyAccessorInterface
+     */
+    protected $propertyAccesor;
+
+    /**
+     *
+     * @var \Twig_Environment
+     */
+    protected $twig;
+
+    public function __construct(PropertyAccessorInterface $propertyAccesor)
+    {
+        $this->propertyAccesor = $propertyAccesor;
+    }
+
+    public function initRuntime(\Twig_Environment $environment)
+    {
+        $this->twig = $environment;
+    }
 
     public function getName()
     {
@@ -216,8 +238,8 @@ class Form extends \Twig_Extension
 
         if (!$sub) {
             //si la llamada no es recursiva se busca en request primero
-            $data = App::getRequest()
-                    ->request($fieldName[0], $this->propertyOrArrayValue($data, $fieldName[0], array()));
+            $data = array_key_exists($fieldName[0], $_REQUEST) ? $_REQUEST[$fieldName[0]] :
+                    $this->propertyOrArrayValue($data, $fieldName[0], array());
 
             if (count($fieldName) > 1) {
                 return $this->getValue($data, $fieldName[1], true);
@@ -250,7 +272,7 @@ class Form extends \Twig_Extension
                 $index = '[' . $index . ']';
             }
 
-            return App::get('property_accesor')->getValue($data, $index);
+            return $this->propertyAccesor->getValue($data, $index);
         } catch (RuntimeException $e) {
             return $default;
         }
@@ -293,7 +315,7 @@ class Form extends \Twig_Extension
      */
     protected function escape($string)
     {
-        return twig_escape_filter(App::get('twig'), (string) $string);
+        return twig_escape_filter($this->twig, (string) $string);
     }
 
     /**
