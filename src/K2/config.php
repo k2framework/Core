@@ -25,9 +25,6 @@ return array(
         'twig' => function(Container $c) {
             return createTwigEnviroment($c);
         },
-        'twig_string' => function(Container $c) {
-            return createTwigEnviromentString($c);
-        },
         'cache' => function() {
             return Cache\Cache::factory(APP_PATH);
         },
@@ -46,8 +43,8 @@ return array(
         'twig_core' => function() {
             return new View\Twig\Extension\Core();
         },
-        'twig_form' => function() {
-            return new View\Twig\Extension\Form();
+        'twig_form' => function($c) {
+            return new View\Twig\Extension\Form($c->get('property_accesor'));
         },
         'mapper' => function($c) {
             return new Datamapper\DataMapper($c['property_accesor']);
@@ -74,8 +71,6 @@ return array(
 
 function createTwigEnviroment(Container $c)
 {
-    App::addSerciveToRequest('twig');
-
     $loader = new \Twig_Loader_Filesystem(APP_PATH . 'view');
 
     $config = App::getParameter('config');
@@ -101,54 +96,6 @@ function createTwigEnviroment(Container $c)
         if (is_dir($dir = rtrim($module['path'], '/') . '/View/')) {
             $loader->addPath($dir, $name);
         }
-    }
-
-    $throw = !$c->get('app.kernel')->hasException();
-    foreach (App::definitions('twig_extensions') as $name) {
-        //las extensiones son servicios, por lo tango los cargamos y 
-        //los vamos pasando a twig
-        try {
-            $twig->addExtension($c->get($name));
-        } catch (\Exception $e) {
-            if ($throw) {//solo si no se ha lanzado una excepción la lanzamos
-                throw $e;
-            }
-        }
-    }
-
-    if (!PRODUCTION) {
-        $twig->addExtension(new \Twig_Extension_Debug());
-    }
-
-    //registramos un callback para cuando no se encuentre una funcion twig, busque primero
-    //si es una funcion de php y así no tire una excepción
-    $twig->registerUndefinedFunctionCallback(function($name) {
-                if (function_exists($name)) {
-                    return new \Twig_Function_Function($name);
-                }
-                return false;
-            });
-
-    return $twig;
-}
-
-function createTwigEnviromentString(Container $c)
-{
-    App::addSerciveToRequest('twig_string');
-
-    $loader = new \Twig_Loader_String();
-
-    $config = App::getParameter('config');
-
-    $twig = new \Twig_Environment($loader, array(
-        'cache' => APP_PATH . 'temp/cache/twig/',
-        'debug' => !PRODUCTION,
-        'strict_variables' => true,
-        'charset' => isset($config['charset']) ? $config['charset'] : 'UTF-8',
-    ));
-
-    if (!PRODUCTION) {
-        $twig->addExtension(new \Twig_Extension_Debug());
     }
 
     $throw = !$c->get('app.kernel')->hasException();
