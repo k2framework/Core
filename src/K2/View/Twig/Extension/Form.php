@@ -27,6 +27,15 @@ class Form extends \Twig_Extension
         );
     }
 
+    public function getFilters()
+    {
+        return array(
+            new \Twig_SimpleFilter('choices', function($choices, $separator = ' ') {
+                        return join($separator, $choices);
+                    }, array('is_safe' => array('html'))),
+        );
+    }
+
     /**
      * Crea una elemento html de tipo <label>
      * @param string $field campo al que se asociará el label
