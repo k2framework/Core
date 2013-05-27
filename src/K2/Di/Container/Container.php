@@ -53,7 +53,7 @@ class Container implements \ArrayAccess
         if (!$this->has($id)) {
             throw new IndexNotDefinedException(sprintf('No existe el servicio "%s"', $id));
         }
-        //si existe el servicio y est· creado lo devolvemos
+        //si existe el servicio y est√° creado lo devolvemos
         if ($this->hasInstance($id)) {
             return $this->services[$id];
         }
@@ -61,7 +61,7 @@ class Container implements \ArrayAccess
         $instance = $this->getInstance($id);
 
         if (!is_object($instance)) {
-            throw new DiException("La funciÛn que crea el servicio $id bebe retornar un objeto");
+            throw new DiException("La funci√≥n que crea el servicio $id bebe retornar un objeto");
         }
 
         return $instance;
@@ -85,7 +85,7 @@ class Container implements \ArrayAccess
     public function setInstance($id, $object)
     {
         $this->services[$id] = $object;
-        //y lo agregamos a las definiciones. (solo ser· a gregado si no existe)
+        //y lo agregamos a las definiciones. (solo ser√° a gregado si no existe)
         if (!isset($this->definitions['services'][$id])) {
 
             $this->definitions['services'][$id] = true;
@@ -141,7 +141,7 @@ class Container implements \ArrayAccess
     }
 
     /**
-     * Crea Û Actualiza la configuraciÛn para la creaciÛn de un servicio.
+     * Crea √≥ Actualiza la configuraci√≥n para la creaci√≥n de un servicio.
      * 
      * @example $container->set("session", function($c){
      *      return new K2\Kernel\Session\Session($c['request']);
@@ -150,7 +150,7 @@ class Container implements \ArrayAccess
      * @param string $id identificador del servicio
      * @param \Closure funcion que crea el servicio
      * @param boolean $singleton Indica si se va a mentener una sola instancia de la clase
-     * Û se crear· una nueva cada vez que el servicio sea solicitado
+     * √≥ se crear√° una nueva cada vez que el servicio sea solicitado
      */
     public function set($id, \Closure $function, $singleton = true)
     {
@@ -159,7 +159,7 @@ class Container implements \ArrayAccess
     }
 
     /**
-     * Crea Û Actualiza la configuraciÛn para la creaciÛn de varios servicios.
+     * Crea √≥ Actualiza la configuraci√≥n para la creaci√≥n de varios servicios.
      * 
      * @example $container->setFromArray(array(
      *                  "session" => function($c){
@@ -179,7 +179,7 @@ class Container implements \ArrayAccess
     }
 
     /**
-     * Verifica la existencia de un serivicio Û un parametro en el contenedor.
+     * Verifica la existencia de un serivicio √≥ un parametro en el contenedor.
      * @param string $offset
      * @return boolean 
      */
@@ -189,7 +189,7 @@ class Container implements \ArrayAccess
     }
 
     /**
-     * Devuelve la instancia de una clase si est· definida, sino devuelve un parametro,
+     * Devuelve la instancia de una clase si est√° definida, sino devuelve un parametro,
      * si tampoco existe, devuelve null.
      * @param string $offset
      * @return mixed 
@@ -230,7 +230,7 @@ class Container implements \ArrayAccess
         if (is_array($data)) {
 
             if (!$data[0] instanceof \Closure) {
-                throw new DiException("No se reconoce el valor para la definiciÛn del servicio $id");
+                throw new DiException("No se reconoce el valor para la definici√≥n del servicio $id");
             }
 
             $instance = $data[0]($this);
@@ -242,7 +242,7 @@ class Container implements \ArrayAccess
             return $instance;
         }
 
-        throw new DiException("No se reconoce el valor para la definiciÛn del servicio $id");
+        throw new DiException("No se reconoce el valor para la definici√≥n del servicio $id");
     }
 
     protected function merge(array &$original, array &$data)
