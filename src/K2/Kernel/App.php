@@ -321,11 +321,15 @@ class App
         static::$requestServices[$idService] = $idService;
     }
 
-    protected static function addDefinitions($key, array &$data = array())
+    protected static function addDefinitions($key = null, array &$data = array())
     {
-        if (isset($data[$key])) {
-            static::$definitions[$key] = array_merge(static::$definitions[$key], $data[$key]);
-            unset($data[$key]);
+        if (null !== $key) {
+            if (isset($data[$key])) {
+                static::$definitions[$key] = array_merge(static::$definitions[$key], $data[$key]);
+                unset($data[$key]);
+            }
+        } else {
+            static::$definitions = array_merge(static::$definitions, $data);
         }
     }
 
@@ -347,7 +351,7 @@ class App
 
         if (isset(static::$definitions[$key])) {
             $def = static::$definitions[$key];
-            if($unset){
+            if ($unset) {
                 static::$definitions[$key] = array();
             }
             return $def;
