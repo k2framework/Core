@@ -25,9 +25,7 @@ return array(
         'twig' => function(Container $c) {
             App::addSerciveToRequest('twig');
 
-            $loaderFiles = new \Twig_Loader_Filesystem(APP_PATH . 'view');
-            $loaderString = new \Twig_Loader_String();
-            $loader = new \Twig_Loader_Chain(array($loaderFiles, $loaderString));
+            $loader = new \Twig_Loader_Filesystem(APP_PATH . 'view');
 
             $config = App::getParameter('config');
 
@@ -47,10 +45,10 @@ return array(
                 //se agrega a los paths de twig, esto permite reescribir templates
                 //en los proyectos :-)
                 if (is_dir($dir = APP_PATH . 'view/' . $module['name'] . '/')) {
-                    $loaderFiles->addPath($dir, $name);
+                    $loader->addPath($dir, $name);
                 }
                 if (is_dir($dir = rtrim($module['path'], '/') . '/View/')) {
-                    $loaderFiles->addPath($dir, $name);
+                    $loader->addPath($dir, $name);
                 }
             }
 
