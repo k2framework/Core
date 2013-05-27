@@ -7,24 +7,21 @@ use K2\Kernel\App;
 class ConfigReader
 {
 
-    protected $file;
+    public static $file;
 
-    public function __construct()
+    public static function getCompiled()
     {
-        $this->file = APP_PATH . 'temp/cache/config.php';
-        if (PRODUCTION) {
-            if ($this->isCompiled()) {
-                App::addDefinitions(require $this->file);
-            } else {
-                $data['definitions'] = App::definitions();
-                $config = PHP_EOL . PHP_EOL . 'return ' . var_export($data, true);
-                file_put_contents($this->file, "<?php$config;");
-            }
+        if (static::isCompiled()) {
+            $data = require static::$file;
+            App::addDefinitions($data['definitions']);
+            App::modules($data['modules']);
+            return true;
         } else {
-            if (is_writable($this->file)) {
-                unlink($this->file);
+            if (is_writable(static::$file)) {
+                unlink(static::$file);
             }
         }
+        return false;
     }
 
     /**
@@ -32,14 +29,21 @@ class ConfigReader
      * modulo en un solo esquema
      *  
      */
-    protected function compile()
+    public static function compile()
     {
-        
+        if (PRODUCTION && !is_file(static::$file)) {
+            $data['definitions'] = App::definitions();
+            $data['modules'] = App::modules();
+            $config = PHP_EOL . 'return ' . var_export($data, true);
+            file_put_contents(static::$file, "<?php$config;");
+        }
     }
 
-    public function isCompiled()
+    public static function isCompiled()
     {
-        return PRODUCTION && is_file($this->file);
+        return PRODUCTION && is_file(static::$file);
     }
 
 }
+
+ConfigReader::$file = APP_PATH . 'temp/cache/config.php';
