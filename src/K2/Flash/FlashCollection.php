@@ -73,6 +73,8 @@ class FlashCollection implements \Iterator, \Serializable
         if (count($this->flashes)) {
             $this->toDelete = $this->flashes;
             $this->flashes = array();
+        } else {
+            $this->toDelete = array();
         }
         return $this->toDelete;
     }
@@ -100,6 +102,10 @@ class FlashCollection implements \Iterator, \Serializable
 
     public function valid()
     {
+        static $x = 0;
+        if (++$x > 20) {
+            return false;
+        }
         return false !== current($this->toDelete);
     }
 
