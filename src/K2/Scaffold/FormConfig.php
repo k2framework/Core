@@ -3,6 +3,7 @@
 namespace K2\Scaffold;
 
 use K2\Kernel\App;
+use ActiveRecord\Relations;
 use K2\View\Twig\Extension\Form;
 use K2\ActiveRecord\ActiveRecord;
 use ActiveRecord\Metadata\Attribute;
@@ -88,17 +89,35 @@ class FormConfig
 
     protected function createSelect($name, $field, $attrs)
     {
-        ($model = $this->model->getRelationalModel($name)) ||
-                ($model = $this->model->getRelationalModel($name, 'hasOne'));
-
-        if ($model) {
-            $model = new $model();
-
-            $options = $this->formExtension
-                    ->options($model::findAll(), $this->getLabelSelect($model));
+        $class = get_class($this->model);
+        if (Relations::has($class, $name, Relations::BELONGS_TO)) {
+            list($model, $fk) = Relations::get($class, Relations::BELONGS_TO);
+        } elseif (Relations::has($class, $name, Relations::HAS_ONE)) {
+            list($model, $fk) = Relations::get($class, Relations::HAS_ONE);
         }
 
-        return $this->formExtension->select($this->context, $field, $options, $attrs);
+        $parts = explode('\\', $class);
+        $name = preg_replace('/_id$/', '', $name);
+        if (count($parts)) {
+            $parts[count($parts) - 1] = ucfirst($name);
+            $class = join('\\', $parts);
+            if (class_exists($class) && is_subclass_of($class, 'ActiveRecord\\Model')) {
+                $model = $class;
+            }
+        }
+
+        if (isset($model)) {
+
+            $model = new $model();
+            $column = $this->getLabelSelect($model);
+            $options = $model::createQuery()
+                    ->select("id, $column")
+                    ->findAll(\PDO::FETCH_KEY_PAIR);
+
+            return $this->formExtension->select($this->context, $field, $options, $attrs);
+        } else {
+            return $this->formExtension->input($this->context, $field, 'number', $attrs);
+        }
     }
 
     private function getLabelSelect(ActiveRecord $model)
