@@ -29,14 +29,14 @@ interface RouterInterface
     public function forward($url);
 
     /**
-     * Crea una url válida. todos las libs y helpers la usan.
+     * Crea una url válida dentro de la app. todos las libs y helpers la usan.
      * 
      * Ejemplos:
      * 
      * $this->createUrl('admin/usuarios/perfil');
      * $this->createUrl('admin/roles');
      * $this->createUrl('admin/recursos/editar/2');
-     * $this->createUrl('K2Backend:usuarios'); módulo:controlador/accion/params
+     * $this->createUrl('@K2Backend/usuarios'); @módulo/controlador/accion/params
      * 
      * El ultimo ejemplo es una forma especial de crear rutas
      * donde especificamos el nombre del módulo en vez del prefijo.
