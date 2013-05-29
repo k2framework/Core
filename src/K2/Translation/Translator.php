@@ -11,7 +11,7 @@ class Translator implements TranslatorInterface
 
     /**
      *
-     * @var MessagesInterface 
+     * @var ProviderInterface 
      */
     protected $messages;
 
@@ -28,7 +28,7 @@ class Translator implements TranslatorInterface
                 throw new \LogicException("La clase {$class} debe implementar la Interfaz K2\\Translation\\Provider\\ProviderInterface");
             }
         } else {
-            $providerClassName = 'K2\\Translation\\Provider\\' . ucfirst($provider);
+            $providerClassName = 'K2\\Translation\\Provider\\' . ucfirst($provider) . 'Provider';
             $this->messages = new $providerClassName();
         }
     }
