@@ -5,6 +5,7 @@ namespace K2\Compiler;
 use K2\Compiler\CompilerInterface;
 use K2\Compiler\CompilerException;
 use Composer\Autoload\ClassLoader;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class Compiler implements CompilerInterface
 {
@@ -12,6 +13,7 @@ class Compiler implements CompilerInterface
     protected $filename;
     protected $code;
     protected $config;
+
     /**
      *
      * @var ClassLoader
@@ -30,13 +32,11 @@ class Compiler implements CompilerInterface
             throw new CompilerException("El directorio \"$dir\" No existe");
         }
         $this->filename = $filename;
-        
+
         $this->loader = $loader;
 
         $this->config = parse_ini_file('compiler.ini', TRUE);
         $this->code = "<?php\n";
-        var_dump($this->config);
-        var_dump('Clases Compiladas:');
     }
 
     public function add($filename)
@@ -51,10 +51,14 @@ class Compiler implements CompilerInterface
         $this->code .= PHP_EOL . file_get_contents($filename);
     }
 
-    public function compile()
+    public function compile(OutputInterface $output = null)
     {
         foreach ($this->includedClasess() as $class) {
-            var_dump($this->loader->findFile($class));
+            if ($output) {
+                $output->writeln("Compilando: " . $this->loader->findFile($class));
+            } else {
+                var_dump($this->loader->findFile($class));
+            }
             $this->add($this->loader->findFile($class));
         }
 
