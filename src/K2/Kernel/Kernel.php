@@ -9,7 +9,6 @@ use K2\Kernel\Event\RequestEvent;
 use K2\Kernel\Event\ResponseEvent;
 use K2\Kernel\Event\ExceptionEvent;
 use K2\EventDispatcher\EventDispatcher;
-use K2\Kernel\Exception\ExceptionHandler;
 use K2\Kernel\Controller\ControllerResolver;
 
 /**
@@ -51,9 +50,9 @@ class Kernel
 
         $this->initDispatcher();
 
-        $this->initModules();
-
         $this->readConfig();
+
+        $this->initModules();
 
         App::get('container')->setParameter('show_exceptions', $showExceptions);
     }
