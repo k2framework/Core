@@ -40,7 +40,6 @@ class Form extends \Twig_Extension
         return array(
             new \Twig_SimpleFunction('form_*', array($this, 'type'), array('needs_context' => true, 'is_safe' => array('html'))),
             new \Twig_SimpleFunction('form_label', array($this, 'label'), array('is_safe' => array('html'))),
-            new \Twig_SimpleFunction('form_input', array($this, 'input'), array('needs_context' => true, 'is_safe' => array('html'))),
             new \Twig_SimpleFunction('form_textarea', array($this, 'textarea'), array('needs_context' => true, 'is_safe' => array('html'))),
             new \Twig_SimpleFunction('form_check', array($this, 'check'), array('needs_context' => true, 'is_safe' => array('html'))),
             new \Twig_SimpleFunction('form_radio', array($this, 'radio'), array('needs_context' => true, 'is_safe' => array('html'))),
@@ -83,27 +82,6 @@ class Form extends \Twig_Extension
      * @return string
      */
     public function type($context, $type, $field, array $attrs = array(), $value = null)
-    {
-        $attrs['type'] = $type;
-
-        $attrs['name'] = resolveName($field);
-        $attrs['id'] = strtr($field, '.', '_');
-
-        $val = $this->getValue($context, $field);
-
-        return "<input {$this->attrsToString($attrs, null !== $val ? $val : $value )} />";
-    }
-
-    /**
-     * Crea una etiqueta de tipo <input>
-     * @param array $context el contexto de la plantilla
-     * @param string $field campo del formulario
-     * @param string $type tipo de campo (text, date, number, password, ...) por defecto text
-     * @param array $attrs atributos adicionales para la etiqueta html
-     * @param string $value valor por defecto del campo
-     * @return string
-     */
-    public function input($context, $field, $type = 'text', array $attrs = array(), $value = null)
     {
         $attrs['type'] = $type;
 

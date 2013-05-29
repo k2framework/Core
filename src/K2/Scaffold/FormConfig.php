@@ -82,8 +82,8 @@ class FormConfig
                 }
             default://text, password, number , ...
                 $attrs['maxlength'] = $attribute->length;
-                return $this->formExtension->input($this->context, $field, $type
-                                , $attrs, $attribute->default);
+                return $this->formExtension->type($this->context, $type
+                                , $field, $attrs, $attribute->default);
         }
     }
 
