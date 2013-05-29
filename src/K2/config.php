@@ -52,10 +52,19 @@ return array(
     ),
     'twig_extensions' => array('twig_core', 'twig_form'),
     'init' => function(Container $c) {
-        if($c->hasParameter('config.locales')){
-            $c->set("translator", function(){
-                return new Translation\Translator();
-            });
+        if ($c->hasParameter('config.locales')) {
+            $c->set("translator", function() {
+                        return new Translation\Translator();
+                    });
+        }
+        if ($c->getParameter('security.enabled')) {
+            //agregamos el servicio firewall al container
+            $c->set('firewall', function($c) {
+                        return new \K2\Security\Listener\Firewall($c);
+                    });
+            //hacemos que el firewall escuche las peticiones
+            $c['event.dispatcher']
+                    ->addListener(K2Events::REQUEST, array('firewall', 'onKernelRequest'), 1000);
         }
     },
     'listeners' => array(
