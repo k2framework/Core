@@ -53,8 +53,8 @@ class Firewall
                 return;
             } elseif ((($this->isSecure($url) || $url === '/_autenticate') && $event->getRequest()->isMethod('post')) ||
                     ('http' === Reader::get('security.security.type') &&
-                    $event->getRequest()->server->get('PHP_AUTH_USER') &&
-                    $event->getRequest()->server->get('PHP_AUTH_PW'))
+                    $event->getRequest()->server('PHP_AUTH_USER') &&
+                    $event->getRequest()->server('PHP_AUTH_PW'))
             ) {
                 //si estamos verificando los datos de acceso.
                 $event->stopPropagation();
