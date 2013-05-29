@@ -36,15 +36,16 @@ class ActiveRecord extends AbstractProvider
     public function getToken(array $config = array(), array $data = null)
     {
         $this->config = $config;
+        
+        isset($config['password']) || $config['password'] = 'password';
 
         $request = App::getRequest();
-
         /**
          * Si data es diferente de nulo, se usa data, sino se busca en request 
          */
         $form = $data ? : $request->request('login', array(
                     $config['username'] => $request->server('PHP_AUTH_USER'),
-                    'password' => $request->server('PHP_AUTH_PW'),
+                    $config['password'] => $request->server('PHP_AUTH_PW'),
         ));
 
         if (!isset($config['class'])) {
