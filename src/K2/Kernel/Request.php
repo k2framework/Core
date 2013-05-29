@@ -182,6 +182,9 @@ class Request
     public function setLocale($locale)
     {
         $this->locale = $locale;
+        if (0 === strpos($this->getRequestUrl(), '/' . $locale . '/')) {
+            $this->uri = substr($this->getRequestUrl(), strlen($locale) + 1);
+        }
     }
 
     public function server($key, $default = null)
