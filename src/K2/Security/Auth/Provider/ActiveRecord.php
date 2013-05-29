@@ -36,7 +36,7 @@ class ActiveRecord extends AbstractProvider
     public function getToken(array $config = array(), array $data = null)
     {
         $this->config = $config;
-        
+
         isset($config['password']) || $config['password'] = 'password';
 
         $request = App::getRequest();
@@ -60,7 +60,7 @@ class ActiveRecord extends AbstractProvider
             throw new AuthException("No existe la clase de usuario '{$config['class']}'<br/>en el security.ini en la seccion  '[model_config]'");
         }
 
-        $user = new $config['class']($form);
+        App::get("mapper")->bindPublic($user = new $config['class'](), $form);
 
         if (!($user instanceof \K2\ActiveRecord\ActiveRecord)) {
             throw new AuthException("La clase {$config['class']} debe extender de ActiveRecord");
