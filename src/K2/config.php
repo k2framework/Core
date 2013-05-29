@@ -49,6 +49,9 @@ return array(
         'mapper' => function($c) {
             return new Datamapper\DataMapper($c['property_accesor']);
         },
+        'firewall' => function($c) {
+            return new \K2\Security\Listener\Firewall($c);
+        },
     ),
     'twig_extensions' => array('twig_core', 'twig_form'),
     'init' => function(Container $c) {
@@ -58,10 +61,6 @@ return array(
                     });
         }
         if ($c->getParameter('security.enabled')) {
-            //agregamos el servicio firewall al container
-            $c->set('firewall', function($c) {
-                        return new \K2\Security\Listener\Firewall($c);
-                    });
             //hacemos que el firewall escuche las peticiones
             $c['event.dispatcher']
                     ->addListener(K2Events::REQUEST, array('firewall', 'onKernelRequest'), 1000);
