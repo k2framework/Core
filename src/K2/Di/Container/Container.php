@@ -113,8 +113,8 @@ class Container implements \ArrayAccess
     {
         try {
             $id = '[' . str_replace('.', '][', $id) . ']';
-            $this->pAccesor->getValue($this->definitions['parameters'], $id);
-            return true;
+            $val = $this->pAccesor->getValue($this->definitions['parameters'], $id);
+            return $val != null;
         } catch (\RuntimeException $e) {
             return false;
         }
