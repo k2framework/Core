@@ -52,11 +52,11 @@ return array(
     ),
     'twig_extensions' => array('twig_core', 'twig_form'),
     'init' => function(Container $c) {
-        $c->setParameter('security.provider', array(
-            'active_record' => 'K2\\Security\\Auth\\Provider\\ActiveRecord',
-            'memory' => 'K2\\Security\\Auth\\Provider\\Memory',
-        ));
-        $c->setParameter('translator.provider', 'arrays');
+        if($c->hasParameter('config.locales')){
+            $c->set("translator", function(){
+                return new Translation\Translator();
+            });
+        }
     },
     'listeners' => array(
         K2Events::EXCEPTION => array(
