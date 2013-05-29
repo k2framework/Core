@@ -5,9 +5,9 @@ namespace K2\View\Twig\Node;
 class Trans extends \Twig_Node
 {
 
-    public function __construct(\Twig_NodeInterface $body, $lineno, $tag = 'trans')
+    public function __construct($locale, \Twig_NodeInterface $body, $lineno, $tag = 'trans')
     {
-        parent::__construct(array('body' => $body), array(), $lineno, $tag);
+        parent::__construct(array('body' => $body), array('locale' => $locale), $lineno, $tag);
     }
 
     /**
@@ -17,10 +17,12 @@ class Trans extends \Twig_Node
      */
     public function compile(\Twig_Compiler $compiler)
     {
+        $string = 'echo \\K2\\Kernel\\App::get("translator")->trans(ob_get_clean(), array(), \'' . $this->getAttribute('locale') . "');\n";
+
         $compiler->addDebugInfo($this)
                 ->write("ob_start();\n")
                 ->subcompile($this->getNode('body'))
-                ->write("echo \\K2\\Kernel\\App::get(\"translator\")->trans(ob_get_clean());\n")
+                ->write($string)
         ;
     }
 
