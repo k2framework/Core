@@ -19,7 +19,9 @@ class Core extends \Twig_Extension
 
     public function getFilters()
     {
-        return array();
+        return array(
+            new \Twig_SimpleFilter('trans', array($this, 'trans')),
+        );
     }
 
     public function getFunctions()
@@ -123,6 +125,17 @@ class Core extends \Twig_Extension
     public function config($key)
     {
         return Reader::get("config.{$key}");
+    }
+
+    /**
+     * Realiza la traducción de un texto
+     * @param string $text
+     * @param array $params
+     * @param string $locale 
+     */
+    public function trans($text, array $params = array(), $locale = null)
+    {
+        return App::get('translator')->trans($text, $params, $locale);
     }
 
 }
