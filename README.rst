@@ -1,7 +1,7 @@
 CORE K2 Framework
 ===========
 
-..  image:: https://secure.travis-ci.org/manuelj555/Core.png?branch=master
+..  image:: https://secure.travis-ci.org/k2framework/Core.png?branch=master
 
 Core de K2 framework, trabaja con php 5.3 ó superior.
 
