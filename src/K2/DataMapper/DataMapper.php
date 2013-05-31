@@ -2,7 +2,7 @@
 
 namespace K2\Datamapper;
 
-use K2\Datamapper\MapperInterface;
+use K2\DataMapper\MapperInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyAccess\Exception\RuntimeException;
 

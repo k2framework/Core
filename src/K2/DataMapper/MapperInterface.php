@@ -2,7 +2,7 @@
 
 namespace K2\DataMapper;
 
-use K2\Datamapper\MapperBuilder;
+use K2\DataMapper\MapperBuilder;
 
 interface MapperInterface
 {

@@ -2,7 +2,7 @@
 
 namespace K2\DataMapper;
 
-use K2\Datamapper\Exception\InvalidArgumentException;
+use K2\DataMapper\Exception\InvalidArgumentException;
 
 /**
  * Esta clase creará los mapeos
