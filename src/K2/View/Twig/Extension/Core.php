@@ -7,10 +7,18 @@ use K2\Kernel\Request;
 use K2\Kernel\Response;
 use K2\View\Twig\Globals;
 use K2\Kernel\Config\Reader;
+use K2\View\Twig\TokenParser\Trans as TransToken;
 use K2\Kernel\Controller\ControllerResolver;
 
 class Core extends \Twig_Extension
 {
+
+    public function getTokenParsers()
+    {
+        return array(
+            new TransToken(),
+        );
+    }
 
     public function getName()
     {

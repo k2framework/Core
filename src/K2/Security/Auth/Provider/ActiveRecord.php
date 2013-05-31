@@ -37,14 +37,15 @@ class ActiveRecord extends AbstractProvider
     {
         $this->config = $config;
 
-        $request = App::getRequest();
+        isset($config['password']) || $config['password'] = 'password';
 
+        $request = App::getRequest();
         /**
          * Si data es diferente de nulo, se usa data, sino se busca en request 
          */
         $form = $data ? : $request->request('login', array(
                     $config['username'] => $request->server('PHP_AUTH_USER'),
-                    'password' => $request->server('PHP_AUTH_PW'),
+                    $config['password'] => $request->server('PHP_AUTH_PW'),
         ));
 
         if (!isset($config['class'])) {
@@ -59,7 +60,7 @@ class ActiveRecord extends AbstractProvider
             throw new AuthException("No existe la clase de usuario '{$config['class']}'<br/>en el security.ini en la seccion  '[model_config]'");
         }
 
-        $user = new $config['class']($form);
+        App::get("mapper")->bindPublic($user = new $config['class'](), $form);
 
         if (!($user instanceof \K2\ActiveRecord\ActiveRecord)) {
             throw new AuthException("La clase {$config['class']} debe extender de ActiveRecord");

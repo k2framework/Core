@@ -146,7 +146,7 @@ class Firewall
             throw new AuthException("la clase proveedora de usuarios debe implementar la interface UserProviderInterface");
         }
 
-        return array($provider, $provider->getToken((array) Reader::get('security.model_config.user'), $data));
+        return array($provider, $provider->getToken((array) Reader::get('security.security.user'), $data));
     }
 
     /**
