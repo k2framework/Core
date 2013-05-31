@@ -1,0 +1,22 @@
+{
+    "name": "k2/datamapper",
+    "type": "library",
+    "description": "Mapeador de datos (arrays) a objetos",
+    "license": "MIT",
+    "keywords": ["object mapper"],
+    "authors": [
+        {
+            "name": "Manuel Aguirre",
+            "email": "programador.manuel@gmail.com"
+        }
+    ],
+    "require": {
+        "symfony/property-access": "v2.2.1"
+    },
+    "autoload": {
+        "psr-0": {
+            "K2\\DataMapper\\": ""
+        }
+    },
+    "target-dir": "K2/DataMapper"
+}

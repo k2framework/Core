@@ -1,6 +1,6 @@
 <?php
 
-namespace K2\Datamapper\Exception;
+namespace K2\DataMapper\Exception;
 
 use \InvalidArgumentException as Base;
 

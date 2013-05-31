@@ -1,6 +1,6 @@
 <?php
 
-namespace K2\Datamapper;
+namespace K2\DataMapper;
 
 use K2\Datamapper\MapperBuilder;
 
