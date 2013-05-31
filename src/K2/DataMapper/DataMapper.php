@@ -20,6 +20,12 @@ class DataMapper
         $this->propertyAccesor = $propertyAccesor;
     }
 
+    /**
+     * Transfiere el contenido de data al objeto
+     * @param \K2\Datamapper\MapperInterface|object $object obteto al que se le pasará la data
+     * @param strin|array $data datos a ser pasados al objeto, si es un string busca los datos en $_REQUEST
+     * @param array $options permite pasar opciones adicionales para el bind
+     */
     public function bind($object, $data, array $options = array())
     {
         if (is_string($data)) {//si data es un string, buscamos en el objeto Request
@@ -48,6 +54,16 @@ class DataMapper
         }
     }
 
+    /**
+     * Transfiere el contenido de data al objeto, a diferencia de bind, si no existen los
+     * atributos, los crea en el objeto.
+     * 
+     * Es lo mismo que usar bind pero pasando en las opciones un indice llamado create_attributes = true
+     * 
+     * @param \K2\Datamapper\MapperInterface|object $object obteto al que se le pasará la data
+     * @param strin|array $data datos a ser pasados al objeto, si es un string busca los datos en $_REQUEST
+     * @param array $options permite pasar opciones adicionales para el bind
+     */
     public function bindPublic($object, $data, array $options = array())
     {
         $options['create_attributes'] = true;
