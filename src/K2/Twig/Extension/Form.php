@@ -1,6 +1,6 @@
 <?php
 
-namespace K2\View\Twig\Extension;
+namespace K2\Twig\Extension;
 
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyAccess\Exception\RuntimeException;

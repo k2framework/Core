@@ -1,6 +1,6 @@
 <?php
 
-namespace K2\View\Twig\Node;
+namespace K2\Twig\Node;
 
 class Trans extends \Twig_Node
 {

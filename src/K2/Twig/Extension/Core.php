@@ -1,13 +1,13 @@
 <?php
 
-namespace K2\View\Twig\Extension;
+namespace K2\Twig\Extension;
 
 use K2\Kernel\App;
 use K2\Kernel\Request;
 use K2\Kernel\Response;
-use K2\View\Twig\Globals;
+use K2\Twig\Globals;
 use K2\Kernel\Config\Reader;
-use K2\View\Twig\TokenParser\Trans as TransToken;
+use K2\Twig\TokenParser\Trans as TransToken;
 use K2\Kernel\Controller\ControllerResolver;
 
 class Core extends \Twig_Extension

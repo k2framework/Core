@@ -1,6 +1,6 @@
 <?php
 
-namespace K2\View\Twig;
+namespace K2\Twig;
 
 use \ArrayAccess;
 use K2\Kernel\App;

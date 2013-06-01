@@ -1,9 +1,9 @@
 <?php
 
-namespace K2\View\Twig\TokenParser;
+namespace K2\Twig\TokenParser;
 
 use K2\Kernel\App;
-use K2\View\Twig\Node\Trans as TransNode;
+use K2\Twig\Node\Trans as TransNode;
 
 class Trans extends \Twig_TokenParser
 {
