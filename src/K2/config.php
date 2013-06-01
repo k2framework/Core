@@ -41,16 +41,19 @@ return array(
             return new Security\Auth\Provider\ActiveRecord($c);
         },
         'twig_core' => function() {
-            return new View\Twig\Extension\Core();
+            return new Twig\Extension\Core();
         },
         'twig_form' => function($c) {
-            return new View\Twig\Extension\Form($c->get('property_accesor'));
+            return new Twig\Extension\Form($c->get('property_accesor'));
         },
         'mapper' => function($c) {
             return new Datamapper\DataMapper($c['property_accesor']);
         },
         'firewall' => function($c) {
             return new \K2\Security\Listener\Firewall($c);
+        },
+        'filesystem' => function($c) {
+            return new \Symfony\Component\Filesystem\Filesystem();
         },
     ),
     'twig_extensions' => array('twig_core', 'twig_form'),
