@@ -1,0 +1,36 @@
+{% block controller %}
+<?php
+
+namespace {{ namespace }}\Controller;
+
+use K2\Kernel\Controller\Controller;
+
+class indexController extends Controller
+{
+
+    public function index_action()
+    {
+        
+    }
+}
+{% endblock %}
+
+{% block config %}
+<?php
+
+namespace {{ namespace }};
+
+return array(
+    'name' => '{{ name }}',
+    'namespace' => __NAMESPACE__,
+    'path' => __DIR__,
+);
+{% endblock %}
+
+{% block view %}
+{{ '{#% extends "default.twig" %#}' }}
+
+{{ '{% block content %}' }}
+<h4>Bienvenido al módulo {{ name }}!!!</h4>
+{{ '{% endblock %}' }}
+{% endblock %}
