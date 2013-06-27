@@ -82,7 +82,6 @@ class View
         }
 
         $response = new Response($content);
-        $config = \K2\Kernel\App::getParameter('config');
         $response->setCharset($this->twig->getCharset());
         $response->cache(isset($params['time']) ? $params['time'] : null);
 

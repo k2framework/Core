@@ -84,14 +84,17 @@ function createTwigEnviroment(Container $c)
 {
     $loader = new \Twig_Loader_Filesystem(APP_PATH . 'view');
 
-    $config = App::getParameter('config');
-
-    $twig = new \Twig_Environment($loader, array(
+    $config = (array) App::getParameter('twig');
+    
+    $config += array(
+        'charset' => 'UTF-8',
         'cache' => APP_PATH . 'temp/cache/twig/',
         'debug' => !PRODUCTION,
+        'charset' => 'UTF-8',
         'strict_variables' => true,
-        'charset' => isset($config['charset']) ? $config['charset'] : 'UTF-8',
-    ));
+    );
+
+    $twig = new \Twig_Environment($loader, $config);
 
     if (!PRODUCTION) {
         $twig->addExtension(new \Twig_Extension_Debug());
@@ -122,18 +125,14 @@ function createTwigEnviroment(Container $c)
         }
     }
 
-    if (!PRODUCTION) {
-        $twig->addExtension(new \Twig_Extension_Debug());
-    }
-
     //registramos un callback para cuando no se encuentre una funcion twig, busque primero
     //si es una funcion de php y así no tire una excepción
-    $twig->registerUndefinedFunctionCallback(function($name) {
-                if (function_exists($name)) {
-                    return new \Twig_Function_Function($name);
-                }
-                return false;
-            });
+//    $twig->registerUndefinedFunctionCallback(function($name) {
+//                if (function_exists($name)) {
+//                    return new \Twig_Function_Function($name);
+//                }
+//                return false;
+//            });
 
     return $twig;
 }
