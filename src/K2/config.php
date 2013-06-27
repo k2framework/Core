@@ -7,6 +7,7 @@ use K2\Kernel\Event\K2Events;
 use K2\Di\Container\Container;
 use K2\Kernel\Event\ExceptionEvent;
 use K2\Kernel\Exception\ExceptionHandler;
+use K2\Twig\Extension\Exception as ExceptionExtension;
 
 return array(
     'name' => 'K2Core',
@@ -98,6 +99,7 @@ function createTwigEnviroment(Container $c)
 
     if (!PRODUCTION) {
         $twig->addExtension(new \Twig_Extension_Debug());
+        $twig->addExtension(new ExceptionExtension());
     }
 
     foreach (App::modules() as $name => $module) {
@@ -124,15 +126,6 @@ function createTwigEnviroment(Container $c)
             }
         }
     }
-
-    //registramos un callback para cuando no se encuentre una funcion twig, busque primero
-    //si es una funcion de php y así no tire una excepción
-//    $twig->registerUndefinedFunctionCallback(function($name) {
-//                if (function_exists($name)) {
-//                    return new \Twig_Function_Function($name);
-//                }
-//                return false;
-//            });
 
     return $twig;
 }

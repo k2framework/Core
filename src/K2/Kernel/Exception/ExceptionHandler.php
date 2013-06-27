@@ -4,7 +4,6 @@ namespace K2\Kernel\Exception;
 
 use K2\Kernel\App;
 use K2\Kernel\Response;
-use K2\Twig\Extension\Exception;
 
 /**
  * Description of ExceptionHandler
@@ -26,7 +25,7 @@ class ExceptionHandler
         while (ob_get_level()) {
             ob_end_clean(); //vamos limpiando todos los niveles de buffer creados.
         }
-        
+
         $twig = App::get('twig');
 
         if (PRODUCTION && !App::getParameter('show_exceptions')) {
@@ -45,7 +44,6 @@ class ExceptionHandler
                 }
             }
         } else {
-            $twig->addExtension(new Exception());
             $html = $twig->render('@K2Core/exception/exception.twig', array('e' => $e));
         }
         return new Response($html, $code);
