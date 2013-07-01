@@ -6,7 +6,6 @@ use K2\Kernel\App;
 use K2\Kernel\Event\K2Events;
 use K2\Di\Container\Container;
 use K2\Kernel\Event\ExceptionEvent;
-use K2\Kernel\Exception\ExceptionHandler;
 use K2\Twig\Extension\Exception as ExceptionExtension;
 
 return array(
@@ -14,7 +13,7 @@ return array(
     'namespace' => __NAMESPACE__,
     'path' => __DIR__,
     'services' => array(
-        'router' => function() {
+        'router' =>  function() {
             return new Kernel\Router\Router();
         },
         'session' => function() {
@@ -41,12 +40,22 @@ return array(
         'activerecord.provider' => function($c) {
             return new Security\Auth\Provider\ActiveRecord($c);
         },
-        'twig_core' => function() {
-            return new Twig\Extension\Core();
-        },
-        'twig_form' => function($c) {
-            return new Twig\Extension\Form($c->get('property_accesor'));
-        },
+        'twig_core' => array(
+            'callback' => function() {
+                return new Twig\Extension\Core();
+            },
+            'tags' => array(
+                'twig.extension' => array(),
+            ),
+        ),
+        'twig_form' => array(
+            'callback' => function($c) {
+                return new Twig\Extension\Form($c->get('property_accesor'));
+            },
+            'tags' => array(
+                'twig.extension' => array(),
+            ),
+        ),
         'mapper' => function($c) {
             return new Datamapper\DataMapper($c['property_accesor']);
         },
@@ -57,7 +66,6 @@ return array(
             return new \Symfony\Component\Filesystem\Filesystem();
         },
     ),
-    'twig_extensions' => array('twig_core', 'twig_form'),
     'init' => function(Container $c) {
         if ($c->hasParameter('config.locales')) {
             $c->set("translator", function() {
@@ -69,16 +77,13 @@ return array(
             $c['event.dispatcher']
                     ->addListener(K2Events::REQUEST, array('firewall', 'onKernelRequest'), 1000);
         }
-    },
-    'listeners' => array(
-        K2Events::EXCEPTION => array(
-            //si ningun evento crea una respuesta para la excepción, retornamos
-            //la excepción del fw
-            -1 => function(ExceptionEvent $e) {
-                $e->setResponse(ExceptionHandler::createException($e->getException()));
-            },
-        )
-    ),
+
+        foreach($c->getTaggedServicesConfig('event.listener') as $id => $config){
+            isset($config['priority']) || $config['priority'] = 0;
+            $c['event.dispatcher']
+                    ->addListener($config['event'], array($id, $config['method']), $config['priority']);
+        }
+    }
 );
 
 function createTwigEnviroment(Container $c)
@@ -115,11 +120,11 @@ function createTwigEnviroment(Container $c)
     }
 
     $throw = !$c->get('app.kernel')->hasException();
-    foreach (App::definitions('twig_extensions') as $name) {
+    foreach ($c->getTaggedServicesConfig('twig.extension') as $id => $config) {
         //las extensiones son servicios, por lo tango los cargamos y 
         //los vamos pasando a twig
         try {
-            $twig->addExtension($c->get($name));
+            $twig->addExtension($c->get($id));
         } catch (\Exception $e) {
             if ($throw) {//solo si no se ha lanzado una excepción la lanzamos
                 throw $e;

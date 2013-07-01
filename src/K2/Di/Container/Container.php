@@ -219,6 +219,19 @@ class Container implements \ArrayAccess
         //nada por ahora
     }
 
+    public function getTaggedServicesConfig($tagName)
+    {
+        $services = array();
+        
+        foreach($this->definitions['services'] as $id => $config){
+            if(is_array($config) and isset($config['tags'][$tagName])){
+                $services[$id] = $config['tags'][$tagName];
+            }
+        }
+
+        return $services;
+    }
+
     protected function getInstance($id)
     {
         $data = $this->definitions['services'][$id];
@@ -229,13 +242,14 @@ class Container implements \ArrayAccess
 
         if (is_array($data)) {
 
-            if (!$data[0] instanceof \Closure) {
+            if (!isset($data['callback']) or !$data['callback'] instanceof \Closure) {
                 throw new DiException("No se reconoce el valor para la definición del servicio $id");
             }
 
-            $instance = $data[0]($this);
+            $instance = $data['callback']($this);
 
-            if (isset($data[1]) && true === $data[1]) {
+            if (!array_key_exists('singleton', $data) 
+                or (isset($data['singleton']) and true === $data['singleton'])) {
                 $this->services[$id] = $instance;
             }
 

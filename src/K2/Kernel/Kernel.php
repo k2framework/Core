@@ -9,6 +9,7 @@ use K2\Kernel\Event\RequestEvent;
 use K2\Kernel\Event\ResponseEvent;
 use K2\Kernel\Event\ExceptionEvent;
 use K2\EventDispatcher\EventDispatcher;
+use K2\Kernel\Exception\ExceptionHandler;
 use K2\Kernel\Controller\ControllerResolver;
 
 /**
@@ -174,11 +175,9 @@ class Kernel
         $this->dispatcher = new EventDispatcher(App::get('container'));
         App::get('container')->setInstance('event.dispatcher', $this->dispatcher);
 
-        foreach (App::definitions('listeners', true) as $event => $listeners) {
-            foreach ($listeners as $priority => $listener) {
-                $this->dispatcher->addListener($event, $listener, $priority);
-            }
-        }
+        $this->dispatcher->addListener(K2Events::EXCEPTION, function(ExceptionEvent $e) {
+                $e->setResponse(ExceptionHandler::createException($e->getException()));
+        }, -1000);
     }
 
     protected function readConfig()
