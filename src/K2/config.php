@@ -102,7 +102,7 @@ function createTwigEnviroment(Container $c)
 
     $twig = new \Twig_Environment($loader, $config);
 
-    if (!PRODUCTION) {
+    if (!PRODUCTION || App::getParameter('show_exceptions')) {
         $twig->addExtension(new \Twig_Extension_Debug());
         $twig->addExtension(new ExceptionExtension());
     }
