@@ -222,10 +222,14 @@ class Container implements \ArrayAccess
     public function getTaggedServicesConfig($tagName)
     {
         $services = array();
-        
-        foreach($this->definitions['services'] as $id => $config){
-            if(is_array($config) and isset($config['tags'][$tagName])){
-                $services[$id] = $config['tags'][$tagName];
+
+        foreach ($this->definitions['services'] as $id => $config) {
+            if (is_array($config) and isset($config['tags'])) {
+                foreach ($config['tags'] as $tag) {
+                    if ($tag['name'] === $tagName) {
+                        $services[$id][] = $tag;
+                    }
+                }
             }
         }
 
@@ -248,8 +252,7 @@ class Container implements \ArrayAccess
 
             $instance = $data['callback']($this);
 
-            if (!array_key_exists('singleton', $data) 
-                or (isset($data['singleton']) and true === $data['singleton'])) {
+            if (!array_key_exists('singleton', $data) or (isset($data['singleton']) and true === $data['singleton'])) {
                 $this->services[$id] = $instance;
             }
 

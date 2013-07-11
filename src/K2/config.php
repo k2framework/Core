@@ -13,7 +13,7 @@ return array(
     'namespace' => __NAMESPACE__,
     'path' => __DIR__,
     'services' => array(
-        'router' =>  function() {
+        'router' => function() {
             return new Kernel\Router\Router();
         },
         'session' => function() {
@@ -37,31 +37,42 @@ return array(
         'security' => function($c) {
             return new Security\Security($c['session']);
         },
-        'activerecord.provider' => function($c) {
-            return new Security\Auth\Provider\ActiveRecord($c);
-        },
         'twig_core' => array(
             'callback' => function() {
                 return new Twig\Extension\Core();
             },
-            'tags' => array(
-                'twig.extension' => array(),
-            ),
+            'tags' => array(array('name' => 'twig.extension')),
         ),
         'twig_form' => array(
             'callback' => function($c) {
                 return new Twig\Extension\Form($c->get('property_accesor'));
             },
-            'tags' => array(
-                'twig.extension' => array(),
-            ),
+            'tags' => array(array('name' => 'twig.extension')),
         ),
         'mapper' => function($c) {
             return new Datamapper\DataMapper($c['property_accesor']);
         },
         'firewall' => function($c) {
-            return new \K2\Security\Listener\Firewall($c);
+            $secutiry = Kernel\Config\Reader::read('security');
+            $providers = explode(',', $secutiry['security']['provider']);
+            return new \K2\Security\Listener\SecurityListener($providers, $c);
         },
+        'security.provider.activerecord' => array(
+            'callback' => function($c) {
+                $secutiry = Kernel\Config\Reader::get('security');
+                return new Security\Auth\Provider\ActiveRecord($secutiry);
+            },
+            'tags' => array(
+                array('name' => 'security.provider', 'alias' => 'activerecord'),
+            ),
+        ),
+        'security.provider.memory' => array(
+            'callback' => function($c) {
+//return new Security\Auth\Provider\ActiveRecord($c);
+            }, 'tags' => array(
+                array('name' => 'security.provider', 'alias' => 'memory'),
+            ),
+        ),
         'filesystem' => function($c) {
             return new \Symfony\Component\Filesystem\Filesystem();
         },
@@ -78,10 +89,12 @@ return array(
                     ->addListener(K2Events::REQUEST, array('firewall', 'onKernelRequest'), 1000);
         }
 
-        foreach($c->getTaggedServicesConfig('event.listener') as $id => $config){
-            isset($config['priority']) || $config['priority'] = 0;
-            $c['event.dispatcher']
-                    ->addListener($config['event'], array($id, $config['method']), $config['priority']);
+        foreach ($c->getTaggedServicesConfig('event.listener') as $id => $tags) {
+            foreach ($tags as $tag) {
+                isset($tag['priority']) || $tag['priority'] = 0;
+                $c['event.dispatcher']
+                        ->addListener($tag['event'], array($id, $tag['method']), $tag['priority']);
+            }
         }
     }
 );
@@ -91,7 +104,7 @@ function createTwigEnviroment(Container $c)
     $loader = new \Twig_Loader_Filesystem(APP_PATH . 'view');
 
     $config = (array) App::getParameter('twig');
-    
+
     $config += array(
         'charset' => 'UTF-8',
         'cache' => APP_PATH . 'temp/cache/twig/',
@@ -120,7 +133,7 @@ function createTwigEnviroment(Container $c)
     }
 
     $throw = !$c->get('app.kernel')->hasException();
-    foreach ($c->getTaggedServicesConfig('twig.extension') as $id => $config) {
+    foreach ($c->getTaggedServicesConfig('twig.extension') as $id => $tags) {
         //las extensiones son servicios, por lo tango los cargamos y 
         //los vamos pasando a twig
         try {
